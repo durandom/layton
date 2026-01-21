@@ -62,6 +62,7 @@ Archive a completed change in the experimental workflow.
    c. **Report findings:**
 
       **If sync needed:**
+
       ```
       ⚠️ Delta specs may not be synced:
       - specs/auth/spec.md → Main spec missing requirement "Token Refresh"
@@ -69,6 +70,7 @@ Archive a completed change in the experimental workflow.
 
       Would you like to sync now before archiving?
       ```
+
       - Use **AskUserQuestion tool** with options: "Sync now", "Archive without syncing"
       - If user chooses sync, execute /opsx:sync logic (use the openspec-sync-specs skill)
 
@@ -80,6 +82,7 @@ Archive a completed change in the experimental workflow.
 5. **Perform the archive**
 
    Create the archive directory if it doesn't exist:
+
    ```bash
    mkdir -p openspec/changes/archive
    ```
@@ -117,6 +120,7 @@ All artifacts complete. All tasks complete.
 ```
 
 **Guardrails**
+
 - Always prompt for change selection if not provided
 - Use artifact graph (openspec status --json) for completion checking
 - Don't block archive on warnings - just inform and confirm
