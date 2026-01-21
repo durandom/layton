@@ -1,0 +1,21 @@
+{
+  "name": "layton",
+  "owner": {
+    "name": "durandom"
+  },
+  "metadata": {
+    "description": "Personal AI secretary for attention management",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "layton",
+      "description": "Personal AI secretary for attention management. Track what matters, maintain focus, get context-aware briefings.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./skills/layton"
+      ]
+    }
+  ]
+}
