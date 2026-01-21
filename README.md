@@ -23,7 +23,7 @@ Ask "What should I know?" and get an answer that respects your time.
 
 ```bash
 claude plugin marketplace add durandom/layton
-claude plugin install layton@layton
+claude plugin install --scope project layton@layton
 ```
 
 ## Prerequisites

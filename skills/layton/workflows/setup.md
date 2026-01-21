@@ -98,17 +98,91 @@ layton workflows add <workflow-name>
 
 Point them to examples in `skills/layton/examples/` for inspiration.
 
-## Step 4a: Optional - Audit Project Instructions
+## Step 5: Integrate with Project Instructions
 
-If the repository has CLAUDE.md or AGENTS.md files:
+Check if the repository has existing instruction files:
 
-> "Would you like me to audit your project instruction files (CLAUDE.md, AGENTS.md) against best practices? This can help organize your AI assistant guidance."
+```bash
+# Check for existing files
+test -f CLAUDE.md && echo "CLAUDE.md exists" || echo "CLAUDE.md missing"
+test -f AGENTS.md && echo "AGENTS.md exists" || echo "AGENTS.md missing"
+```
 
-If user is interested, suggest running the audit after setup completes:
+### If Neither File Exists
 
-> "After we finish setup, you can run the audit-project-instructions workflow to review your files."
+> "I noticed this repository doesn't have CLAUDE.md or AGENTS.md files yet. Would you like me to create them with Layton integration? They'll include:
+>
+> - Session start protocol (run `/layton` first)
+> - Beads issue tracking commands
+> - Session completion checklist"
 
-## Step 5: Verify Setup
+If yes, create files based on `skills/layton/examples/`:
+
+- Copy `examples/CLAUDE.md` to repo root
+- Copy `examples/AGENTS.md` to repo root
+
+### If Files Exist
+
+Read the existing files and compare against `skills/layton/examples/AGENTS.md`.
+
+**Check for these Layton integration elements:**
+
+| Element | Look for | Example suggests |
+|---------|----------|------------------|
+| Session start | `/layton` or "invoke Layton" | "BEFORE doing ANYTHING else... invoke /layton" |
+| Beads commands | `bd ready`, `bd show`, `bd close` | Issue tracking section |
+| Session completion | push protocol, "landing the plane" | Git push requirements |
+| Critical rules | push before stopping | "Work is NOT complete until git push succeeds" |
+
+**For each missing element, suggest:**
+
+> "**Suggestion**: Add a Session Start Protocol section to AGENTS.md:
+>
+> ```markdown
+> ## ⚠️ MANDATORY: Session Start Protocol
+>
+> **BEFORE doing ANYTHING else in a new session, you MUST:**
+>
+> 1. **Invoke the Layton skill**: `/layton` (no parameters)
+>
+> **NO EXCEPTIONS** — unless the user explicitly says "skip Layton".
+> ```
+>
+> Would you like me to add this?"
+
+**Present all findings:**
+
+```markdown
+## Layton Integration Analysis
+
+**Files analyzed:**
+- CLAUDE.md: {exists/missing}
+- AGENTS.md: {exists/missing}
+
+**Layton integration status:**
+- [ ] Session start protocol
+- [ ] Beads commands
+- [ ] Session completion protocol
+- [ ] Critical rules
+
+**Suggestions:** {list of specific additions}
+
+Would you like me to apply these suggestions?
+```
+
+### After Analysis
+
+If user wants changes:
+
+- Show the proposed edit
+- Ask for confirmation
+- Apply changes with Edit tool
+
+> **Optional**: For a more thorough audit (checking verbosity, duplication, and best practices), you can run the `audit-project-instructions` workflow later.
+
+Then proceed to verification step.
+
+## Step 6: Verify Setup
 
 Run a final check to confirm everything is configured:
 
@@ -132,5 +206,7 @@ Summarize what was configured and suggest next steps.
 - [ ] User name and timezone are set
 - [ ] Work schedule is configured
 - [ ] At least one skill file created (if skills were discovered)
+- [ ] CLAUDE.md and AGENTS.md analyzed (or created)
+- [ ] Layton integration suggestions reviewed
 - [ ] User understands how to invoke Layton for orientation (`layton` with no args)
 </success_criteria>

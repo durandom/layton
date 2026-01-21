@@ -48,3 +48,6 @@ htmlcov/
 # Layton data directories
 .layton/
 .beads/
+
+# Claude Code
+.claude/plans/
