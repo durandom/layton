@@ -137,11 +137,13 @@ def run_orientation(formatter: OutputFormatter) -> int:
     config_exists_check = check_config_exists()
     checks.append(config_exists_check)
 
+    needs_setup = config_exists_check.status == "fail"
+
     if config_exists_check.status == "pass":
         config_valid_check = check_config_valid()
         checks.append(config_valid_check)
 
-    if config_exists_check.status == "fail":
+    if needs_setup:
         next_steps.append("Follow workflows/setup.md for guided onboarding")
         next_steps.append("Or run 'layton config init' for quick setup")
 
@@ -164,6 +166,7 @@ def run_orientation(formatter: OutputFormatter) -> int:
 
     # Build output
     data = {
+        "needs_setup": needs_setup,
         "checks": [c.to_dict() for c in checks],
         "skills": skills_data,
         "workflows": workflows_data,

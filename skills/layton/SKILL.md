@@ -28,6 +28,14 @@ Layton is your personal secretary—managing attention, synthesizing information
 </essential_principles>
 
 <intake>
+## Step 1: Run CLI
+
+```bash
+$LAYTON
+```
+
+## Step 2: Menu
+
 What would you like to do?
 
 1. Get oriented (full status check)
