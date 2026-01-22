@@ -45,39 +45,19 @@ class DiscoveredSkill:
         }
 
 
-# Template for new skill files
-SKILL_TEMPLATE = """---
-name: {name}
-description: <when/why to query this skill>
-source: skills/{name}/SKILL.md
----
+def get_skill_template() -> str:
+    """Read the skill template from the templates directory.
 
-## Commands
+    Returns:
+        The skill template content with {name} placeholder.
+    """
+    # Template is in templates/skill.md relative to this file's parent
+    template_path = Path(__file__).parent.parent / "templates" / "skill.md"
+    return template_path.read_text()
 
-<!-- Commands to run when gathering data from this skill -->
-<!-- Run from repo root -->
 
-```bash
-# Example:
-# SKILL="./.claude/skills/{name}/scripts/{name}"
-# $SKILL <command>
-```
-
-## What to Extract
-
-<!-- Key information to look for in the output -->
-
--
--
-
-## Key Metrics
-
-<!-- Important numbers or states to surface in briefings -->
-
-| Metric | Meaning |
-|--------|---------|
-|        |         |
-"""
+# Keep for backwards compatibility with tests
+SKILL_TEMPLATE = get_skill_template()
 
 
 def get_skills_dir() -> Path:

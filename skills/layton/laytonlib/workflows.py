@@ -31,46 +31,19 @@ class WorkflowInfo:
         return result
 
 
-# Template for new workflow files
-WORKFLOW_TEMPLATE = """---
-name: {name}
-description: <what this workflow does>
-triggers:
-  - <phrase that activates this workflow>
-  - <another trigger phrase>
----
+def get_workflow_template() -> str:
+    """Read the workflow template from the templates directory.
 
-## Objective
+    Returns:
+        The workflow template content with {name} placeholder.
+    """
+    # Template is in templates/workflow.md relative to this file's parent
+    template_path = Path(__file__).parent.parent / "templates" / "workflow.md"
+    return template_path.read_text()
 
-<!-- What this workflow accomplishes -->
 
-## Steps
-
-<!-- AI-readable instructions for executing this workflow -->
-
-1. Get context:
-   ```bash
-   layton context
-   ```
-
-1. <!-- Next step -->
-
-1. <!-- Next step -->
-
-## Context Adaptation
-
-<!-- How to adapt based on time/context -->
-
-- If morning + work hours: ...
-- If evening: ...
-
-## Success Criteria
-
-<!-- How to know the workflow completed successfully -->
-
-- [ ]
-- [ ]
-"""
+# Keep for backwards compatibility with tests
+WORKFLOW_TEMPLATE = get_workflow_template()
 
 
 def get_workflows_dir() -> Path:

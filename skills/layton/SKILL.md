@@ -54,6 +54,8 @@ What would you like to do?
 | --- | --- |
 | "setup", "configure", "onboard" | `workflows/setup.md` |
 | "audit", "review instructions" | `workflows/audit-project-instructions.md` |
+| "skill", "add skill", "create skill", "capture skill" | `workflows/author-skill.md` |
+| "workflow", "add workflow", "create workflow", "capture workflow" | `workflows/author-workflow.md` |
 
 **After selecting a workflow, read and follow it exactly.**
 </routing>
@@ -144,6 +146,8 @@ $LAYTON workflows add <name>   # Create new workflow file from template
 | set-focus.md | Set current focus (only one at a time) |
 | retrospect.md | Reflect on a completed workflow |
 | audit-project-instructions.md | Review CLAUDE.md/AGENTS.md against best practices |
+| author-skill.md | Create or capture a skill file |
+| author-workflow.md | Create or capture a workflow file |
 
 </workflows_index>
 
@@ -154,6 +158,8 @@ $LAYTON workflows add <name>   # Create new workflow file from template
 | persona.md | Layton's voice and persona characteristics |
 | beads-commands.md | bd CLI command reference for state operations |
 | project-instructions.md | Best practices for CLAUDE.md/AGENTS.md files |
+| skill-authoring.md | Template and guide for writing skill files |
+| workflow-authoring.md | Template and guide for writing workflow files |
 
 </reference_index>
 

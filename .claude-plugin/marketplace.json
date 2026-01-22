@@ -1,15 +1,16 @@
 {
   "name": "layton",
+  "version": "0.2.0",
+  "description": "Personal AI secretary for attention management",
+  "author": "durandom",
   "owner": {
     "name": "durandom"
   },
-  "metadata": {
-    "description": "Personal AI secretary for attention management",
-    "version": "0.1.0"
-  },
+  "homepage": "https://github.com/durandom/layton",
   "plugins": [
     {
       "name": "layton",
+      "version": "0.2.0",
       "description": "Personal AI secretary for attention management. Track what matters, maintain focus, get context-aware briefings.",
       "source": "./",
       "strict": false,
