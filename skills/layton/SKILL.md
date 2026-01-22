@@ -73,7 +73,7 @@ What would you like to do?
 **Get oriented** (full status):
 
 ```bash
-.claude/skills/layton/scripts/layton
+${CLAUDE_PLUGIN_ROOT}/scripts/layton
 ```
 
 **Setup for first-time users**: Run workflow in `workflows/setup.md`
@@ -91,10 +91,10 @@ What would you like to do?
 
 <cli_commands>
 
-**Invocation:** Execute from repository root:
+**Invocation:** Set the LAYTON variable for this session:
 
 ```bash
-LAYTON=".claude/skills/layton/scripts/layton"
+LAYTON="${CLAUDE_PLUGIN_ROOT}/scripts/layton"
 ```
 
 **Orientation (no args):**
