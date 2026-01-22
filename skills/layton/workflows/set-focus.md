@@ -33,7 +33,7 @@ Always remove focus from previous item before setting new focus.
 
 <success_criteria>
 
-- [ ] Only ONE bead has `focus` label
-- [ ] Previous focus label removed (if any)
+- Only ONE bead has `focus` label
+- Previous focus label removed (if any)
 </success_criteria>
 </workflow>

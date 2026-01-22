@@ -68,7 +68,7 @@ Get tracked items that might need attention.
 Score tasks based on current context:
 
 | Context | Preferred Task Types |
-|---------|---------------------|
+| --- | --- |
 | Morning + high energy | Deep work, complex problems, creative tasks |
 | Mid-day | Meetings, collaborative work, communication |
 | Afternoon | Routine tasks, follow-ups, documentation |
@@ -120,8 +120,8 @@ Read `skills/layton/workflows/set-focus.md` and follow its steps to:
 
 ## Success Criteria
 
-- [ ] Context is considered in suggestions
-- [ ] 2-3 options presented with clear rationale
-- [ ] Energy level matched to task difficulty
-- [ ] Source of each task is clear
-- [ ] User can select and focus is set via set-focus workflow
+- Context is considered in suggestions
+- 2-3 options presented with clear rationale
+- Energy level matched to task difficulty
+- Source of each task is clear
+- User can select and focus is set via set-focus workflow

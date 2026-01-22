@@ -132,10 +132,10 @@ Provide a brief summary:
 
 <success_criteria>
 
-- [ ] Workflow identified
-- [ ] Goal achievement evaluated
-- [ ] Friction points captured (if any)
-- [ ] Improvements discussed
-- [ ] User offered chance to capture changes
-- [ ] Summary provided
+- Workflow identified
+- Goal achievement evaluated
+- Friction points captured (if any)
+- Improvements discussed
+- User offered chance to capture changes
+- Summary provided
 </success_criteria>

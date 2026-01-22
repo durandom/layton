@@ -74,16 +74,16 @@ Compare CLAUDE.md and AGENTS.md for overlapping content:
 
 **CLAUDE.md should have:**
 
-- [ ] Mandatory/Important section at top
-- [ ] Project description or overview
-- [ ] Primary entry point
-- [ ] Folder structure or key files
+- Mandatory/Important section at top
+- Project description or overview
+- Primary entry point
+- Folder structure or key files
 
 **AGENTS.md should have:**
 
-- [ ] Quick reference commands
-- [ ] Session completion protocol
-- [ ] Critical rules
+- Quick reference commands
+- Session completion protocol
+- Critical rules
 
 For each missing section:
 
@@ -133,8 +133,8 @@ If user wants to apply a suggestion:
 
 <success_criteria>
 
-- [ ] Both files (if they exist) were analyzed
-- [ ] Findings presented with rationale (not just "fix this")
-- [ ] No automatic modifications made
-- [ ] User guided on next steps
+- Both files (if they exist) were analyzed
+- Findings presented with rationale (not just "fix this")
+- No automatic modifications made
+- User guided on next steps
 </success_criteria>

@@ -29,7 +29,7 @@ bd create "PR-847: user wants to monitor" -t task -p 2 -l watching,github,layton
 
 <success_criteria>
 
-- [ ] Bead created with `watching` and `layton` labels
-- [ ] User received confirmation with bead ID
+- Bead created with `watching` and `layton` labels
+- User received confirmation with bead ID
 </success_criteria>
 </workflow>

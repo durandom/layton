@@ -7,9 +7,11 @@ tags: [workflow, artifacts, experimental]
 
 Implement tasks from an OpenSpec change.
 
-**Input**: Optionally specify `--change <name>` after `/opsx:apply`. If omitted, MUST prompt for available changes.
+## Input
 
-**Steps**
+Optionally specify `--change <name>` after `/opsx:apply`. If omitted, MUST prompt for available changes.
+
+## Steps
 
 1. **If no change name provided, prompt for selection**
 
@@ -87,9 +89,9 @@ Implement tasks from an OpenSpec change.
    - If all done: suggest archive
    - If paused: explain why and wait for guidance
 
-**Output During Implementation**
+## Output During Implementation
 
-```
+```text
 ## Implementing: <change-name> (schema: <schema-name>)
 
 Working on task 3/7: <task description>
@@ -101,9 +103,9 @@ Working on task 4/7: <task description>
 ✓ Task complete
 ```
 
-**Output On Completion**
+## Output On Completion
 
-```
+```text
 ## Implementation Complete
 
 **Change:** <change-name>
@@ -118,9 +120,9 @@ Working on task 4/7: <task description>
 All tasks complete! Ready to archive this change.
 ```
 
-**Output On Pause (Issue Encountered)**
+## Output On Pause (Issue Encountered)
 
-```
+```text
 ## Implementation Paused
 
 **Change:** <change-name>
@@ -138,7 +140,7 @@ All tasks complete! Ready to archive this change.
 What would you like to do?
 ```
 
-**Guardrails**
+## Guardrails
 
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
@@ -149,7 +151,7 @@ What would you like to do?
 - Pause on errors, blockers, or unclear requirements - don't guess
 - Use contextFiles from CLI output, don't assume specific file names
 
-**Fluid Workflow Integration**
+## Fluid Workflow Integration
 
 This skill supports the "actions on a change" model:
 

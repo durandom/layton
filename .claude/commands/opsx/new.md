@@ -7,9 +7,11 @@ tags: [workflow, artifacts, experimental]
 
 Start a new change using the experimental artifact-driven approach.
 
-**Input**: The argument after `/opsx:new` is the change name (kebab-case), OR a description of what the user wants to build.
+## Input
 
-**Steps**
+The argument after `/opsx:new` is the change name (kebab-case), OR a description of what the user wants to build.
+
+## Steps
 
 1. **If no input provided, ask what they want to build**
 
@@ -59,7 +61,7 @@ Start a new change using the experimental artifact-driven approach.
 
 6. **STOP and wait for user direction**
 
-**Output**
+## Output
 
 After completing the steps, summarize:
 
@@ -69,7 +71,7 @@ After completing the steps, summarize:
 - The template for the first artifact
 - Prompt: "Ready to create the first artifact? Run `/opsx:continue` or just describe what this change is about and I'll draft it."
 
-**Guardrails**
+## Guardrails
 
 - Do NOT create any artifacts yet - just show the instructions
 - Do NOT advance beyond showing the first artifact template

@@ -7,9 +7,11 @@ tags: [workflow, verify, experimental]
 
 Verify that an implementation matches the change artifacts (specs, tasks, design).
 
-**Input**: Optionally specify `--change <name>` after `/opsx:verify`. If omitted, MUST prompt for available changes.
+## Input
 
-**Steps**
+Optionally specify `--change <name>` after `/opsx:verify`. If omitted, MUST prompt for available changes.
+
+## Steps
 
 1. **If no change name provided, prompt for selection**
 
@@ -109,7 +111,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 
    **Summary Scorecard**:
 
-   ```
+   ```text
    ## Verification Report: <change-name>
 
    ### Summary
@@ -120,7 +122,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
    | Coherence    | Followed/Issues  |
    ```
 
-   **Issues by Priority**:
+   ### Issues by Priority
 
    1. **CRITICAL** (Must fix before archive):
       - Incomplete tasks
@@ -142,7 +144,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
    - If only warnings: "No critical issues. Y warning(s) to consider. Ready for archive (with noted improvements)."
    - If all clear: "All checks passed. Ready for archive."
 
-**Verification Heuristics**
+## Verification Heuristics
 
 - **Completeness**: Focus on objective checklist items (checkboxes, requirements list)
 - **Correctness**: Use keyword search, file path analysis, reasonable inference - don't require perfect certainty
@@ -150,14 +152,14 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 - **False Positives**: When uncertain, prefer SUGGESTION over WARNING, WARNING over CRITICAL
 - **Actionability**: Every issue must have a specific recommendation with file/line references where applicable
 
-**Graceful Degradation**
+## Graceful Degradation
 
 - If only tasks.md exists: verify task completion only, skip spec/design checks
 - If tasks + specs exist: verify completeness and correctness, skip design
 - If full artifacts: verify all three dimensions
 - Always note which checks were skipped and why
 
-**Output Format**
+## Output Format
 
 Use clear markdown with:
 

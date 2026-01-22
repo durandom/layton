@@ -7,9 +7,11 @@ tags: [workflow, artifacts, experimental]
 
 Fast-forward through artifact creation - generate everything needed to start implementation.
 
-**Input**: The argument after `/opsx:ff` is the change name (kebab-case), OR a description of what the user wants to build.
+## Input
 
-**Steps**
+The argument after `/opsx:ff` is the change name (kebab-case), OR a description of what the user wants to build.
+
+## Steps
 
 1. **If no input provided, ask what they want to build**
 
@@ -75,7 +77,7 @@ Fast-forward through artifact creation - generate everything needed to start imp
    openspec status --change "<name>"
    ```
 
-**Output**
+## Output
 
 After completing all artifacts, summarize:
 
@@ -84,14 +86,14 @@ After completing all artifacts, summarize:
 - What's ready: "All artifacts created! Ready for implementation."
 - Prompt: "Run `/opsx:apply` to start implementing."
 
-**Artifact Creation Guidelines**
+## Artifact Creation Guidelines
 
 - Follow the `instruction` field from `openspec instructions` for each artifact type
 - The schema defines what each artifact should contain - follow it
 - Read dependency artifacts for context before creating new ones
 - Use the `template` as a starting point, filling in based on context
 
-**Guardrails**
+## Guardrails
 
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one

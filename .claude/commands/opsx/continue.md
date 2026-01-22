@@ -7,9 +7,11 @@ tags: [workflow, artifacts, experimental]
 
 Continue working on a change by creating the next artifact.
 
-**Input**: Optionally specify `--change <name>` after `/opsx:continue`. If omitted, MUST prompt for available changes.
+## Input
 
-**Steps**
+Optionally specify `--change <name>` after `/opsx:continue`. If omitted, MUST prompt for available changes.
+
+## Steps
 
 1. **If no change name provided, prompt for selection**
 
@@ -27,26 +29,23 @@ Continue working on a change by creating the next artifact.
 
 2. **Check current status**
 
-   ```bash
-   openspec status --change "<name>" --json
-   ```
+```bash
+openspec status --change "<name>" --json
+```
 
-   Parse the JSON to understand current state. The response includes:
-   - `schemaName`: The workflow schema being used (e.g., "spec-driven", "tdd")
-   - `artifacts`: Array of artifacts with their status ("done", "ready", "blocked")
-   - `isComplete`: Boolean indicating if all artifacts are complete
+Parse the JSON to understand current state. The response includes:
 
-3. **Act based on status**:
+- `schemaName`: The workflow schema being used (e.g., "spec-driven", "tdd")
+- `artifacts`: Array of artifacts with their status ("done", "ready", "blocked")
+- `isComplete`: Boolean indicating if all artifacts are complete
 
-   ---
+1. **Act based on status**
 
    **If all artifacts are complete (`isComplete: true`)**:
    - Congratulate the user
    - Show final status including the schema used
    - Suggest: "All artifacts created! You can now implement this change or archive it."
    - STOP
-
-   ---
 
    **If artifacts are ready to create** (status shows artifacts with `status: "ready"`):
    - Pick the FIRST artifact with `status: "ready"` from the status output
@@ -64,19 +63,17 @@ Continue working on a change by creating the next artifact.
    - Show what was created and what's now unlocked
    - STOP after creating ONE artifact
 
-   ---
-
    **If no artifacts are ready (all blocked)**:
    - This shouldn't happen with a valid schema
    - Show status and suggest checking for issues
 
-4. **After creating an artifact, show progress**
+2. **After creating an artifact, show progress**
 
    ```bash
    openspec status --change "<name>"
    ```
 
-**Output**
+## Output
 
 After each invocation, show:
 
@@ -86,7 +83,7 @@ After each invocation, show:
 - What artifacts are now unlocked
 - Prompt: "Run `/opsx:continue` to create the next artifact"
 
-**Artifact Creation Guidelines**
+## Artifact Creation Guidelines
 
 The artifact types and their purpose depend on the schema. Use the `instruction` field from the instructions output to understand what to create.
 
@@ -109,7 +106,7 @@ Common artifact patterns:
 
 For other schemas, follow the `instruction` field from the CLI output.
 
-**Guardrails**
+## Guardrails
 
 - Create ONE artifact per invocation
 - Always read dependency artifacts before creating a new one

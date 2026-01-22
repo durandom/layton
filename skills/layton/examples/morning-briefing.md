@@ -70,7 +70,7 @@ Use the persona voice from `references/persona.md` to deliver the briefing.
 Adjust briefing depth based on context:
 
 | Context | Adaptation |
-|---------|------------|
+| --- | --- |
 | Morning + work hours | Full briefing with all details |
 | Evening + not work hours | Brief summary only |
 | Attention count > 5 | Suggest triage before detailed review |
@@ -79,8 +79,8 @@ Adjust briefing depth based on context:
 
 ## Success Criteria
 
-- [ ] Briefing adapts to time of day and work status
-- [ ] Focus item mentioned first (if one exists)
-- [ ] Attention items summarized with accurate counts
-- [ ] Tone matches Elizabeth Layton persona (professional, warm, helpful)
-- [ ] Actionable next step suggested
+- Briefing adapts to time of day and work status
+- Focus item mentioned first (if one exists)
+- Attention items summarized with accurate counts
+- Tone matches Elizabeth Layton persona (professional, warm, helpful)
+- Actionable next step suggested

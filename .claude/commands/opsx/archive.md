@@ -7,9 +7,11 @@ tags: [workflow, archive, experimental]
 
 Archive a completed change in the experimental workflow.
 
-**Input**: Optionally specify `--change <name>` after `/opsx:archive`. If omitted, MUST prompt for available changes.
+## Input
 
-**Steps**
+Optionally specify `--change <name>` after `/opsx:archive`. If omitted, MUST prompt for available changes.
+
+## Steps
 
 1. **If no change name provided, prompt for selection**
 
@@ -65,7 +67,7 @@ Archive a completed change in the experimental workflow.
 
       **If sync needed:**
 
-      ```
+      ```text
       ⚠️ Delta specs may not be synced:
       - specs/auth/spec.md → Main spec missing requirement "Token Refresh"
       - specs/api/spec.md → Main spec doesn't exist yet
@@ -108,9 +110,9 @@ Archive a completed change in the experimental workflow.
    - Spec sync status (synced / not synced / no delta specs)
    - Note about any warnings (incomplete artifacts/tasks)
 
-**Output On Success**
+## Output On Success
 
-```
+```text
 ## Archive Complete
 
 **Change:** <change-name>
@@ -121,9 +123,9 @@ Archive a completed change in the experimental workflow.
 All artifacts complete. All tasks complete.
 ```
 
-**Output On Success (No Delta Specs)**
+## Output On Success (No Delta Specs)
 
-```
+```text
 ## Archive Complete
 
 **Change:** <change-name>
@@ -134,9 +136,9 @@ All artifacts complete. All tasks complete.
 All artifacts complete. All tasks complete.
 ```
 
-**Output On Success With Warnings**
+## Output On Success With Warnings
 
-```
+```text
 ## Archive Complete (with warnings)
 
 **Change:** <change-name>
@@ -152,9 +154,9 @@ All artifacts complete. All tasks complete.
 Review the archive if this was not intentional.
 ```
 
-**Output On Error (Archive Exists)**
+## Output On Error (Archive Exists)
 
-```
+```text
 ## Archive Failed
 
 **Change:** <change-name>
@@ -168,7 +170,7 @@ Target archive directory already exists.
 3. Wait until a different date to archive
 ```
 
-**Guardrails**
+## Guardrails
 
 - Always prompt for change selection if not provided
 - Use artifact graph (openspec status --json) for completion checking

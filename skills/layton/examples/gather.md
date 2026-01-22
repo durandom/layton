@@ -84,8 +84,8 @@ Gathered Data
 
 ## Success Criteria
 
-- [ ] All configured skills are queried
-- [ ] Failures don't stop the gather process
-- [ ] Results are organized by skill name
-- [ ] Key metrics extracted per skill file guidance
-- [ ] Errors are clearly noted but don't crash the workflow
+- All configured skills are queried
+- Failures don't stop the gather process
+- Results are organized by skill name
+- Key metrics extracted per skill file guidance
+- Errors are clearly noted but don't crash the workflow

@@ -128,7 +128,7 @@ Read the existing files and compare against `skills/layton/examples/AGENTS.md`.
 **Check for these Layton integration elements:**
 
 | Element | Look for | Example suggests |
-|---------|----------|------------------|
+| --- | --- | --- |
 | Session start | `/layton` or "invoke Layton" | "BEFORE doing ANYTHING else... invoke /layton" |
 | Beads commands | `bd ready`, `bd show`, `bd close` | Issue tracking section |
 | Session completion | push protocol, "landing the plane" | Git push requirements |
@@ -160,10 +160,10 @@ Read the existing files and compare against `skills/layton/examples/AGENTS.md`.
 - AGENTS.md: {exists/missing}
 
 **Layton integration status:**
-- [ ] Session start protocol
-- [ ] Beads commands
-- [ ] Session completion protocol
-- [ ] Critical rules
+- Session start protocol
+- Beads commands
+- Session completion protocol
+- Critical rules
 
 **Suggestions:** {list of specific additions}
 
@@ -202,11 +202,11 @@ Summarize what was configured and suggest next steps.
 
 <success_criteria>
 
-- [ ] Config file exists at `.layton/config.json`
-- [ ] User name and timezone are set
-- [ ] Work schedule is configured
-- [ ] At least one skill file created (if skills were discovered)
-- [ ] CLAUDE.md and AGENTS.md analyzed (or created)
-- [ ] Layton integration suggestions reviewed
-- [ ] User understands how to invoke Layton for orientation (`layton` with no args)
+- Config file exists at `.layton/config.json`
+- User name and timezone are set
+- Work schedule is configured
+- At least one skill file created (if skills were discovered)
+- CLAUDE.md and AGENTS.md analyzed (or created)
+- Layton integration suggestions reviewed
+- User understands how to invoke Layton for orientation (`layton` with no args)
 </success_criteria>

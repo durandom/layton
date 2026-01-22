@@ -9,9 +9,11 @@ Sync delta specs from a change to main specs.
 
 This is an **agent-driven** operation - you will read delta specs and directly edit main specs to apply the changes. This allows intelligent merging (e.g., adding a scenario without copying the entire requirement).
 
-**Input**: Optionally specify `--change <name>` after `/opsx:sync`. If omitted, MUST prompt for available changes.
+## Input
 
-**Steps**
+Optionally specify `--change <name>` after `/opsx:sync`. If omitted, MUST prompt for available changes.
+
+## Steps
 
 1. **If no change name provided, prompt for selection**
 
@@ -72,7 +74,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
    - Which capabilities were updated
    - What changes were made (requirements added/modified/removed/renamed)
 
-**Delta Spec Format Reference**
+## Delta Spec Format Reference
 
 ```markdown
 ## ADDED Requirements
@@ -101,7 +103,7 @@ The system SHALL do something new.
 - TO: `### Requirement: New Name`
 ```
 
-**Key Principle: Intelligent Merging**
+## Key Principle: Intelligent Merging
 
 Unlike programmatic merging, you can apply **partial updates**:
 
@@ -109,9 +111,9 @@ Unlike programmatic merging, you can apply **partial updates**:
 - The delta represents *intent*, not a wholesale replacement
 - Use your judgment to merge changes sensibly
 
-**Output On Success**
+## Output On Success
 
-```
+```text
 ## Specs Synced: <change-name>
 
 Updated main specs:
@@ -127,7 +129,7 @@ Updated main specs:
 Main specs are now updated. The change remains active - archive when implementation is complete.
 ```
 
-**Guardrails**
+## Guardrails
 
 - Read both delta and main specs before making changes
 - Preserve existing content not mentioned in delta

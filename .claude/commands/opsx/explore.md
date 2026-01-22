@@ -27,36 +27,34 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 - **Patient** - Don't rush to conclusions, let the shape of the problem emerge
 - **Grounded** - Explore the actual codebase when relevant, don't just theorize
 
----
-
 ## What You Might Do
 
 Depending on what the user brings, you might:
 
-**Explore the problem space**
+### Explore the problem space
 
 - Ask clarifying questions that emerge from what they said
 - Challenge assumptions
 - Reframe the problem
 - Find analogies
 
-**Investigate the codebase**
+### Investigate the codebase
 
 - Map existing architecture relevant to the discussion
 - Find integration points
 - Identify patterns already in use
 - Surface hidden complexity
 
-**Compare options**
+### Compare options
 
 - Brainstorm multiple approaches
 - Build comparison tables
 - Sketch tradeoffs
 - Recommend a path (if asked)
 
-**Visualize**
+### Visualize
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │     Use ASCII diagrams liberally        │
 ├─────────────────────────────────────────┤
@@ -73,13 +71,11 @@ Depending on what the user brings, you might:
 └─────────────────────────────────────────┘
 ```
 
-**Surface risks and unknowns**
+### Surface risks and unknowns
 
 - Identify what could go wrong
 - Find gaps in understanding
 - Suggest spikes or investigations
-
----
 
 ## OpenSpec Awareness
 
@@ -125,14 +121,14 @@ If the user mentions a change or you detect one is relevant:
 
 3. **Offer to capture when decisions are made**
 
-   | Insight Type | Where to Capture |
-   |--------------|------------------|
-   | New requirement discovered | `specs/<capability>/spec.md` |
-   | Requirement changed | `specs/<capability>/spec.md` |
-   | Design decision made | `design.md` |
-   | Scope changed | `proposal.md` |
-   | New work identified | `tasks.md` |
-   | Assumption invalidated | Relevant artifact |
+   | Insight Type                | Where to Capture                     |
+   | --------------------------- | ------------------------------------ |
+   | New requirement discovered  | `specs/<capability>/spec.md`         |
+   | Requirement changed         | `specs/<capability>/spec.md`         |
+   | Design decision made        | `design.md`                          |
+   | Scope changed               | `proposal.md`                        |
+   | New work identified         | `tasks.md`                           |
+   | Assumption invalidated      | Relevant artifact                    |
 
    Example offers:
    - "That's a design decision. Capture it in design.md?"
@@ -140,8 +136,6 @@ If the user mentions a change or you detect one is relevant:
    - "This changes scope. Update the proposal?"
 
 4. **The user decides** - Offer and move on. Don't pressure. Don't auto-capture.
-
----
 
 ## What You Don't Have To Do
 
@@ -151,8 +145,6 @@ If the user mentions a change or you detect one is relevant:
 - Reach a conclusion
 - Stay on topic if a tangent is valuable
 - Be brief (this is thinking time)
-
----
 
 ## Ending Discovery
 
@@ -164,8 +156,6 @@ There's no required ending. Discovery might:
 - **Continue later**: "We can pick this up anytime"
 
 When things crystallize, you might offer a summary - but it's optional. Sometimes the thinking IS the value.
-
----
 
 ## Guardrails
 
