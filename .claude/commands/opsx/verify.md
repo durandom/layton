@@ -1,5 +1,5 @@
 ---
-name: OPSX: Verify
+name: "OPSX: Verify"
 description: Verify implementation matches change artifacts before archiving
 category: Workflow
 tags: [workflow, verify, experimental]
@@ -7,11 +7,9 @@ tags: [workflow, verify, experimental]
 
 Verify that an implementation matches the change artifacts (specs, tasks, design).
 
-## Input
+**Input**: Optionally specify a change name after `/opsx:verify` (e.g., `/opsx:verify add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
-Optionally specify `--change <name>` after `/opsx:verify`. If omitted, MUST prompt for available changes.
-
-## Steps
+**Steps**
 
 1. **If no change name provided, prompt for selection**
 
@@ -24,13 +22,11 @@ Optionally specify `--change <name>` after `/opsx:verify`. If omitted, MUST prom
    **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
 
 2. **Check status to understand the schema**
-
    ```bash
    openspec status --change "<name>" --json
    ```
-
    Parse the JSON to understand:
-   - `schemaName`: The workflow being used (e.g., "spec-driven", "tdd")
+   - `schemaName`: The workflow being used (e.g., "spec-driven")
    - Which artifacts exist for this change
 
 3. **Get the change directory and load artifacts**
@@ -110,8 +106,7 @@ Optionally specify `--change <name>` after `/opsx:verify`. If omitted, MUST prom
 8. **Generate Verification Report**
 
    **Summary Scorecard**:
-
-   ```text
+   ```
    ## Verification Report: <change-name>
 
    ### Summary
@@ -122,7 +117,7 @@ Optionally specify `--change <name>` after `/opsx:verify`. If omitted, MUST prom
    | Coherence    | Followed/Issues  |
    ```
 
-   ### Issues by Priority
+   **Issues by Priority**:
 
    1. **CRITICAL** (Must fix before archive):
       - Incomplete tasks
@@ -144,7 +139,7 @@ Optionally specify `--change <name>` after `/opsx:verify`. If omitted, MUST prom
    - If only warnings: "No critical issues. Y warning(s) to consider. Ready for archive (with noted improvements)."
    - If all clear: "All checks passed. Ready for archive."
 
-## Verification Heuristics
+**Verification Heuristics**
 
 - **Completeness**: Focus on objective checklist items (checkboxes, requirements list)
 - **Correctness**: Use keyword search, file path analysis, reasonable inference - don't require perfect certainty
@@ -152,17 +147,16 @@ Optionally specify `--change <name>` after `/opsx:verify`. If omitted, MUST prom
 - **False Positives**: When uncertain, prefer SUGGESTION over WARNING, WARNING over CRITICAL
 - **Actionability**: Every issue must have a specific recommendation with file/line references where applicable
 
-## Graceful Degradation
+**Graceful Degradation**
 
 - If only tasks.md exists: verify task completion only, skip spec/design checks
 - If tasks + specs exist: verify completeness and correctness, skip design
 - If full artifacts: verify all three dimensions
 - Always note which checks were skipped and why
 
-## Output Format
+**Output Format**
 
 Use clear markdown with:
-
 - Table for summary scorecard
 - Grouped lists for issues (CRITICAL/WARNING/SUGGESTION)
 - Code references in format: `file.ts:123`
