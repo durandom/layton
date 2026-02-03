@@ -76,7 +76,7 @@ What would you like to do?
 **Get oriented** (full status):
 
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/layton
+.claude/skills/layton/scripts/layton
 ```
 
 **Setup for first-time users**: Run workflow in `workflows/setup.md`
@@ -97,7 +97,7 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/layton
 **Invocation:** Set the LAYTON variable for this session:
 
 ```bash
-LAYTON="${CLAUDE_PLUGIN_ROOT}/scripts/layton"
+LAYTON=".claude/skills/layton/scripts/layton"
 ```
 
 **Orientation (no args):**
