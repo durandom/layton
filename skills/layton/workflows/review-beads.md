@@ -8,7 +8,7 @@
    ```
    Look at the `beads_pending_review` field for closed beads with `needs-review` label
 
-2. For each bead pending review:
+1. For each bead pending review:
    a. Show bead details:
 
       ```bash
@@ -21,7 +21,7 @@
       bd comments <bead-id>
       ```
 
-3. After reviewing, either:
+1. After reviewing, either:
    - Accept the work and remove the review label:
 
      ```bash
@@ -35,7 +35,7 @@
      bd comments add <bead-id> "Changes needed: <feedback>"
      ```
 
-4. Summarize review status to user
+1. Summarize review status to user
 </steps>
 
 <examples>
@@ -49,12 +49,12 @@ layton
 bd show <bead-id>
 bd comments <bead-id>
 
-```
+```text
 
 User: "Accept bead abc-123"
 ```bash
 bd label remove abc-123 needs-review
-```
+```text
 
 </examples>
 

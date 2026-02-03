@@ -1,25 +1,19 @@
-# cli-framework Specification
-
-## Purpose
-
-TBD - created by archiving change layton-stage0-foundation. Update Purpose after archive.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: No-arg invocation
 
-Running `layton` with no arguments SHALL return full AI orientation (doctor + skills + workflows).
+Running `layton` with no arguments SHALL return full AI orientation (doctor + skills + workflows + beads).
 
 #### Scenario: Layton with no args returns orientation
 
 - **WHEN** user runs `layton` with no arguments
-- **THEN** CLI SHALL return JSON with `checks` (doctor output), `skills` (from `.layton/skills/`), and `workflows` (from `.layton/workflows/`)
+- **THEN** CLI SHALL return JSON with `checks` (doctor output), `skills` (from `.layton/skills/`), `workflows` (from `.layton/workflows/`), and `beads` (from `.layton/beads/`)
 - **AND** output SHALL include `next_steps` for common actions
 
 #### Scenario: Orientation includes doctor checks
 
 - **WHEN** user runs `layton` with no arguments
-- **THEN** `checks` field SHALL contain all doctor check results (beads, config validity)
+- **THEN** `checks` field SHALL contain all doctor check results (beads CLI, config validity)
 
 #### Scenario: Orientation includes skills inventory
 
@@ -33,79 +27,28 @@ Running `layton` with no arguments SHALL return full AI orientation (doctor + sk
 - **THEN** `workflows` field SHALL be an array of user workflows
 - **AND** each workflow SHALL include `name`, `description`, and `triggers` from frontmatter
 
+#### Scenario: Orientation includes bead templates
+
+- **WHEN** user runs `layton` with no arguments
+- **THEN** `bead_templates` field SHALL be an array of bead templates from `.layton/beads/`
+- **AND** each template SHALL include `name`, `description`, and `variables` from frontmatter
+
+#### Scenario: Orientation includes beads pending review
+
+- **WHEN** user runs `layton` with no arguments
+- **THEN** `beads_pending_review` field SHALL be an array of beads with `needs-review` label and closed status
+- **AND** each bead SHALL include `id`, `title`, and `closed_at` from bd
+- **AND** if no beads pending review, field SHALL be empty array
+
+#### Scenario: Orientation includes beads scheduled
+
+- **WHEN** user runs `layton` with no arguments
+- **THEN** `beads_scheduled` field SHALL be an array of beads with `scheduled` label and open status
+- **AND** each bead SHALL include `id`, `title`, and `created_at` from bd
+- **AND** if no beads scheduled, field SHALL be empty array
+
 #### Scenario: Layton config with no subcommand
 
 - **WHEN** user runs `layton config` with no subcommand
 - **THEN** CLI SHALL run `layton config show` (safe, read-only)
 - **AND** if config missing, SHALL suggest `layton config init`
-
----
-
-### Requirement: Global CLI options
-
-The CLI SHALL support global options available on all commands.
-
-#### Scenario: Human output flag
-
-- **WHEN** user runs any command with `--human` flag
-- **THEN** output SHALL be formatted for human readability (colors, tables, etc.)
-- **AND** output MAY include progress messages
-
-#### Scenario: Verbose flag
-
-- **WHEN** user runs any command with `--verbose` flag
-- **THEN** output SHALL include additional debug information in the JSON response
-
-#### Scenario: Help flag
-
-- **WHEN** user runs any command with `--help` flag
-- **THEN** CLI SHALL display help text for that command (human-readable)
-
-#### Scenario: Version flag
-
-- **WHEN** user runs `layton --version`
-- **THEN** CLI SHALL display the package version
-
----
-
-### Requirement: Output format consistency
-
-All CLI commands SHALL follow consistent JSON output format.
-
-#### Scenario: Success response structure
-
-- **WHEN** any command succeeds
-- **THEN** output SHALL include `"success": true` and `"next_steps": []` array
-
-#### Scenario: Error response structure
-
-- **WHEN** any command fails
-- **THEN** output SHALL include `"success": false` and `"error": {"code": "...", "message": "..."}`
-- **AND** output SHALL include `"next_steps"` with recovery suggestions
-
-#### Scenario: Exit codes
-
-- **WHEN** command succeeds
-- **THEN** exit code SHALL be 0
-- **WHEN** command has fixable issues
-- **THEN** exit code SHALL be 1
-- **WHEN** command has critical issues
-- **THEN** exit code SHALL be 2
-
----
-
-### Requirement: JSON output by default (agent-first)
-
-JSON output SHALL be the default; human output requires explicit flag.
-
-#### Scenario: Default output is JSON
-
-- **WHEN** user runs any command without flags
-- **THEN** output SHALL be valid JSON with consistent structure
-- **AND** output SHALL be a single JSON object (no progress messages or spinners)
-
-#### Scenario: Human output for debugging
-
-- **WHEN** user runs any command with `--human`
-- **THEN** output SHALL be formatted for human readability (colors, tables, etc.)
-- **AND** output MAY include progress messages or spinners

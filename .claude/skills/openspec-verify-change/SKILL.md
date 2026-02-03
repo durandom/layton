@@ -13,7 +13,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
-**Steps**
+## Steps
 
 1. **If no change name provided, prompt for selection**
 
@@ -25,7 +25,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 
    **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
 
-2. **Check status to understand the schema**
+1. **Check status to understand the schema**
 
    ```bash
    openspec status --change "<name>" --json
@@ -35,7 +35,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
    - `schemaName`: The workflow being used (e.g., "spec-driven")
    - Which artifacts exist for this change
 
-3. **Get the change directory and load artifacts**
+1. **Get the change directory and load artifacts**
 
    ```bash
    openspec instructions apply --change "<name>" --json
@@ -43,7 +43,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 
    This returns the change directory and context files. Read all available artifacts from `contextFiles`.
 
-4. **Initialize verification report structure**
+1. **Initialize verification report structure**
 
    Create a report structure with three dimensions:
    - **Completeness**: Track tasks and spec coverage
@@ -52,7 +52,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 
    Each dimension can have CRITICAL, WARNING, or SUGGESTION issues.
 
-5. **Verify Completeness**
+1. **Verify Completeness**
 
    **Task Completion**:
    - If tasks.md exists in contextFiles, read it
@@ -72,7 +72,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
        - Add CRITICAL issue: "Requirement not found: <requirement name>"
        - Recommendation: "Implement requirement X: <description>"
 
-6. **Verify Correctness**
+1. **Verify Correctness**
 
    **Requirement Implementation Mapping**:
    - For each requirement from delta specs:
@@ -91,7 +91,7 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
        - Add WARNING: "Scenario not covered: <scenario name>"
        - Recommendation: "Add test or implementation for scenario: <description>"
 
-7. **Verify Coherence**
+1. **Verify Coherence**
 
    **Design Adherence**:
    - If design.md exists in contextFiles:
@@ -109,11 +109,11 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
      - Add SUGGESTION: "Code pattern deviation: <details>"
      - Recommendation: "Consider following project pattern: <example>"
 
-8. **Generate Verification Report**
+1. **Generate Verification Report**
 
    **Summary Scorecard**:
 
-   ```
+```text
    ## Verification Report: <change-name>
 
    ### Summary
@@ -142,11 +142,12 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
       - Each with specific recommendation
 
    **Final Assessment**:
-   - If CRITICAL issues: "X critical issue(s) found. Fix before archiving."
-   - If only warnings: "No critical issues. Y warning(s) to consider. Ready for archive (with noted improvements)."
-   - If all clear: "All checks passed. Ready for archive."
 
-**Verification Heuristics**
+- If CRITICAL issues: "X critical issue(s) found. Fix before archiving."
+- If only warnings: "No critical issues. Y warning(s) to consider. Ready for archive (with noted improvements)."
+- If all clear: "All checks passed. Ready for archive."
+
+## Verification Heuristics
 
 - **Completeness**: Focus on objective checklist items (checkboxes, requirements list)
 - **Correctness**: Use keyword search, file path analysis, reasonable inference - don't require perfect certainty
@@ -154,14 +155,14 @@ Verify that an implementation matches the change artifacts (specs, tasks, design
 - **False Positives**: When uncertain, prefer SUGGESTION over WARNING, WARNING over CRITICAL
 - **Actionability**: Every issue must have a specific recommendation with file/line references where applicable
 
-**Graceful Degradation**
+## Graceful Degradation
 
 - If only tasks.md exists: verify task completion only, skip spec/design checks
 - If tasks + specs exist: verify completeness and correctness, skip design
 - If full artifacts: verify all three dimensions
 - Always note which checks were skipped and why
 
-**Output Format**
+## Output Format
 
 Use clear markdown with:
 

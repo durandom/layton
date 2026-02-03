@@ -8,7 +8,7 @@ The skill template is in `templates/skill.md`. The CLI uses this when you run:
 
 ```bash
 layton skills add <name>
-```
+```text
 
 This creates `.layton/skills/<name>.md` with the template structure.
 
@@ -40,16 +40,16 @@ Good example:
 ```bash
 # Requires: JIRA_TOKEN environment variable
 jira-cli issue list --project PROJ --status "In Progress" --json
-```
+```text
 
-```
+```text
 
 Bad example:
 ```markdown
 ## Commands
 
 Query Jira for issues.
-```
+```text
 
 #### `## What to Extract`
 
@@ -68,7 +68,7 @@ Good example:
 - Items blocked or waiting (status = "Blocked")
 - Items older than 7 days without update (stale)
 - High priority items (P1, P2)
-```
+```text
 
 Bad example:
 
@@ -77,7 +77,7 @@ Bad example:
 
 - Important stuff
 - Things I should know about
-```
+```text
 
 #### `## Key Metrics`
 
@@ -97,7 +97,7 @@ Good example:
 | inbox_count | Emails requiring triage |
 | starred_stale | Starred items > 7 days old (decision debt) |
 | unread_priority | Unread emails from VIPs |
-```
+```text
 
 ## Examples
 
@@ -114,7 +114,7 @@ source: gh CLI
 
 ```bash
 gh api notifications --jq '.[] | {reason, subject: .subject.title, url: .subject.url}'
-```
+```text
 
 ## What to Extract
 
@@ -130,7 +130,7 @@ gh api notifications --jq '.[] | {reason, subject: .subject.title, url: .subject
 | review_requests | PRs waiting for my review |
 | ci_failures | My PRs with failed checks |
 
-```
+```text
 
 ### Skill with MCP Server
 
@@ -145,7 +145,7 @@ source: google_workspace MCP server
 
 ```bash
 mcp-cli google_workspace/search_gmail_messages '{"query": "is:starred"}'
-```
+```text
 
 ## What to Extract
 
@@ -162,7 +162,7 @@ mcp-cli google_workspace/search_gmail_messages '{"query": "is:starred"}'
 | starred_stale | Decision debt accumulating |
 | starred_unread | New items needing triage |
 
-```
+```text
 
 ## Optional Sections
 
@@ -180,11 +180,11 @@ GTD="./.claude/skills/gtd/scripts/gtd"
 $GTD              # Status overview with next steps
 $GTD list         # All tasks grouped by context
 $GTD next         # Suggested next action
-```
+```text
 
 The script output includes **Next steps** with available commands. Follow those.
 
-```
+```text
 
 ### `## Actions`
 
@@ -199,7 +199,7 @@ For skills that DO things (not just query), document the action commands:
 | Remove star | `modify_gmail_message_labels` remove `STARRED` |
 | Archive | `modify_gmail_message_labels` remove `INBOX` |
 | Archive + Unstar | Remove both `INBOX` and `STARRED` |
-```
+```text
 
 ### `## Beads Integration`
 
@@ -219,7 +219,7 @@ bd create "<Subject>" \
 
 # List tracked emails
 bd list --label email --json
-```
+```text
 
 ### Bead Labels for This Skill
 
@@ -229,7 +229,7 @@ bd list --label email --json
 | `starred` | Still starred in Gmail |
 | `needs-reply` | Reply required |
 
-```
+```text
 
 ### `## Common Patterns`
 
@@ -247,9 +247,9 @@ $GTD due 46 2026-01-30
 
 # View task with full context
 gh issue view 42 --repo owner/repo --comments
-```
+```text
 
-```
+```text
 
 ### `## Pitfalls`
 
@@ -263,7 +263,7 @@ What NOT to do — saves users from common mistakes:
 | Start work without creating a Bead | `bd create ... --external-ref "gtd-<id>"` first |
 | `gtd done 1 2 3` | `gtd bulk 1,2,3 --close` |
 | Run from skill dir | Run from **repo root** |
-```
+```text
 
 ### `## Domain Reference`
 
@@ -277,14 +277,14 @@ For skills with domain-specific syntax (like Gmail search operators):
 | `is:starred` | `is:starred` | Starred emails |
 | `newer_than:` | `newer_than:7d` | Within last 7 days |
 | `from:` | `from:boss` | From specific sender |
-```
+```text
 
 ## Common Mistakes
 
 1. **Vague descriptions** - "Query Jira" doesn't tell Layton when to use it
-2. **Missing commands** - AI can't gather data without executable commands
-3. **Commands that require interaction** - Use `--json` flags, avoid prompts
-4. **Credentials in skill files** - Reference env vars, never embed secrets
-5. **Overly complex extraction** - Keep metrics actionable, not comprehensive
-6. **Query-only thinking** - Real skills often need Action commands too
-7. **No Beads integration** - If items should be tracked, document how
+1. **Missing commands** - AI can't gather data without executable commands
+1. **Commands that require interaction** - Use `--json` flags, avoid prompts
+1. **Credentials in skill files** - Reference env vars, never embed secrets
+1. **Overly complex extraction** - Keep metrics actionable, not comprehensive
+1. **Query-only thinking** - Real skills often need Action commands too
+1. **No Beads integration** - If items should be tracked, document how

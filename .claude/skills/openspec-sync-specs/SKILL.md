@@ -15,7 +15,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
-**Steps**
+## Steps
 
 1. **If no change name provided, prompt for selection**
 
@@ -25,7 +25,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 
    **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
 
-2. **Find delta specs**
+1. **Find delta specs**
 
    Look for delta spec files in `openspec/changes/<name>/specs/*/spec.md`.
 
@@ -37,7 +37,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 
    If no delta specs found, inform user and stop.
 
-3. **For each delta spec, apply changes to main specs**
+1. **For each delta spec, apply changes to main specs**
 
    For each capability with a delta spec at `openspec/changes/<name>/specs/<capability>/spec.md`:
 
@@ -70,13 +70,13 @@ This is an **agent-driven** operation - you will read delta specs and directly e
       - Add Purpose section (can be brief, mark as TBD)
       - Add Requirements section with the ADDED requirements
 
-4. **Show summary**
+1. **Show summary**
 
    After applying all changes, summarize:
    - Which capabilities were updated
    - What changes were made (requirements added/modified/removed/renamed)
 
-**Delta Spec Format Reference**
+## Delta Spec Format Reference
 
 ```markdown
 ## ADDED Requirements
@@ -103,7 +103,7 @@ The system SHALL do something new.
 
 - FROM: `### Requirement: Old Name`
 - TO: `### Requirement: New Name`
-```
+```text
 
 **Key Principle: Intelligent Merging**
 
@@ -115,7 +115,7 @@ Unlike programmatic merging, you can apply **partial updates**:
 
 **Output On Success**
 
-```
+```text
 ## Specs Synced: <change-name>
 
 Updated main specs:
@@ -129,7 +129,7 @@ Updated main specs:
 - Added requirement: "Another Feature"
 
 Main specs are now updated. The change remains active - archive when implementation is complete.
-```
+```text
 
 **Guardrails**
 

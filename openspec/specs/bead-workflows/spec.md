@@ -22,7 +22,7 @@ A workflow SHALL guide users through scheduling beads from templates.
 
 A workflow SHALL guide users through reviewing completed beads.
 
-#### Scenario: Workflow file exists
+#### Scenario: Workflow file exists (review)
 
 - **WHEN** Layton is installed
 - **THEN** `skills/layton/workflows/review-beads.md` SHALL exist

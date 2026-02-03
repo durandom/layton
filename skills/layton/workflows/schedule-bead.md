@@ -7,11 +7,11 @@
    layton beads
    ```
 
-2. If user hasn't specified a template, show them the list and ask which to use
+1. If user hasn't specified a template, show them the list and ask which to use
 
-3. Gather any required variables from the user (check template's `variables` field)
+1. Gather any required variables from the user (check template's `variables` field)
 
-4. Schedule the bead with variables as JSON:
+1. Schedule the bead with variables as JSON:
 
    ```bash
    layton beads schedule <template-name> '{"var1": "value1", "var2": "value2"}'
@@ -19,7 +19,7 @@
 
    (The epic is auto-created on first use if not configured)
 
-5. Confirm to user with the created bead ID
+1. Confirm to user with the created bead ID
 </steps>
 
 <examples>
@@ -32,12 +32,12 @@ layton beads
 
 layton beads schedule code-review '{"file_path": "src/auth.py"}'
 
-```
+```text
 
 User: "I want to run the standup template"
 ```bash
 layton beads schedule standup
-```
+```text
 
 </examples>
 

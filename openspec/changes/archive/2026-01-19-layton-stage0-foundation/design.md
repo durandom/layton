@@ -143,7 +143,7 @@ Stage 0 proves the core architecture:
 
 Follows flat package pattern from [python-project-architecture.md](../../../../recipes/python-project-architecture.md):
 
-```
+```text
 skills/layton/
 ├── SKILL.md                  # Placeholder for Stage 1
 ├── scripts/

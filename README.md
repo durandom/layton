@@ -35,7 +35,7 @@ Layton is a **knowledge repo skill** for building personalized AI workflows. Ski
 ```bash
 claude plugin marketplace add durandom/layton
 claude plugin install --scope project layton@layton
-```
+```text
 
 ## Prerequisites
 
@@ -45,13 +45,13 @@ Beads stores everything Layton tracks: items you're watching, your current focus
 
 ```bash
 bd --version  # verify it's installed
-```
+```text
 
 ## What You'll Build
 
 After setup, your project will have a `.layton/` directory with your personalized configuration:
 
-```
+```text
 your-project/
 ├── .layton/                  # YOUR personalizations
 │   ├── config.json          # Timezone, work hours, user info
@@ -64,7 +64,7 @@ your-project/
 │       └── process-inbox.md
 ├── CLAUDE.md                # Project instructions (with Layton integration)
 └── AGENTS.md                # Agent behavior rules
-```
+```text
 
 ### Example: config.json
 
@@ -80,7 +80,7 @@ your-project/
     "days": ["monday", "tuesday", "wednesday", "thursday", "friday"]
   }
 }
-```
+```text
 
 ### Example: Skill File (.layton/skills/gmail.md)
 
@@ -110,7 +110,7 @@ mcp-cli google_workspace/search_gmail_messages '{"query": "is:starred"}'
 |--------|---------|
 | starred_count | Items flagged for attention |
 | starred_stale | Decision debt accumulating |
-```
+```text
 
 ### Example: Workflow File (.layton/workflows/morning-briefing.md)
 
@@ -123,10 +123,10 @@ triggers: [morning briefing, good morning, what should I know today]
 ## Steps
 
 1. Get temporal context: `layton context`
-2. Get current focus: `bd list --label focus --json`
-3. Get watching items: `bd list --label watching --json`
-4. Query configured skills
-5. Synthesize briefing adapted to time of day
+1. Get current focus: `bd list --label focus --json`
+1. Get watching items: `bd list --label watching --json`
+1. Query configured skills
+1. Synthesize briefing adapted to time of day
 
 ## Context Adaptation
 
@@ -136,7 +136,7 @@ triggers: [morning briefing, good morning, what should I know today]
 | Afternoon | Lighter briefing, check if focus needs updating |
 | Evening | Brief summary, acknowledge end of day |
 | Monday morning | Include weekly perspective |
-```
+```text
 
 ## Getting Started
 
@@ -144,19 +144,19 @@ triggers: [morning briefing, good morning, what should I know today]
 
 ```text
 /layton
-```
+```text
 
 Select "setup" or say "configure layton" - Layton will guide you through:
 
 1. Creating `.layton/config.json` with your preferences
-2. Discovering available skills
-3. Setting up CLAUDE.md/AGENTS.md integration
+1. Discovering available skills
+1. Setting up CLAUDE.md/AGENTS.md integration
 
 ### Daily Usage
 
 ```text
 /layton
-```
+```text
 
 This runs orientation: health checks + skills inventory + workflows inventory.
 
@@ -174,7 +174,7 @@ This runs orientation: health checks + skills inventory + workflows inventory.
 
 ```bash
 LAYTON=".claude/skills/layton/scripts/layton"
-```
+```text
 
 | Command | Description |
 |---------|-------------|
@@ -198,7 +198,7 @@ bd list --label focus --json      # Current focus (only one)
 bd create "PR #123" -l watching,github,layton --json
 bd update <id> --add-label focus --json
 bd close <id> --reason "merged" --json
-```
+```text
 
 ## Built-in Workflows
 
@@ -221,7 +221,7 @@ To copy an example to your `.layton/workflows/`:
 
 ```bash
 $LAYTON workflows add morning-briefing
-```
+```text
 
 ## Integration with CLAUDE.md / AGENTS.md
 
@@ -237,7 +237,7 @@ Layton works best when integrated into your project's AI instructions.
 1. **Invoke the Layton skill**: `/layton`
 
 **NO EXCEPTIONS** - unless the user explicitly says "skip Layton".
-```
+```text
 
 Run `/layton` and select "setup" to have Layton analyze your existing instruction files and suggest integration points.
 

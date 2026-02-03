@@ -48,7 +48,7 @@ triggers:
 1. Get context:
    ```bash
    layton context
-   ```
+```text
 
 1. <!-- Next step -->
 
@@ -68,7 +68,7 @@ triggers:
 - [ ]
 - [ ]
 
-```
+```text
 
 #### Scenario: Template sections purpose
 

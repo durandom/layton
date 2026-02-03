@@ -44,7 +44,7 @@ source: skills/<name>/SKILL.md
 # Example:
 # SKILL="./.claude/skills/<name>/scripts/<name>"
 # $SKILL <command>
-```
+```text
 
 ## What to Extract
 
@@ -61,7 +61,7 @@ source: skills/<name>/SKILL.md
 |--------|---------|
 |        |         |
 
-```
+```text
 
 #### Scenario: Template sections purpose
 

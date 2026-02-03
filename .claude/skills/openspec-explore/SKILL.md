@@ -32,30 +32,30 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 
 Depending on what the user brings, you might:
 
-**Explore the problem space**
+## Explore the problem space
 
 - Ask clarifying questions that emerge from what they said
 - Challenge assumptions
 - Reframe the problem
 - Find analogies
 
-**Investigate the codebase**
+## Investigate the codebase
 
 - Map existing architecture relevant to the discussion
 - Find integration points
 - Identify patterns already in use
 - Surface hidden complexity
 
-**Compare options**
+## Compare options
 
 - Brainstorm multiple approaches
 - Build comparison tables
 - Sketch tradeoffs
 - Recommend a path (if asked)
 
-**Visualize**
+## Visualize
 
-```
+```text
 ┌─────────────────────────────────────────┐
 │     Use ASCII diagrams liberally        │
 ├─────────────────────────────────────────┤
@@ -70,7 +70,7 @@ Depending on what the user brings, you might:
 │   dependency graphs, comparison tables  │
 │                                         │
 └─────────────────────────────────────────┘
-```
+```text
 
 **Surface risks and unknowns**
 
@@ -90,7 +90,7 @@ At the start, quickly check what exists:
 
 ```bash
 openspec list --json
-```
+```text
 
 This tells you:
 
@@ -116,11 +116,11 @@ If the user mentions a change or you detect one is relevant:
    - `openspec/changes/<name>/tasks.md`
    - etc.
 
-2. **Reference them naturally in conversation**
+1. **Reference them naturally in conversation**
    - "Your design mentions using Redis, but we just realized SQLite fits better..."
    - "The proposal scopes this to premium users, but we're now thinking everyone..."
 
-3. **Offer to capture when decisions are made**
+1. **Offer to capture when decisions are made**
 
    | Insight Type | Where to Capture |
    |--------------|------------------|
@@ -136,7 +136,7 @@ If the user mentions a change or you detect one is relevant:
    - "This is a new requirement. Add it to specs?"
    - "This changes scope. Update the proposal?"
 
-4. **The user decides** - Offer and move on. Don't pressure. Don't auto-capture.
+1. **The user decides** - Offer and move on. Don't pressure. Don't auto-capture.
 
 ---
 
@@ -155,7 +155,7 @@ If the user mentions a change or you detect one is relevant:
 
 **User brings a vague idea:**
 
-```
+```text
 User: I'm thinking about adding real-time collaboration
 
 You: Real-time collab is a big space. Let me think about this...
@@ -175,11 +175,11 @@ You: Real-time collab is a big space. Let me think about this...
        trivial            moderate           complex
 
       Where's your head at?
-```
+```text
 
 **User brings a specific problem:**
 
-```
+```text
 User: The auth system is a mess
 
 You: [reads codebase]
@@ -207,11 +207,11 @@ You: [reads codebase]
                   └───────────┘
 
      I see three tangles. Which one's burning?
-```
+```text
 
 **User is stuck mid-implementation:**
 
-```
+```text
 User: /opsx:explore add-auth-system
       The OAuth integration is more complex than expected
 
@@ -225,11 +225,11 @@ You: [reads change artifacts]
 
      Want to update the design to reflect this?
      Or add a spike task to investigate?
-```
+```text
 
 **User wants to compare options:**
 
-```
+```text
 User: Should we use Postgres or SQLite?
 
 You: Generic answer is boring. What's the context?
@@ -255,7 +255,7 @@ You: That changes everything.
      SQLite. Not even close.
 
      Unless... is there a sync component?
-```
+```text
 
 ---
 
@@ -270,7 +270,7 @@ There's no required ending. Discovery might:
 
 When it feels like things are crystallizing, you might summarize:
 
-```
+```text
 ## What We Figured Out
 
 **The problem**: [crystallized understanding]
@@ -283,7 +283,7 @@ When it feels like things are crystallizing, you might summarize:
 - Create a change: /opsx:new <name>
 - Fast-forward to tasks: /opsx:ff <name>
 - Keep exploring: just keep talking
-```
+```text
 
 But this summary is optional. Sometimes the thinking IS the value.
 

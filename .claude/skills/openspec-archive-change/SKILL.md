@@ -13,7 +13,7 @@ Archive a completed change in the experimental workflow.
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
-**Steps**
+## Steps
 
 1. **If no change name provided, prompt for selection**
 
@@ -24,7 +24,7 @@ Archive a completed change in the experimental workflow.
 
    **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
 
-2. **Check artifact completion status**
+1. **Check artifact completion status**
 
    Run `openspec status --change "<name>" --json` to check artifact completion.
 
@@ -37,7 +37,7 @@ Archive a completed change in the experimental workflow.
    - Use **AskUserQuestion tool** to confirm user wants to proceed
    - Proceed if user confirms
 
-3. **Check task completion status**
+1. **Check task completion status**
 
    Read the tasks file (typically `tasks.md`) to check for incomplete tasks.
 
@@ -50,7 +50,7 @@ Archive a completed change in the experimental workflow.
 
    **If no tasks file exists:** Proceed without task-related warning.
 
-4. **Assess delta spec sync state**
+1. **Assess delta spec sync state**
 
    Check for delta specs at `openspec/changes/<name>/specs/`. If none exist, proceed without sync prompt.
 
@@ -65,7 +65,7 @@ Archive a completed change in the experimental workflow.
 
    If user chooses sync, execute /opsx:sync logic (use the openspec-sync-specs skill). Proceed to archive regardless of choice.
 
-5. **Perform the archive**
+1. **Perform the archive**
 
    Create the archive directory if it doesn't exist:
 
@@ -83,7 +83,7 @@ Archive a completed change in the experimental workflow.
    mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
    ```
 
-6. **Display summary**
+1. **Display summary**
 
    Show archive completion summary including:
    - Change name
@@ -92,9 +92,9 @@ Archive a completed change in the experimental workflow.
    - Whether specs were synced (if applicable)
    - Note about any warnings (incomplete artifacts/tasks)
 
-**Output On Success**
+## Output On Success
 
-```
+```text
 ## Archive Complete
 
 **Change:** <change-name>
@@ -103,7 +103,7 @@ Archive a completed change in the experimental workflow.
 **Specs:** ✓ Synced to main specs (or "No delta specs" or "Sync skipped")
 
 All artifacts complete. All tasks complete.
-```
+```text
 
 **Guardrails**
 

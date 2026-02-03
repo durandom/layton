@@ -13,7 +13,7 @@ Implement tasks from an OpenSpec change.
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
-**Steps**
+## Steps
 
 1. **Select the change**
 
@@ -24,7 +24,7 @@ Implement tasks from an OpenSpec change.
 
    Always announce: "Using change: <name>" and how to override (e.g., `/opsx:apply <other>`).
 
-2. **Check status to understand the schema**
+1. **Check status to understand the schema**
 
    ```bash
    openspec status --change "<name>" --json
@@ -34,7 +34,7 @@ Implement tasks from an OpenSpec change.
    - `schemaName`: The workflow being used (e.g., "spec-driven")
    - Which artifact contains the tasks (typically "tasks" for spec-driven, check status for others)
 
-3. **Get apply instructions**
+1. **Get apply instructions**
 
    ```bash
    openspec instructions apply --change "<name>" --json
@@ -51,14 +51,14 @@ Implement tasks from an OpenSpec change.
    - If `state: "all_done"`: congratulate, suggest archive
    - Otherwise: proceed to implementation
 
-4. **Read context files**
+1. **Read context files**
 
    Read the files listed in `contextFiles` from the apply instructions output.
    The files depend on the schema being used:
    - **spec-driven**: proposal, specs, design, tasks
    - Other schemas: follow the contextFiles from CLI output
 
-5. **Show current progress**
+1. **Show current progress**
 
    Display:
    - Schema being used
@@ -66,7 +66,7 @@ Implement tasks from an OpenSpec change.
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+1. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
@@ -81,7 +81,7 @@ Implement tasks from an OpenSpec change.
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+1. **On completion or pause, show status**
 
    Display:
    - Tasks completed this session
@@ -89,9 +89,9 @@ Implement tasks from an OpenSpec change.
    - If all done: suggest archive
    - If paused: explain why and wait for guidance
 
-**Output During Implementation**
+## Output During Implementation
 
-```
+```text
 ## Implementing: <change-name> (schema: <schema-name>)
 
 Working on task 3/7: <task description>
@@ -101,11 +101,11 @@ Working on task 3/7: <task description>
 Working on task 4/7: <task description>
 [...implementation happening...]
 ✓ Task complete
-```
+```text
 
 **Output On Completion**
 
-```
+```text
 ## Implementation Complete
 
 **Change:** <change-name>
@@ -118,11 +118,11 @@ Working on task 4/7: <task description>
 ...
 
 All tasks complete! Ready to archive this change.
-```
+```text
 
 **Output On Pause (Issue Encountered)**
 
-```
+```text
 ## Implementation Paused
 
 **Change:** <change-name>
@@ -134,11 +134,11 @@ All tasks complete! Ready to archive this change.
 
 **Options:**
 1. <option 1>
-2. <option 2>
-3. Other approach
+1. <option 2>
+1. Other approach
 
 What would you like to do?
-```
+```text
 
 **Guardrails**
 

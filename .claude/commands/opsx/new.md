@@ -9,7 +9,7 @@ Start a new change using the experimental artifact-driven approach.
 
 **Input**: The argument after `/opsx:new` is the change name (kebab-case), OR a description of what the user wants to build.
 
-**Steps**
+## Steps
 
 1. **If no input provided, ask what they want to build**
 
@@ -20,7 +20,7 @@ Start a new change using the experimental artifact-driven approach.
 
    **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
 
-2. **Determine the workflow schema**
+1. **Determine the workflow schema**
 
    Use the default schema (omit `--schema`) unless the user explicitly requests a different workflow.
 
@@ -30,7 +30,7 @@ Start a new change using the experimental artifact-driven approach.
 
    **Otherwise**: Omit `--schema` to use the default.
 
-3. **Create the change directory**
+1. **Create the change directory**
 
    ```bash
    openspec new change "<name>"
@@ -39,7 +39,7 @@ Start a new change using the experimental artifact-driven approach.
    Add `--schema <name>` only if the user requested a specific workflow.
    This creates a scaffolded change at `openspec/changes/<name>/` with the selected schema.
 
-4. **Show the artifact status**
+1. **Show the artifact status**
 
    ```bash
    openspec status --change "<name>"
@@ -47,7 +47,7 @@ Start a new change using the experimental artifact-driven approach.
 
    This shows which artifacts need to be created and which are ready (dependencies satisfied).
 
-5. **Get instructions for the first artifact**
+1. **Get instructions for the first artifact**
    The first artifact depends on the schema. Check the status output to find the first artifact with status "ready".
 
    ```bash
@@ -56,9 +56,9 @@ Start a new change using the experimental artifact-driven approach.
 
    This outputs the template and context for creating the first artifact.
 
-6. **STOP and wait for user direction**
+1. **STOP and wait for user direction**
 
-**Output**
+## Output
 
 After completing the steps, summarize:
 
@@ -68,7 +68,7 @@ After completing the steps, summarize:
 - The template for the first artifact
 - Prompt: "Ready to create the first artifact? Run `/opsx:continue` or just describe what this change is about and I'll draft it."
 
-**Guardrails**
+## Guardrails
 
 - Do NOT create any artifacts yet - just show the instructions
 - Do NOT advance beyond showing the first artifact template

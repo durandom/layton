@@ -8,7 +8,7 @@ The workflow template is in `templates/workflow.md`. The CLI uses this when you 
 
 ```bash
 layton workflows add <name>
-```
+```text
 
 This creates `.layton/workflows/<name>.md` with the template structure.
 
@@ -38,7 +38,7 @@ Good example:
 ## Objective
 
 Provide a context-aware status update at the start of the day. Synthesize current focus, attention items, and schedule into a cohesive briefing using the Layton persona voice.
-```
+```text
 
 Bad example:
 
@@ -46,7 +46,7 @@ Bad example:
 ## Objective
 
 Do the morning briefing.
-```
+```text
 
 #### `## Steps`
 
@@ -67,7 +67,7 @@ Gather temporal and environmental context:
 
 ```bash
 layton context
-```
+```text
 
 Parse the output to understand:
 
@@ -81,26 +81,26 @@ Query items being actively tracked:
 
 ```bash
 bd list --label watching --json
-```
+```text
 
 ### 3. Synthesize Briefing
 
 Combine context and items into a briefing. Present in this order:
 
 1. Current focus (if any)
-2. Attention items (sorted by priority)
-3. Time-appropriate suggestions
+1. Attention items (sorted by priority)
+1. Time-appropriate suggestions
 
-```
+```text
 
 Bad example:
 ```markdown
 ## Steps
 
 1. Check stuff
-2. Get the data
-3. Tell the user about it
-```
+1. Get the data
+1. Tell the user about it
+```text
 
 #### `## Context Adaptation`
 
@@ -122,7 +122,7 @@ Good example:
 | Attention count > 5 | Suggest triage before detailed review |
 | Weekend | Lighter touch, acknowledge personal time |
 | Monday morning | Include weekly perspective |
-```
+```text
 
 #### `## Success Criteria`
 
@@ -141,7 +141,7 @@ Good example:
 - [ ] Focus item mentioned first (if one exists)
 - [ ] Attention items summarized with accurate counts
 - [ ] Actionable next step suggested
-```
+```text
 
 ## Examples
 
@@ -168,13 +168,13 @@ Provide a rapid status snapshot without full briefing ceremony.
    bd list --label focus --json
    ```
 
-2. Get watching count:
+1. Get watching count:
 
    ```bash
    bd list --label watching --json | jq length
    ```
 
-3. Report in one sentence:
+1. Report in one sentence:
    - "You're focused on [X], watching [N] items."
    - Or: "No current focus. Watching [N] items."
 
@@ -189,7 +189,7 @@ Provide a rapid status snapshot without full briefing ceremony.
 - [ ] Watching count accurate
 - [ ] Response is one sentence
 
-```
+```text
 
 ### Complex Workflow
 
@@ -214,7 +214,7 @@ Guide user through a structured weekly review: celebrate wins, clear completed i
 
 ```bash
 layton context
-```
+```text
 
 Confirm it's end of week (Thursday PM or Friday).
 
@@ -222,7 +222,7 @@ Confirm it's end of week (Thursday PM or Friday).
 
 ```bash
 bd list --label closed --since "7 days ago" --json
-```
+```text
 
 Summarize what was accomplished this week.
 
@@ -230,7 +230,7 @@ Summarize what was accomplished this week.
 
 ```bash
 bd list --label watching --json
-```
+```text
 
 For each item:
 
@@ -242,7 +242,7 @@ For each item:
 
 ```bash
 bd list --label focus --json
-```
+```text
 
 Is current focus still the right priority for next week?
 
@@ -279,7 +279,7 @@ Provide a summary:
 - [ ] Next week intention captured
 - [ ] User feels closure on the week
 
-```
+```text
 
 ## Optional Sections
 
@@ -299,7 +299,7 @@ Show what the workflow result should look like. This helps AI understand the exp
 > **GTD:** Inbox clear ✓ | 4 focus tasks ready | 2 active projects
 >
 > **Suggestion:** Your high-energy morning slot is ideal for the architecture review. I'd start there.
-```
+```text
 
 This is especially valuable for:
 
@@ -310,9 +310,9 @@ This is especially valuable for:
 ## Common Mistakes
 
 1. **Vague steps** - "Check the status" doesn't tell AI what command to run
-2. **Missing commands** - If a step needs data, include the exact command
-3. **No adaptation** - Workflows should flex based on context
-4. **Too many triggers** - 2-5 focused triggers beat 10 overlapping ones
-5. **Rigid structure** - Leave room for AI judgment within steps
-6. **No success criteria** - How do you know when it's done?
-7. **No example output** - For briefings/reports, show what good looks like
+1. **Missing commands** - If a step needs data, include the exact command
+1. **No adaptation** - Workflows should flex based on context
+1. **Too many triggers** - 2-5 focused triggers beat 10 overlapping ones
+1. **Rigid structure** - Leave room for AI judgment within steps
+1. **No success criteria** - How do you know when it's done?
+1. **No example output** - For briefings/reports, show what good looks like

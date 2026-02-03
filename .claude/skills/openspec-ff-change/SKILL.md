@@ -13,7 +13,7 @@ Fast-forward through artifact creation - generate everything needed to start imp
 
 **Input**: The user's request should include a change name (kebab-case) OR a description of what they want to build.
 
-**Steps**
+## Steps
 
 1. **If no clear input provided, ask what they want to build**
 
@@ -24,7 +24,7 @@ Fast-forward through artifact creation - generate everything needed to start imp
 
    **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
 
-2. **Create the change directory**
+1. **Create the change directory**
 
    ```bash
    openspec new change "<name>"
@@ -32,7 +32,7 @@ Fast-forward through artifact creation - generate everything needed to start imp
 
    This creates a scaffolded change at `openspec/changes/<name>/`.
 
-3. **Get the artifact build order**
+1. **Get the artifact build order**
 
    ```bash
    openspec status --change "<name>" --json
@@ -42,7 +42,7 @@ Fast-forward through artifact creation - generate everything needed to start imp
    - `applyRequires`: array of artifact IDs needed before implementation (e.g., `["tasks"]`)
    - `artifacts`: list of all artifacts with their status and dependencies
 
-4. **Create artifacts in sequence until apply-ready**
+1. **Create artifacts in sequence until apply-ready**
 
    Use the **TodoWrite tool** to track progress through the artifacts.
 
@@ -76,13 +76,13 @@ Fast-forward through artifact creation - generate everything needed to start imp
       - Use **AskUserQuestion tool** to clarify
       - Then continue with creation
 
-5. **Show final status**
+1. **Show final status**
 
    ```bash
    openspec status --change "<name>"
    ```
 
-**Output**
+## Output
 
 After completing all artifacts, summarize:
 
@@ -91,7 +91,7 @@ After completing all artifacts, summarize:
 - What's ready: "All artifacts created! Ready for implementation."
 - Prompt: "Run `/opsx:apply` or ask me to implement to start working on the tasks."
 
-**Artifact Creation Guidelines**
+## Artifact Creation Guidelines
 
 - Follow the `instruction` field from `openspec instructions` for each artifact type
 - The schema defines what each artifact should contain - follow it
@@ -101,7 +101,7 @@ After completing all artifacts, summarize:
   - Do NOT copy `<context>`, `<rules>`, `<project_context>` blocks into the artifact
   - These guide what you write, but should never appear in the output
 
-**Guardrails**
+## Guardrails
 
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one

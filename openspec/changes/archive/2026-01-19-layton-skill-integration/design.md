@@ -141,7 +141,7 @@ This design extends Layton to aggregate data from external skills and synthesize
 
 ## File Structure
 
-```
+```text
 skills/layton/
 ├── SKILL.md                    # Updated with new capabilities
 ├── laytonlib/

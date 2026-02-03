@@ -13,7 +13,7 @@ Continue working on a change by creating the next artifact.
 
 **Input**: Optionally specify a change name. If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
-**Steps**
+## Steps
 
 1. **If no change name provided, prompt for selection**
 
@@ -29,7 +29,7 @@ Continue working on a change by creating the next artifact.
 
    **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
 
-2. **Check current status**
+1. **Check current status**
 
    ```bash
    openspec status --change "<name>" --json
@@ -40,7 +40,7 @@ Continue working on a change by creating the next artifact.
    - `artifacts`: Array of artifacts with their status ("done", "ready", "blocked")
    - `isComplete`: Boolean indicating if all artifacts are complete
 
-3. **Act based on status**:
+1. **Act based on status**:
 
    ---
 
@@ -81,13 +81,13 @@ Continue working on a change by creating the next artifact.
    - This shouldn't happen with a valid schema
    - Show status and suggest checking for issues
 
-4. **After creating an artifact, show progress**
+1. **After creating an artifact, show progress**
 
    ```bash
    openspec status --change "<name>"
    ```
 
-**Output**
+## Output
 
 After each invocation, show:
 
@@ -97,7 +97,7 @@ After each invocation, show:
 - What artifacts are now unlocked
 - Prompt: "Want to continue? Just ask me to continue or tell me what to do next."
 
-**Artifact Creation Guidelines**
+## Artifact Creation Guidelines
 
 The artifact types and their purpose depend on the schema. Use the `instruction` field from the instructions output to understand what to create.
 
@@ -113,7 +113,7 @@ Common artifact patterns:
 
 For other schemas, follow the `instruction` field from the CLI output.
 
-**Guardrails**
+## Guardrails
 
 - Create ONE artifact per invocation
 - Always read dependency artifacts before creating a new one

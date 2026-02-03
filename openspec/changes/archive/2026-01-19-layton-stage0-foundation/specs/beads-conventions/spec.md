@@ -161,7 +161,7 @@ The Layton skill SHALL use the Router Pattern for multi-workflow organization.
 - **WHEN** organizing the Layton skill
 - **THEN** directory structure SHALL be:
 
-```
+```text
 skills/layton/
 ├── SKILL.md              # Router + essential principles (under 500 lines)
 ├── workflows/            # Step-by-step procedures (FOLLOW)
@@ -173,7 +173,7 @@ skills/layton/
 │   └── persona.md
 └── scripts/              # Executable code (RUN)
     └── layton            # CLI entrypoint
-```
+```text
 
 #### Scenario: SKILL.md as router
 
@@ -227,7 +227,7 @@ For bd command details, see `references/beads-commands.md`.
 - [ ] User knows their current focus
 - [ ] Briefings adapt to time of day and workload
 </success_criteria>
-```
+```text
 
 ---
 
@@ -253,7 +253,7 @@ Beads commands are **LOW FREEDOM** operations—exact syntax matters.
 Create bead:
 `bd create "<ID>: <context>" -t task -p 2 -l watching,<source>,layton --json`
 </step>
-```
+```text
 
 ---
 
@@ -282,7 +282,7 @@ Workflow files in `workflows/` SHALL use XML structure with numbered steps.
 - [ ] User received confirmation with bead ID
 </success_criteria>
 </workflow>
-```
+```text
 
 #### Scenario: Morning briefing workflow
 
@@ -318,7 +318,7 @@ Context adaptation:
 - [ ] Attention items summarized with counts
 </success_criteria>
 </workflow>
-```
+```text
 
 #### Scenario: Set focus workflow
 
@@ -342,7 +342,7 @@ Context adaptation:
 - [ ] Previous focus label removed (if any)
 </success_criteria>
 </workflow>
-```
+```text
 
 ---
 
@@ -381,7 +381,7 @@ The skill SHALL include a `references/beads-commands.md` file for detailed bd us
 Output:
 ```json
 {"id": "beads-abc", "title": "JIRA-1234: blocking release", "labels": ["watching", "jira", "layton"]}
-```
+```text
 
 ## Querying beads
 
@@ -401,4 +401,4 @@ Output:
 
 `bd close <id> --reason "..." --json`
 
-```
+```text
