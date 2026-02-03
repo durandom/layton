@@ -66,6 +66,7 @@ Scan the codebase for small improvement opportunities. Look for:
 6. **Missing validation** - User input handlers without validation
 
 Also check recent git activity:
+
 ```bash
 git log --oneline -10 2>/dev/null || echo "No git history"
 ```
@@ -133,6 +134,7 @@ Before we create a change, let me quickly show you **explore mode**—it's how y
 ```
 
 Spend 1-2 minutes investigating the relevant code:
+
 - Read the file(s) involved
 - Draw a quick ASCII diagram if it helps
 - Note any considerations
@@ -158,6 +160,7 @@ Now let's create a change to hold our work.
 ## Phase 4: Create the Change
 
 **EXPLAIN:**
+
 ```
 ## Creating a Change
 
@@ -167,21 +170,25 @@ Let me create one for our task.
 ```
 
 **DO:** Create the change with a derived kebab-case name:
+
 ```bash
 openspec new change "<derived-name>"
 ```
 
 **SHOW:**
+
 ```
 Created: `openspec/changes/<name>/`
 
 The folder structure:
 ```
+
 openspec/changes/<name>/
 ├── proposal.md    ← Why we're doing this (empty, we'll fill it)
 ├── design.md      ← How we'll build it (empty)
 ├── specs/         ← Detailed requirements (empty)
 └── tasks.md       ← Implementation checklist (empty)
+
 ```
 
 Now let's fill in the first artifact—the proposal.
@@ -192,6 +199,7 @@ Now let's fill in the first artifact—the proposal.
 ## Phase 5: Proposal
 
 **EXPLAIN:**
+
 ```
 ## The Proposal
 
@@ -236,9 +244,11 @@ Does this capture the intent? I can adjust before we save it.
 **PAUSE** - Wait for user approval/feedback.
 
 After approval, save the proposal:
+
 ```bash
 openspec instructions proposal --change "<name>" --json
 ```
+
 Then write the content to `openspec/changes/<name>/proposal.md`.
 
 ```
@@ -252,6 +262,7 @@ Next up: specs.
 ## Phase 6: Specs
 
 **EXPLAIN:**
+
 ```
 ## Specs
 
@@ -261,6 +272,7 @@ For a small task like this, we might only need one spec file.
 ```
 
 **DO:** Create the spec file:
+
 ```bash
 mkdir -p openspec/changes/<name>/specs/<capability-name>
 ```
@@ -296,6 +308,7 @@ Save to `openspec/changes/<name>/specs/<capability>/spec.md`.
 ## Phase 7: Design
 
 **EXPLAIN:**
+
 ```
 ## Design
 
@@ -341,6 +354,7 @@ Save to `openspec/changes/<name>/design.md`.
 ## Phase 8: Tasks
 
 **EXPLAIN:**
+
 ```
 ## Tasks
 
@@ -379,6 +393,7 @@ Save to `openspec/changes/<name>/tasks.md`.
 ## Phase 9: Apply (Implementation)
 
 **EXPLAIN:**
+
 ```
 ## Implementation
 
@@ -413,6 +428,7 @@ The change is implemented! One more step—let's archive it.
 ## Phase 10: Archive
 
 **EXPLAIN:**
+
 ```
 ## Archiving
 
@@ -422,11 +438,13 @@ Archived changes become your project's decision history—you can always find th
 ```
 
 **DO:**
+
 ```bash
 openspec archive "<name>"
 ```
 
 **SHOW:**
+
 ```
 Archived to: `openspec/changes/archive/YYYY-MM-DD-<name>/`
 

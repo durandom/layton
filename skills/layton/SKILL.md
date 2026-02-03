@@ -64,6 +64,9 @@ What would you like to do?
 | "audit", "review instructions" | `workflows/audit-project-instructions.md` |
 | "skill", "add skill", "create skill", "capture skill" | `workflows/author-skill.md` |
 | "workflow", "add workflow", "create workflow", "capture workflow" | `workflows/author-workflow.md` |
+| "bead template", "create bead template", "new bead template", "author bead" | `workflows/author-bead-template.md` |
+| "schedule bead", "run template" | `workflows/schedule-bead.md` |
+| "review beads", "pending review", "check completed" | `workflows/review-beads.md` |
 
 **After selecting a workflow, read and follow it exactly.**
 </routing>
@@ -143,6 +146,14 @@ $LAYTON workflows              # List workflows from .layton/workflows/
 $LAYTON workflows add <name>   # Create new workflow file from template
 ```
 
+**Bead Templates:**
+
+```bash
+$LAYTON beads                  # List bead templates from .layton/beads/
+$LAYTON beads add <name>       # Create new bead template from skeleton
+$LAYTON beads schedule <name> [json]  # Schedule bead from template with variables
+```
+
 </cli_commands>
 
 <workflows_index>
@@ -156,6 +167,9 @@ $LAYTON workflows add <name>   # Create new workflow file from template
 | audit-project-instructions.md | Review CLAUDE.md/AGENTS.md against best practices |
 | author-skill.md | Create or capture a skill file |
 | author-workflow.md | Create or capture a workflow file |
+| author-bead-template.md | Create or capture a bead template |
+| schedule-bead.md | Schedule a bead from a template for background execution |
+| review-beads.md | Find and review completed beads needing attention |
 
 </workflows_index>
 
@@ -222,4 +236,7 @@ When following workflows like `gather.md` or `morning-briefing.md`, read each sk
 - [ ] Skills are discovered and integrated via skill files
 - [ ] User can customize workflows in .layton/workflows/
 - [ ] Orientation command provides full status in one call
+- [ ] User can schedule beads from templates (layton beads schedule)
+- [ ] User is informed of beads pending review (beads_pending_review in orientation)
+- [ ] Bead templates are discoverable (layton beads lists templates)
 </success_criteria>

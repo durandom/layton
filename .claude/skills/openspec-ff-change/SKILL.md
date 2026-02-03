@@ -25,15 +25,19 @@ Fast-forward through artifact creation - generate everything needed to start imp
    **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
 
 2. **Create the change directory**
+
    ```bash
    openspec new change "<name>"
    ```
+
    This creates a scaffolded change at `openspec/changes/<name>/`.
 
 3. **Get the artifact build order**
+
    ```bash
    openspec status --change "<name>" --json
    ```
+
    Parse the JSON to get:
    - `applyRequires`: array of artifact IDs needed before implementation (e.g., `["tasks"]`)
    - `artifacts`: list of all artifacts with their status and dependencies
@@ -46,9 +50,11 @@ Fast-forward through artifact creation - generate everything needed to start imp
 
    a. **For each artifact that is `ready` (dependencies satisfied)**:
       - Get instructions:
+
         ```bash
         openspec instructions <artifact-id> --change "<name>" --json
         ```
+
       - The instructions JSON includes:
         - `context`: Project background (constraints for you - do NOT include in output)
         - `rules`: Artifact-specific rules (constraints for you - do NOT include in output)
@@ -71,6 +77,7 @@ Fast-forward through artifact creation - generate everything needed to start imp
       - Then continue with creation
 
 5. **Show final status**
+
    ```bash
    openspec status --change "<name>"
    ```
@@ -78,6 +85,7 @@ Fast-forward through artifact creation - generate everything needed to start imp
 **Output**
 
 After completing all artifacts, summarize:
+
 - Change name and location
 - List of artifacts created with brief descriptions
 - What's ready: "All artifacts created! Ready for implementation."
@@ -94,6 +102,7 @@ After completing all artifacts, summarize:
   - These guide what you write, but should never appear in the output
 
 **Guardrails**
+
 - Create ALL artifacts needed for implementation (as defined by schema's `apply.requires`)
 - Always read dependency artifacts before creating a new one
 - If context is critically unclear, ask the user - but prefer making reasonable decisions to keep momentum

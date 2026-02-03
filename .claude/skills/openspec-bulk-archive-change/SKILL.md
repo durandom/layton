@@ -93,12 +93,14 @@ This skill allows you to batch-archive changes, handling spec conflicts intellig
    ```
 
    For conflicts, show the resolution:
+
    ```
    * Conflict resolution:
      - auth spec: Will apply add-oauth then add-jwt (both implemented, chronological order)
    ```
 
    For incomplete changes, show warnings:
+
    ```
    Warnings:
    - add-verify-skill: 1 incomplete artifact, 3 incomplete tasks
@@ -126,6 +128,7 @@ This skill allows you to batch-archive changes, handling spec conflicts intellig
       - Track if sync was done
 
    b. **Perform the archive**:
+
       ```bash
       mkdir -p openspec/changes/archive
       mv openspec/changes/<name> openspec/changes/archive/YYYY-MM-DD-<name>
@@ -157,6 +160,7 @@ This skill allows you to batch-archive changes, handling spec conflicts intellig
    ```
 
    If any failures:
+
    ```
    Failed 1 change:
    - some-change: Archive directory already exists
@@ -165,6 +169,7 @@ This skill allows you to batch-archive changes, handling spec conflicts intellig
 **Conflict Resolution Examples**
 
 Example 1: Only one implemented
+
 ```
 Conflict: specs/auth/spec.md touched by [add-oauth, add-jwt]
 
@@ -180,6 +185,7 @@ Resolution: Only add-oauth is implemented. Will sync add-oauth specs only.
 ```
 
 Example 2: Both implemented
+
 ```
 Conflict: specs/api/spec.md touched by [add-rest-api, add-graphql]
 
@@ -233,6 +239,7 @@ No active changes found. Use `/opsx:new` to create a new change.
 ```
 
 **Guardrails**
+
 - Allow any number of changes (1+ is fine, 2+ is the typical use case)
 - Always prompt for selection, never auto-select
 - Detect spec conflicts early and resolve by checking codebase

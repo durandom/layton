@@ -93,11 +93,41 @@ def create_parser() -> argparse.ArgumentParser:
     )
     workflows_add.add_argument("name", help="Workflow name (lowercase identifier)")
 
+    # beads command
+    beads_parser = subparsers.add_parser("beads", help="Manage bead templates")
+    beads_subparsers = beads_parser.add_subparsers(dest="beads_command")
+
+    # beads add
+    beads_add = beads_subparsers.add_parser("add", help="Create new bead template")
+    beads_add.add_argument("name", help="Bead template name (lowercase identifier)")
+
+    # beads schedule
+    beads_schedule = beads_subparsers.add_parser(
+        "schedule", help="Schedule a bead from template"
+    )
+    beads_schedule.add_argument("name", help="Bead template name")
+    beads_schedule.add_argument(
+        "json_vars",
+        nargs="?",
+        default=None,
+        help="Variables as JSON (or pipe via stdin)",
+    )
+
+    # beads epic (get/set)
+    beads_epic = beads_subparsers.add_parser("epic", help="Manage epic ID")
+    beads_epic.add_argument(
+        "action",
+        nargs="?",
+        choices=["set"],
+        help="Action (omit to show current epic)",
+    )
+    beads_epic.add_argument("epic_id", nargs="?", help="Epic ID to set")
+
     return parser
 
 
 def run_orientation(formatter: OutputFormatter) -> int:
-    """Run orientation - combined doctor + skills + workflows.
+    """Run orientation - combined doctor + skills + workflows + beads.
 
     Args:
         formatter: Output formatter
@@ -105,6 +135,11 @@ def run_orientation(formatter: OutputFormatter) -> int:
     Returns:
         Exit code (0=success, 1=fixable, 2=critical)
     """
+    from laytonlib.beads import (
+        get_beads_pending_review,
+        get_beads_scheduled,
+        list_beads,
+    )
     from laytonlib.doctor import (
         check_beads_available,
         check_beads_initialized,
@@ -164,12 +199,32 @@ def run_orientation(formatter: OutputFormatter) -> int:
     if not workflows:
         next_steps.append("Run 'layton workflows add <name>' to create a workflow")
 
+    # Get bead templates inventory
+    bead_templates = list_beads()
+    bead_templates_data = [
+        {"name": b.name, "description": b.description, "variables": b.variables}
+        for b in bead_templates
+    ]
+
+    # Get scheduled and pending review beads (from bd)
+    beads_scheduled = get_beads_scheduled()
+    beads_pending_review = get_beads_pending_review()
+
+    # Add workflow hints based on beads status
+    if beads_pending_review:
+        next_steps.append(
+            f"{len(beads_pending_review)} bead(s) pending review - see workflows/review-beads.md"
+        )
+
     # Build output
     data = {
         "needs_setup": needs_setup,
         "checks": [c.to_dict() for c in checks],
         "skills": skills_data,
         "workflows": workflows_data,
+        "bead_templates": bead_templates_data,
+        "beads_scheduled": beads_scheduled,
+        "beads_pending_review": beads_pending_review,
     }
 
     if next_steps:
@@ -299,6 +354,152 @@ def run_workflows(
         return 0
 
 
+def run_beads(
+    formatter: OutputFormatter,
+    command: str | None,
+    name: str | None,
+    json_vars: str | None,
+    epic_action: str | None,
+    epic_id: str | None,
+) -> int:
+    """Run beads command.
+
+    Args:
+        formatter: Output formatter
+        command: Subcommand (add, schedule, epic, or None for list)
+        name: Bead template name for add/schedule
+        json_vars: JSON variables for schedule (or read from stdin)
+        epic_action: Epic action (set, or None for show)
+        epic_id: Epic ID for set action
+
+    Returns:
+        Exit code (0=success, 1=error)
+    """
+    import json
+    import sys
+
+    from laytonlib.beads import (
+        add_bead,
+        get_epic,
+        list_beads,
+        schedule_bead,
+        set_epic,
+    )
+
+    if command == "add":
+        if not name:
+            formatter.error("MISSING_NAME", "Bead template name is required")
+            return 1
+
+        try:
+            path = add_bead(name)
+            formatter.success(
+                {"created": str(path), "name": name},
+                next_steps=[f"Edit {path} to configure the bead template"],
+            )
+            return 0
+        except FileExistsError as e:
+            formatter.error(
+                "BEAD_EXISTS",
+                str(e),
+                next_steps=["Review existing template or choose a different name"],
+            )
+            return 1
+
+    elif command == "schedule":
+        if not name:
+            formatter.error("MISSING_NAME", "Bead template name is required")
+            return 1
+
+        # Parse variables from JSON arg or stdin
+        variables = {}
+        if json_vars:
+            try:
+                variables = json.loads(json_vars)
+            except json.JSONDecodeError as e:
+                formatter.error("INVALID_JSON", f"Invalid JSON: {e}")
+                return 1
+        elif not sys.stdin.isatty():
+            # Read from stdin
+            try:
+                stdin_data = sys.stdin.read().strip()
+                if stdin_data:
+                    variables = json.loads(stdin_data)
+            except json.JSONDecodeError as e:
+                formatter.error("INVALID_JSON", f"Invalid JSON from stdin: {e}")
+                return 1
+
+        try:
+            result = schedule_bead(name, variables)
+            formatter.success({"scheduled": result})
+            return 0
+        except FileNotFoundError:
+            formatter.error(
+                "TEMPLATE_NOT_FOUND",
+                f"Bead template '{name}' not found",
+                next_steps=["Run 'layton beads' to list available templates"],
+            )
+            return 1
+        except RuntimeError as e:
+            error_str = str(e)
+            if "BD_UNAVAILABLE" in error_str:
+                formatter.error(
+                    "BD_UNAVAILABLE",
+                    "bd CLI not found",
+                    next_steps=[
+                        "Install Beads CLI: https://github.com/steveyegge/beads"
+                    ],
+                )
+            elif "NO_EPIC" in error_str:
+                formatter.error(
+                    "NO_EPIC",
+                    "Epic not configured",
+                    next_steps=["Run 'layton beads epic set <id>' to configure epic"],
+                )
+            else:
+                formatter.error("BD_ERROR", error_str)
+            return 1
+
+    elif command == "epic":
+        if epic_action == "set":
+            if not epic_id:
+                formatter.error("MISSING_EPIC_ID", "Epic ID is required for set")
+                return 1
+            if set_epic(epic_id):
+                formatter.success({"epic": epic_id})
+                return 0
+            else:
+                formatter.error("WRITE_FAILED", "Failed to save epic to config")
+                return 1
+        else:
+            # Show current epic
+            epic = get_epic()
+            if epic:
+                formatter.success({"epic": epic})
+                return 0
+            else:
+                formatter.error(
+                    "NO_EPIC",
+                    "Epic not configured",
+                    next_steps=["Run 'layton beads epic set <id>' to configure epic"],
+                )
+                return 1
+
+    else:
+        # Default: list beads
+        beads = list_beads()
+        next_steps = []
+        if not beads:
+            next_steps.append("Run 'layton beads add <name>' to create a bead template")
+        else:
+            next_steps.append("See workflows/schedule-bead.md for scheduling workflow")
+        formatter.success(
+            {"beads": [b.to_dict() for b in beads]},
+            next_steps=next_steps if next_steps else None,
+        )
+        return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     """CLI entrypoint.
 
@@ -355,6 +556,16 @@ def main(argv: list[str] | None = None) -> int:
             formatter,
             command=getattr(args, "workflows_command", None),
             name=getattr(args, "name", None),
+        )
+
+    elif args.command == "beads":
+        return run_beads(
+            formatter,
+            command=getattr(args, "beads_command", None),
+            name=getattr(args, "name", None),
+            json_vars=getattr(args, "json_vars", None),
+            epic_action=getattr(args, "action", None),
+            epic_id=getattr(args, "epic_id", None),
         )
 
     else:

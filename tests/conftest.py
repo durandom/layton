@@ -68,6 +68,14 @@ def temp_workflows_dir(isolated_env):
 
 
 @pytest.fixture
+def temp_beads_dir(isolated_env):
+    """Temporary .layton/beads/ directory for isolated tests."""
+    beads_dir = isolated_env / ".layton" / "beads"
+    beads_dir.mkdir(exist_ok=True)
+    return beads_dir
+
+
+@pytest.fixture
 def temp_skills_root(isolated_env):
     """Temporary skills/ directory (for skill discovery tests)."""
     skills_root = isolated_env / "skills"

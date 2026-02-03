@@ -26,9 +26,11 @@ Continue working on a change by creating the next artifact.
    **IMPORTANT**: Do NOT guess or auto-select a change. Always let the user choose.
 
 2. **Check current status**
+
    ```bash
    openspec status --change "<name>" --json
    ```
+
    Parse the JSON to understand current state. The response includes:
    - `schemaName`: The workflow schema being used (e.g., "spec-driven")
    - `artifacts`: Array of artifacts with their status ("done", "ready", "blocked")
@@ -49,9 +51,11 @@ Continue working on a change by creating the next artifact.
    **If artifacts are ready to create** (status shows artifacts with `status: "ready"`):
    - Pick the FIRST artifact with `status: "ready"` from the status output
    - Get its instructions:
+
      ```bash
      openspec instructions <artifact-id> --change "<name>" --json
      ```
+
    - Parse the JSON. The key fields are:
      - `context`: Project background (constraints for you - do NOT include in output)
      - `rules`: Artifact-specific rules (constraints for you - do NOT include in output)
@@ -74,6 +78,7 @@ Continue working on a change by creating the next artifact.
    - Show status and suggest checking for issues
 
 4. **After creating an artifact, show progress**
+
    ```bash
    openspec status --change "<name>"
    ```
@@ -81,6 +86,7 @@ Continue working on a change by creating the next artifact.
 **Output**
 
 After each invocation, show:
+
 - Which artifact was created
 - Schema workflow being used
 - Current progress (N/M complete)
@@ -94,6 +100,7 @@ The artifact types and their purpose depend on the schema. Use the `instruction`
 Common artifact patterns:
 
 **spec-driven schema** (proposal → specs → design → tasks):
+
 - **proposal.md**: Ask user about the change if not clear. Fill in Why, What Changes, Capabilities, Impact.
   - The Capabilities section is critical - each capability listed will need a spec file.
 - **specs/<capability>/spec.md**: Create one spec per capability listed in the proposal's Capabilities section (use the capability name, not the change name).
@@ -103,6 +110,7 @@ Common artifact patterns:
 For other schemas, follow the `instruction` field from the CLI output.
 
 **Guardrails**
+
 - Create ONE artifact per invocation
 - Always read dependency artifacts before creating a new one
 - Never skip artifacts or create out of order
