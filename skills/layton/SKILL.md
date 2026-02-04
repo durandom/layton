@@ -25,7 +25,84 @@ Layton is your personal secretary—managing attention, synthesizing information
 - Workflows are AI instructions—Layton follows them, not executes them as code
 - Skill files in `.layton/skills/` define how to query external tools
 - User workflows in `.layton/workflows/` are customizable by users
+- **ALWAYS** run `$LAYTON` at session start before any other action
+- **NEVER** query external tools without first reading their skill file in `.layton/skills/`
+- **NEVER** skip a workflow if the routing table matches the user's intent
 </essential_principles>
+
+<decision_framework>
+
+## ⚠️ CRITICAL: WORKFLOW-FIRST DECISION FRAMEWORK
+
+Before taking ANY action, you MUST follow this process:
+
+### Step 1: Run Orientation
+
+```bash
+$LAYTON
+```
+
+This discovers available skills, workflows, and current state. **Never skip this.**
+
+### Step 2: Check for Matching Workflow
+
+Scan the `<routing>` table for intent matches. If found:
+
+- Read the workflow file FIRST
+- Follow it EXACTLY
+
+### Step 3: Check for Skill Files
+
+If the task involves external tools (calendar, tasks, git, etc.):
+
+```bash
+$LAYTON skills
+```
+
+Read matching skill file in `.layton/skills/` before querying.
+
+### Step 4: ONLY if No Match
+
+Clarify intent with user, then select appropriate workflow.
+
+### Examples
+
+**❌ INCORRECT** (skipping workflow):
+
+```bash
+User: "What should I focus on?"
+Agent: bd list --label watching --json
+Problem: Skipped orientation, missed focus-suggestion workflow
+```
+
+**✅ CORRECT**:
+
+```bash
+User: "What should I focus on?"
+Agent: $LAYTON  # orientation first
+Agent: $LAYTON workflows  # discover available workflows
+Agent: Reads .layton/workflows/focus-suggestion.md (or creates via `$LAYTON workflows add`)
+Agent: Follows workflow steps exactly
+```
+
+**❌ INCORRECT** (skipping skill discovery):
+
+```bash
+User: "What's on my calendar today?"
+Agent: <tries to guess calendar command>
+Problem: Skipped skill file, doesn't know user's calendar tool
+```
+
+**✅ CORRECT**:
+
+```bash
+User: "What's on my calendar today?"
+Agent: $LAYTON skills  # discover skills
+Agent: Reads .layton/skills/calendar.md
+Agent: Executes commands documented in skill file
+```
+
+</decision_framework>
 
 <intake>
 ## Step 1: Run CLI
@@ -50,23 +127,32 @@ What would you like to do?
 <routing>
 | Response | Workflow |
 | --- | --- |
-| 1, "orient", "status", "check" | Run `layton` CLI (no args) |
-| 2, "track", "watch", "monitor" | `workflows/track-item.md` |
-| 3, "focus", "working on" | `workflows/set-focus.md` |
-| 4, "retrospect", "reflect", "retro" | `workflows/retrospect.md` |
+| 1, "orient", "status", "check", "what's going on" | Run `$LAYTON` (no args) |
+| 2, "track", "watch", "monitor", "keep eye on" | `workflows/track-item.md` |
+| 3, "focus", "working on", "what should I do", "next task", "priority" | `workflows/set-focus.md` |
+| 4, "retrospect", "reflect", "retro", "what worked" | `workflows/retrospect.md` |
 | 5, other | Clarify intent, then select |
 
 **Intent-based routing (bypass menu):**
 
-| Intent | Workflow |
+| Intent / Trigger Phrases | Workflow |
 | --- | --- |
-| "setup", "configure", "onboard" | `workflows/setup.md` |
-| "audit", "review instructions" | `workflows/audit-project-instructions.md` |
-| "skill", "add skill", "create skill", "capture skill" | `workflows/author-skill.md` |
-| "workflow", "add workflow", "create workflow", "capture workflow" | `workflows/author-workflow.md` |
+| "setup", "configure", "onboard", "first time" | `workflows/setup.md` |
+| "audit", "review instructions", "check CLAUDE.md" | `workflows/audit-project-instructions.md` |
+| "skill", "add skill", "create skill", "capture skill", "new skill" | `workflows/author-skill.md` |
+| "workflow", "add workflow", "create workflow", "capture workflow", "new workflow" | `workflows/author-workflow.md` |
 | "bead template", "create bead template", "new bead template", "author bead" | `workflows/author-bead-template.md` |
-| "schedule bead", "run template" | `workflows/schedule-bead.md` |
-| "review beads", "pending review", "check completed" | `workflows/review-beads.md` |
+| "schedule bead", "run template", "background task" | `workflows/schedule-bead.md` |
+| "review beads", "pending review", "check completed", "what finished" | `workflows/review-beads.md` |
+
+**External tool queries (calendar, tasks, email, etc.):**
+
+| Intent / Trigger Phrases | Action |
+| --- | --- |
+| "calendar", "schedule", "meetings", "agenda" | Check `.layton/skills/` for calendar skill |
+| "tasks", "todos", "inbox", "gtd", "things to do" | Check `.layton/skills/` for task skill |
+| "email", "messages", "mail" | Check `.layton/skills/` for email skill |
+| "git", "commits", "PRs", "code" | Check `.layton/skills/` for git skill |
 
 **After selecting a workflow, read and follow it exactly.**
 </routing>
@@ -76,7 +162,7 @@ What would you like to do?
 **Get oriented** (full status):
 
 ```bash
-${CLAUDE_PLUGIN_ROOT}/scripts/layton
+$LAYTON
 ```
 
 **Setup for first-time users**: Run workflow in `workflows/setup.md`
@@ -92,13 +178,23 @@ ${CLAUDE_PLUGIN_ROOT}/scripts/layton
 **Focus suggestions**: Follow `examples/focus-suggestion.md`
 </quick_start>
 
-<cli_commands>
+<cli_setup>
+**Locate and set the CLI variable:**
 
-**Invocation:** Set the LAYTON variable for this session:
+The CLI script is at `scripts/layton` **relative to this SKILL.md file** (not the working directory).
+
+When you read this file, note its path and derive the script location:
+
+- If SKILL.md is at `/path/to/skills/layton/SKILL.md`
+- Then the CLI is at `/path/to/skills/layton/scripts/layton`
 
 ```bash
-LAYTON="${CLAUDE_PLUGIN_ROOT}/scripts/layton"
+LAYTON="/path/to/skills/layton/scripts/layton"  # Use the actual path
 ```
+
+</cli_setup>
+
+<cli_commands>
 
 **Orientation (no args):**
 

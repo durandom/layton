@@ -46,10 +46,15 @@ class TestOrientationCommand:
 
         if data.get("success"):
             checks = data["data"]["checks"]
-            assert isinstance(checks, list)
-            # Should have at least beads_available and config checks
-            check_names = [c["name"] for c in checks]
-            assert "config_exists" in check_names
+            # When all checks pass, checks is compacted to a dict
+            if isinstance(checks, dict):
+                assert "summary" in checks
+                assert "all_passed" in checks
+            else:
+                # When there are failures/warnings, checks is a list
+                assert isinstance(checks, list)
+                check_names = [c["name"] for c in checks]
+                assert "config_exists" in check_names
 
     def test_orientation_includes_skills(
         self,
@@ -130,9 +135,9 @@ class TestCompactOutput:
             return
 
         # Should show compact summary, not individual checks
-        # Format: "✓ N/N checks passed"
-        assert "checks passed" in result.stdout, (
-            f"Expected compact summary with 'checks passed', got: {result.stdout}"
+        # Format: "✓ N/N passed"
+        assert "passed" in result.stdout and "✓" in result.stdout, (
+            f"Expected compact summary with '✓ N/N passed', got: {result.stdout}"
         )
         # Should NOT show individual check names in compact mode
         # (unless there's a failure)

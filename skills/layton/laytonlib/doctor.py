@@ -66,33 +66,34 @@ def check_beads_available() -> CheckResult:
             message="bd CLI not found in PATH. Install Beads: https://github.com/steveyegge/beads",
         )
 
-    # Check if bd info --json works
+    # Check if bd version works (fast, no db access)
     try:
         result = subprocess.run(
-            ["bd", "info", "--json"],
+            ["bd", "version"],
             capture_output=True,
             text=True,
             timeout=5,
         )
         if result.returncode == 0:
+            version = result.stdout.strip()
             return CheckResult(
                 name="beads_available",
                 status="pass",
-                message=f"bd CLI available at {bd_path}",
+                message=f"bd CLI {version} at {bd_path}",
             )
         else:
             return CheckResult(
                 name="beads_available",
                 status="fail",
                 message=(
-                    f"bd CLI found but 'bd info --json' failed: {result.stderr.strip()}"
+                    f"bd CLI found but 'bd version' failed: {result.stderr.strip()}"
                 ),
             )
     except subprocess.TimeoutExpired:
         return CheckResult(
             name="beads_available",
             status="fail",
-            message="bd CLI found but 'bd info --json' timed out",
+            message="bd CLI found but 'bd version' timed out",
         )
     except Exception as e:
         return CheckResult(
