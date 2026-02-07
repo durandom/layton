@@ -2,12 +2,12 @@
 
 ### Requirement: No-arg invocation
 
-Running `layton` with no arguments SHALL return full AI orientation (doctor + skills + workflows + beads).
+Running `layton` with no arguments SHALL return full AI orientation (doctor + rolodex + protocols + errands).
 
 #### Scenario: Layton with no args returns orientation
 
 - **WHEN** user runs `layton` with no arguments
-- **THEN** CLI SHALL return JSON with `checks` (doctor output), `skills` (from `.layton/skills/`), `workflows` (from `.layton/workflows/`), and `beads` (from `.layton/beads/`)
+- **THEN** CLI SHALL return JSON with `checks` (doctor output), `rolodex` (from `.layton/rolodex/`), `protocols` (from `.layton/protocols/`), and `errands` (from `.layton/errands/`)
 - **AND** output SHALL include `next_steps` for common actions
 
 #### Scenario: Orientation includes doctor checks
@@ -15,23 +15,23 @@ Running `layton` with no arguments SHALL return full AI orientation (doctor + sk
 - **WHEN** user runs `layton` with no arguments
 - **THEN** `checks` field SHALL contain all doctor check results (beads CLI, config validity)
 
-#### Scenario: Orientation includes skills inventory
+#### Scenario: Orientation includes rolodex inventory
 
 - **WHEN** user runs `layton` with no arguments
-- **THEN** `skills` field SHALL be an array of known skills
-- **AND** each skill SHALL include `name` and `description` from frontmatter
+- **THEN** `rolodex` field SHALL be an array of known rolodex cards
+- **AND** each card SHALL include `name` and `description` from frontmatter
 
-#### Scenario: Orientation includes workflows inventory
-
-- **WHEN** user runs `layton` with no arguments
-- **THEN** `workflows` field SHALL be an array of user workflows
-- **AND** each workflow SHALL include `name`, `description`, and `triggers` from frontmatter
-
-#### Scenario: Orientation includes bead templates
+#### Scenario: Orientation includes protocols inventory
 
 - **WHEN** user runs `layton` with no arguments
-- **THEN** `bead_templates` field SHALL be an array of bead templates from `.layton/beads/`
-- **AND** each template SHALL include `name`, `description`, and `variables` from frontmatter
+- **THEN** `protocols` field SHALL be an array of user protocols
+- **AND** each protocol SHALL include `name`, `description`, and `triggers` from frontmatter
+
+#### Scenario: Orientation includes errands
+
+- **WHEN** user runs `layton` with no arguments
+- **THEN** `errands` field SHALL be an array of errands from `.layton/errands/`
+- **AND** each errand SHALL include `name`, `description`, and `variables` from frontmatter
 
 #### Scenario: Orientation includes beads pending review
 

@@ -1,8 +1,8 @@
 <overview>
-Command reference for the `bd` (beads) CLI used by Layton for state operations.
+Command reference for the `bd` (errands) CLI used by Layton for state operations.
 </overview>
 
-<creating_beads>
+<creating_errands>
 **Track external item:**
 
 ```bash
@@ -15,20 +15,20 @@ Output:
 {"id": "beads-abc", "title": "JIRA-1234: blocking release", "labels": ["watching", "jira", "layton"]}
 ```
 
-</creating_beads>
+</creating_errands>
 
-<querying_beads>
+<querying_errands>
 
 | Query | Command |
 | --- | --- |
 | Watched items | `bd list --label watching --json` |
 | Current focus | `bd list --label focus --json` |
-| All Layton beads | `bd list --label layton --json` |
+| All Layton errands | `bd list --label layton --json` |
 | Ready work | `bd ready --json` |
 
-</querying_beads>
+</querying_errands>
 
-<updating_beads>
+<updating_errands>
 **Add label:**
 
 ```bash
@@ -41,21 +41,21 @@ bd update <id> --add-label <label> --json
 bd update <id> --remove-label <label> --json
 ```
 
-</updating_beads>
+</updating_errands>
 
-<closing_beads>
+<closing_errands>
 
 ```bash
 bd close <id> --reason "..." --json
 ```
 
-</closing_beads>
+</closing_errands>
 
 <label_conventions>
 
 | Label | Purpose |
 | --- | --- |
-| `layton` | Namespace - all Layton-managed beads |
+| `layton` | Namespace - all Layton-managed errands |
 | `watching` | Items user wants tracked |
 | `focus` | Current work item (only one) |
 | `jira`, `github`, etc. | Source system |

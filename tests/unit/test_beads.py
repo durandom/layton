@@ -1,4 +1,4 @@
-"""Unit tests for beads module."""
+"""Unit tests for errands module."""
 
 import sys
 from pathlib import Path
@@ -6,16 +6,16 @@ from pathlib import Path
 # Add laytonlib to path for testing
 sys.path.insert(
     0,
-    str(Path(__file__).parent.parent.parent / "skills" / "layton"),
+    str(Path(__file__).parent.parent.parent / "skills" / "layton" / "scripts"),
 )
 
-from laytonlib.beads import (
-    BEAD_TEMPLATE,
-    BeadInfo,
-    add_bead,
-    list_beads,
+from laytonlib.errands import (
+    ERRAND_TEMPLATE,
+    ErrandInfo,
+    add_errand,
+    list_errands,
     parse_frontmatter,
-    schedule_bead,
+    schedule_errand,
 )
 
 
@@ -26,7 +26,7 @@ class TestParseFrontmatter:
         """Parses valid YAML frontmatter."""
         content = """---
 name: test
-description: A test bead
+description: A test errand
 ---
 
 ## Task
@@ -36,7 +36,7 @@ Do something.
         result = parse_frontmatter(content)
         assert result is not None
         assert result["name"] == "test"
-        assert result["description"] == "A test bead"
+        assert result["description"] == "A test errand"
 
     def test_frontmatter_with_variables(self):
         """Parses frontmatter with variables section."""
@@ -80,7 +80,7 @@ Review ${file_path}.
         content = """---
 name: test
 # This is a comment
-description: A test bead
+description: A test errand
 ---
 
 ## Task
@@ -88,7 +88,7 @@ description: A test bead
         result = parse_frontmatter(content)
         assert result is not None
         assert result["name"] == "test"
-        assert result["description"] == "A test bead"
+        assert result["description"] == "A test errand"
 
     def test_variables_with_comments(self):
         """Parses variables section with comment lines."""
@@ -107,48 +107,47 @@ variables:
         assert result["variables"]["file_path"] == "The file path"
 
 
-class TestListBeads:
-    """Tests for list_beads function."""
+class TestListErrands:
+    """Tests for list_errands function."""
 
-    def test_empty_dir(self, temp_beads_dir):
-        """Returns empty list when beads directory is empty."""
-        result = list_beads()
+    def test_empty_dir(self, temp_errands_dir):
+        """Returns empty list when errands directory is empty."""
+        result = list_errands()
         assert result == []
 
     def test_missing_dir(self, isolated_env):
-        """Returns empty list when beads directory doesn't exist."""
-        # The beads dir doesn't exist by default in isolated_env
-        beads_dir = isolated_env / ".layton" / "beads"
-        if beads_dir.exists():
-            beads_dir.rmdir()
-        result = list_beads()
+        """Returns empty list when errands directory doesn't exist."""
+        errands_dir = isolated_env / ".layton" / "errands"
+        if errands_dir.exists():
+            errands_dir.rmdir()
+        result = list_errands()
         assert result == []
 
-    def test_multiple_beads(self, temp_beads_dir):
-        """Lists multiple bead templates sorted by name."""
-        (temp_beads_dir / "zebra.md").write_text(
+    def test_multiple_errands(self, temp_errands_dir):
+        """Lists multiple errands sorted by name."""
+        (temp_errands_dir / "zebra.md").write_text(
             """---
 name: zebra
-description: Last bead
+description: Last errand
 ---
 """
         )
-        (temp_beads_dir / "alpha.md").write_text(
+        (temp_errands_dir / "alpha.md").write_text(
             """---
 name: alpha
-description: First bead
+description: First errand
 ---
 """
         )
 
-        result = list_beads()
+        result = list_errands()
         assert len(result) == 2
         assert result[0].name == "alpha"
         assert result[1].name == "zebra"
 
-    def test_beads_with_variables(self, temp_beads_dir):
-        """Lists beads with their declared variables."""
-        (temp_beads_dir / "review.md").write_text(
+    def test_errands_with_variables(self, temp_errands_dir):
+        """Lists errands with their declared variables."""
+        (temp_errands_dir / "review.md").write_text(
             """---
 name: review
 description: Code review
@@ -159,60 +158,60 @@ variables:
 """
         )
 
-        result = list_beads()
+        result = list_errands()
         assert len(result) == 1
         assert result[0].name == "review"
         assert result[0].variables["file_path"] == "File to review"
         assert result[0].variables["focus"] == "Focus area"
 
 
-class TestAddBead:
-    """Tests for add_bead function."""
+class TestAddErrand:
+    """Tests for add_errand function."""
 
-    def test_creates_file(self, temp_beads_dir):
-        """Creates bead template from skeleton."""
-        path = add_bead("newbead")
+    def test_creates_file(self, temp_errands_dir):
+        """Creates errand from template."""
+        path = add_errand("newerrand")
 
         assert path.exists()
-        assert path.name == "newbead.md"
+        assert path.name == "newerrand.md"
         content = path.read_text()
-        assert "name: newbead" in content
+        assert "name: newerrand" in content
 
     def test_creates_directory(self, isolated_env):
-        """Creates .layton/beads/ if it doesn't exist."""
-        beads_dir = isolated_env / ".layton" / "beads"
-        if beads_dir.exists():
-            beads_dir.rmdir()
+        """Creates .layton/errands/ if it doesn't exist."""
+        errands_dir = isolated_env / ".layton" / "errands"
+        if errands_dir.exists():
+            errands_dir.rmdir()
 
-        path = add_bead("newbead")
+        path = add_errand("newerrand")
 
-        assert beads_dir.exists()
+        assert errands_dir.exists()
         assert path.exists()
 
-    def test_error_if_exists(self, temp_beads_dir):
-        """Raises FileExistsError if bead template already exists."""
-        (temp_beads_dir / "existing.md").write_text("existing content")
+    def test_error_if_exists(self, temp_errands_dir):
+        """Raises FileExistsError if errand already exists."""
+        (temp_errands_dir / "existing.md").write_text("existing content")
 
         try:
-            add_bead("existing")
+            add_errand("existing")
             assert False, "Should have raised FileExistsError"
         except FileExistsError as e:
             assert "already exists" in str(e)
 
 
-class TestScheduleBead:
-    """Tests for schedule_bead function with variable substitution."""
+class TestScheduleErrand:
+    """Tests for schedule_errand function with variable substitution."""
 
-    def test_variable_substitution(self, temp_beads_dir, temp_config, monkeypatch):
+    def test_variable_substitution(self, temp_errands_dir, temp_config, monkeypatch):
         """Substitutes variables using string.Template."""
         import json
         import shutil
         import subprocess
 
-        from laytonlib import beads as beads_module
+        from laytonlib import errands as errands_module
 
-        # Create template with variables
-        (temp_beads_dir / "review.md").write_text(
+        # Create errand with variables
+        (temp_errands_dir / "review.md").write_text(
             """---
 name: review
 description: Review code
@@ -228,13 +227,13 @@ Check ${missing_var} as well.
         )
 
         # Configure epic in config file
-        temp_config.write_text(json.dumps({"beads": {"epic": "test-epic"}}))
+        temp_config.write_text(json.dumps({"errands": {"epic": "test-epic"}}))
 
-        # Mock get_beads_dir to return our temp dir
-        monkeypatch.setattr(beads_module, "get_beads_dir", lambda: temp_beads_dir)
+        # Mock get_errands_dir to return our temp dir
+        monkeypatch.setattr(errands_module, "get_errands_dir", lambda: temp_errands_dir)
 
         # Mock get_epic to return our epic (since config path detection may differ)
-        monkeypatch.setattr(beads_module, "get_epic", lambda: "test-epic")
+        monkeypatch.setattr(errands_module, "get_epic", lambda: "test-epic")
 
         # Mock bd to avoid actual execution - capture the command for assertions
         captured_cmd = []
@@ -255,7 +254,7 @@ Check ${missing_var} as well.
             shutil, "which", lambda cmd: "/usr/bin/bd" if cmd == "bd" else None
         )
 
-        result = schedule_bead("review", {"file_path": "src/auth.py"})
+        result = schedule_errand("review", {"file_path": "src/auth.py"})
 
         # Result should come from mocked bd
         assert result["id"] == "bead-123"
@@ -267,54 +266,54 @@ Check ${missing_var} as well.
         assert "${missing_var}" in rendered_body  # Unsubstituted var remains as-is
 
 
-class TestBeadTemplate:
-    """Tests for bead template."""
+class TestErrandTemplate:
+    """Tests for errand template."""
 
     def test_has_required_sections(self):
         """Template has required sections."""
-        assert "## Task" in BEAD_TEMPLATE
-        assert "## Acceptance Criteria" in BEAD_TEMPLATE
-        assert "## When Complete" in BEAD_TEMPLATE
+        assert "## Task" in ERRAND_TEMPLATE
+        assert "## Acceptance Criteria" in ERRAND_TEMPLATE
+        assert "## When Complete" in ERRAND_TEMPLATE
 
     def test_has_frontmatter_placeholders(self):
         """Template has frontmatter placeholders."""
-        assert "name: {name}" in BEAD_TEMPLATE
-        assert "description:" in BEAD_TEMPLATE
-        assert "variables:" in BEAD_TEMPLATE
+        assert "name: {name}" in ERRAND_TEMPLATE
+        assert "description:" in ERRAND_TEMPLATE
+        assert "variables:" in ERRAND_TEMPLATE
 
     def test_has_closing_instructions(self):
         """Template has standard closing instructions."""
-        assert "bd comments add" in BEAD_TEMPLATE
-        assert "bd close --add-label needs-review" in BEAD_TEMPLATE
+        assert "bd comments add" in ERRAND_TEMPLATE
+        assert "bd close --add-label needs-review" in ERRAND_TEMPLATE
 
 
-class TestBeadInfo:
-    """Tests for BeadInfo dataclass."""
+class TestErrandInfo:
+    """Tests for ErrandInfo dataclass."""
 
     def test_to_dict(self, tmp_path):
         """to_dict returns proper dictionary."""
         path = tmp_path / "test.md"
-        bead = BeadInfo(
+        errand = ErrandInfo(
             name="test",
-            description="Test bead",
+            description="Test errand",
             variables={"file_path": "File to process"},
             path=path,
         )
-        d = bead.to_dict()
+        d = errand.to_dict()
 
         assert d["name"] == "test"
-        assert d["description"] == "Test bead"
+        assert d["description"] == "Test errand"
         assert d["variables"]["file_path"] == "File to process"
         assert d["path"] == str(path)
 
     def test_to_dict_without_path(self):
         """to_dict works without path."""
-        bead = BeadInfo(
+        errand = ErrandInfo(
             name="test",
-            description="Test bead",
+            description="Test errand",
             variables={},
         )
-        d = bead.to_dict()
+        d = errand.to_dict()
 
         assert d["name"] == "test"
         assert "path" not in d

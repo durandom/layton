@@ -1,50 +1,50 @@
 ## ADDED Requirements
 
-### Requirement: List bead templates
+### Requirement: List errands
 
-The CLI SHALL list all available bead templates.
+The CLI SHALL list all available errands.
 
-#### Scenario: List templates with no args
+#### Scenario: List errands with no args
 
-- **WHEN** user runs `layton beads` with no subcommand
-- **THEN** CLI SHALL return JSON array of templates from `.layton/beads/`
-- **AND** each template SHALL include `name` and `description` from frontmatter
-- **AND** each template SHALL include `variables` object with variable names as keys and descriptions as values
+- **WHEN** user runs `layton errands` with no subcommand
+- **THEN** CLI SHALL return JSON array of errands from `.layton/errands/`
+- **AND** each errand SHALL include `name` and `description` from frontmatter
+- **AND** each errand SHALL include `variables` object with variable names as keys and descriptions as values
 
-#### Scenario: Empty beads directory
+#### Scenario: Empty errands directory
 
-- **WHEN** user runs `layton beads` and `.layton/beads/` is empty or missing
-- **THEN** CLI SHALL return empty array `{"beads": []}`
-- **AND** `next_steps` SHALL include `layton beads add <name>`
+- **WHEN** user runs `layton errands` and `.layton/errands/` is empty or missing
+- **THEN** CLI SHALL return empty array `{"errands": []}`
+- **AND** `next_steps` SHALL include `layton errands add <name>`
 
-#### Scenario: Template not found for schedule
+#### Scenario: Errand not found for schedule
 
-- **WHEN** user runs `layton beads schedule nonexistent`
-- **THEN** CLI SHALL return error with code `TEMPLATE_NOT_FOUND`
-- **AND** `next_steps` SHALL suggest `layton beads` to list available templates
+- **WHEN** user runs `layton errands schedule nonexistent`
+- **THEN** CLI SHALL return error with code `ERRAND_NOT_FOUND`
+- **AND** `next_steps` SHALL suggest `layton errands` to list available errands
 
 ---
 
-### Requirement: Schedule bead from template
+### Requirement: Schedule errand
 
-The CLI SHALL create beads from templates with variable substitution.
+The CLI SHALL create beads from errands with variable substitution.
 
 #### Scenario: Schedule with JSON variables
 
-- **WHEN** user runs `layton beads schedule code-review '{"file_path": "src/auth.py"}'`
-- **THEN** CLI SHALL load template from `.layton/beads/code-review.md`
+- **WHEN** user runs `layton errands schedule code-review '{"file_path": "src/auth.py"}'`
+- **THEN** CLI SHALL load errand from `.layton/errands/code-review.md`
 - **AND** CLI SHALL substitute `${file_path}` with `src/auth.py` in body
 - **AND** CLI SHALL call `bd create` with rendered description
 
 #### Scenario: Schedule with stdin variables
 
-- **WHEN** user pipes JSON to `layton beads schedule code-review`
+- **WHEN** user pipes JSON to `layton errands schedule code-review`
 - **THEN** CLI SHALL read variables from stdin
 - **AND** CLI SHALL process identically to inline JSON
 
 #### Scenario: Schedule with no variables
 
-- **WHEN** user runs `layton beads schedule standup` with no JSON argument
+- **WHEN** user runs `layton errands schedule standup` with no JSON argument
 - **THEN** CLI SHALL use empty variables `{}`
 - **AND** any `${var}` patterns SHALL remain as-is in output
 
@@ -62,13 +62,13 @@ The CLI SHALL apply fixed labels to all scheduled beads.
 
 #### Scenario: Labels on bead creation
 
-- **WHEN** a bead is scheduled from template `code-review`
+- **WHEN** a bead is scheduled from errand `code-review`
 - **THEN** CLI SHALL apply label `scheduled`
 - **AND** CLI SHALL apply label `type:code-review`
 
-#### Scenario: Labels are not configurable per template
+#### Scenario: Labels are not configurable per errand
 
-- **WHEN** a template file contains any label-related frontmatter
+- **WHEN** an errand file contains any label-related frontmatter
 - **THEN** CLI SHALL ignore it
 - **AND** CLI SHALL apply only the fixed labels
 
@@ -80,21 +80,21 @@ The CLI SHALL manage a project epic for bead scheduling.
 
 #### Scenario: Epic stored in config
 
-- **WHEN** user runs `layton beads epic set beads-xyz123`
+- **WHEN** user runs `layton errands epic set beads-xyz123`
 - **THEN** CLI SHALL store epic ID at `beads.epic` in config file
 - **AND** CLI SHALL return success with stored value
 
 #### Scenario: Show current epic
 
-- **WHEN** user runs `layton beads epic`
+- **WHEN** user runs `layton errands epic`
 - **THEN** CLI SHALL return current epic ID from config
 - **AND** if no epic configured, SHALL return error with code `NO_EPIC`
 
 #### Scenario: Schedule requires epic
 
-- **WHEN** user runs `layton beads schedule` without epic configured
+- **WHEN** user runs `layton errands schedule` without epic configured
 - **THEN** CLI SHALL return error with code `NO_EPIC`
-- **AND** `next_steps` SHALL include `layton beads epic set <id>`
+- **AND** `next_steps` SHALL include `layton errands epic set <id>`
 
 ---
 
@@ -104,7 +104,7 @@ The CLI SHALL delegate bead creation to the `bd` CLI.
 
 #### Scenario: Successful bead creation
 
-- **WHEN** `layton beads schedule` is invoked with valid template and epic
+- **WHEN** `layton errands schedule` is invoked with valid errand and epic
 - **THEN** CLI SHALL execute `bd create` with title, parent, labels, and description
 - **AND** CLI SHALL return created bead ID in response
 

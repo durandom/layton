@@ -52,27 +52,27 @@ def real_beads_isolated(isolated_env):
 
 
 @pytest.fixture
-def temp_skills_dir(isolated_env):
-    """Temporary .layton/skills/ directory for isolated tests."""
-    skills_dir = isolated_env / ".layton" / "skills"
-    skills_dir.mkdir(exist_ok=True)
-    return skills_dir
+def temp_rolodex_dir(isolated_env):
+    """Temporary .layton/rolodex/ directory for isolated tests."""
+    rolodex_dir = isolated_env / ".layton" / "rolodex"
+    rolodex_dir.mkdir(exist_ok=True)
+    return rolodex_dir
 
 
 @pytest.fixture
-def temp_workflows_dir(isolated_env):
-    """Temporary .layton/workflows/ directory for isolated tests."""
-    workflows_dir = isolated_env / ".layton" / "workflows"
-    workflows_dir.mkdir(exist_ok=True)
-    return workflows_dir
+def temp_protocols_dir(isolated_env):
+    """Temporary .layton/protocols/ directory for isolated tests."""
+    protocols_dir = isolated_env / ".layton" / "protocols"
+    protocols_dir.mkdir(exist_ok=True)
+    return protocols_dir
 
 
 @pytest.fixture
-def temp_beads_dir(isolated_env):
-    """Temporary .layton/beads/ directory for isolated tests."""
-    beads_dir = isolated_env / ".layton" / "beads"
-    beads_dir.mkdir(exist_ok=True)
-    return beads_dir
+def temp_errands_dir(isolated_env):
+    """Temporary .layton/errands/ directory for isolated tests."""
+    errands_dir = isolated_env / ".layton" / "errands"
+    errands_dir.mkdir(exist_ok=True)
+    return errands_dir
 
 
 @pytest.fixture
@@ -84,12 +84,12 @@ def temp_skills_root(isolated_env):
 
 
 @pytest.fixture
-def sample_skill_file(temp_skills_dir):
-    """Create a sample skill file for testing."""
-    skill_path = temp_skills_dir / "sample.md"
-    skill_path.write_text("""---
+def sample_rolodex_card(temp_rolodex_dir):
+    """Create a sample rolodex card for testing."""
+    card_path = temp_rolodex_dir / "sample.md"
+    card_path.write_text("""---
 name: sample
-description: A sample skill for testing
+description: A sample card for testing
 source: skills/sample/SKILL.md
 ---
 
@@ -110,24 +110,24 @@ sample --help
 |--------|---------|
 | count  | Number of items |
 """)
-    return skill_path
+    return card_path
 
 
 @pytest.fixture
-def sample_workflow_file(temp_workflows_dir):
-    """Create a sample workflow file for testing."""
-    workflow_path = temp_workflows_dir / "sample.md"
-    workflow_path.write_text("""---
+def sample_protocol_file(temp_protocols_dir):
+    """Create a sample protocol file for testing."""
+    protocol_path = temp_protocols_dir / "sample.md"
+    protocol_path.write_text("""---
 name: sample
-description: A sample workflow for testing
+description: A sample protocol for testing
 triggers:
   - run sample
-  - test workflow
+  - test protocol
 ---
 
 ## Objective
 
-Test the workflow system.
+Test the protocol system.
 
 ## Steps
 
@@ -148,4 +148,35 @@ Test the workflow system.
 - [ ] Task completed
 - [ ] No errors
 """)
-    return workflow_path
+    return protocol_path
+
+
+# Backward compatibility aliases for old fixture names
+@pytest.fixture
+def temp_skills_dir(temp_rolodex_dir):
+    """Alias for temp_rolodex_dir (backward compat)."""
+    return temp_rolodex_dir
+
+
+@pytest.fixture
+def temp_beads_dir(temp_errands_dir):
+    """Alias for temp_errands_dir (backward compat)."""
+    return temp_errands_dir
+
+
+@pytest.fixture
+def sample_skill_file(sample_rolodex_card):
+    """Alias for sample_rolodex_card (backward compat)."""
+    return sample_rolodex_card
+
+
+@pytest.fixture
+def temp_workflows_dir(temp_protocols_dir):
+    """Alias for temp_protocols_dir (backward compat)."""
+    return temp_protocols_dir
+
+
+@pytest.fixture
+def sample_workflow_file(sample_protocol_file):
+    """Alias for sample_protocol_file (backward compat)."""
+    return sample_protocol_file

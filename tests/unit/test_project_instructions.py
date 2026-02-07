@@ -56,12 +56,12 @@ class TestExampleClaudeMd:
 
     def test_example_claude_md_exists(self):
         """Example CLAUDE.md exists at expected path."""
-        example_path = LAYTON_SKILL_DIR / "examples" / "CLAUDE.md"
+        example_path = LAYTON_SKILL_DIR / "references" / "examples" / "CLAUDE.md"
         assert example_path.exists(), f"Missing example at {example_path}"
 
     def test_example_claude_md_includes_agents(self):
         """Example CLAUDE.md includes @AGENTS.md directive."""
-        example_path = LAYTON_SKILL_DIR / "examples" / "CLAUDE.md"
+        example_path = LAYTON_SKILL_DIR / "references" / "examples" / "CLAUDE.md"
         content = example_path.read_text()
 
         assert "@AGENTS.md" in content or "@agents.md" in content.lower(), (
@@ -70,7 +70,7 @@ class TestExampleClaudeMd:
 
     def test_example_claude_md_minimal(self):
         """Example CLAUDE.md is minimal (under 10 lines)."""
-        example_path = LAYTON_SKILL_DIR / "examples" / "CLAUDE.md"
+        example_path = LAYTON_SKILL_DIR / "references" / "examples" / "CLAUDE.md"
         content = example_path.read_text()
         line_count = len(content.strip().split("\n"))
 
@@ -84,12 +84,12 @@ class TestExampleAgentsMd:
 
     def test_example_agents_md_exists(self):
         """Example AGENTS.md exists at expected path."""
-        example_path = LAYTON_SKILL_DIR / "examples" / "AGENTS.md"
+        example_path = LAYTON_SKILL_DIR / "references" / "examples" / "AGENTS.md"
         assert example_path.exists(), f"Missing example at {example_path}"
 
     def test_example_agents_md_sections(self):
         """Example AGENTS.md has required sections."""
-        example_path = LAYTON_SKILL_DIR / "examples" / "AGENTS.md"
+        example_path = LAYTON_SKILL_DIR / "references" / "examples" / "AGENTS.md"
         content = example_path.read_text()
         content_lower = content.lower()
 
@@ -100,25 +100,19 @@ class TestExampleAgentsMd:
         assert "entry point" in content_lower or "layton" in content_lower, (
             "Example should mention Layton as entry point"
         )
-        assert "session" in content_lower and "completion" in content_lower, (
-            "Example should have session completion section"
-        )
-        assert "critical" in content_lower and "rules" in content_lower, (
-            "Example should have critical rules"
-        )
 
-    def test_example_agents_md_has_commands(self):
-        """Example AGENTS.md has Beads commands."""
-        example_path = LAYTON_SKILL_DIR / "examples" / "AGENTS.md"
+    def test_example_agents_md_has_layton_skill(self):
+        """Example AGENTS.md mentions /layton skill."""
+        example_path = LAYTON_SKILL_DIR / "references" / "examples" / "AGENTS.md"
         content = example_path.read_text()
 
-        assert "bd ready" in content or "bd show" in content, (
-            "Example should have Beads commands"
+        assert "/layton" in content or "layton skill" in content.lower(), (
+            "Example should reference /layton skill"
         )
 
     def test_example_agents_md_concise(self):
         """Example AGENTS.md is concise (under 60 lines)."""
-        example_path = LAYTON_SKILL_DIR / "examples" / "AGENTS.md"
+        example_path = LAYTON_SKILL_DIR / "references" / "examples" / "AGENTS.md"
         content = example_path.read_text()
         line_count = len(content.strip().split("\n"))
 

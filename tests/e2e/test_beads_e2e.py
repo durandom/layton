@@ -1,4 +1,4 @@
-"""E2E tests for layton beads command."""
+"""E2E tests for layton errands command."""
 
 import json
 import subprocess
@@ -41,31 +41,30 @@ def extract_json(output: str):
     return json.loads(json_str)
 
 
-class TestBeadsCommand:
-    """E2E tests for layton beads."""
+class TestErrandsCommand:
+    """E2E tests for layton errands."""
 
-    def test_beads_outputs_json(self, isolated_env):
-        """beads outputs valid JSON by default."""
-        result = run_layton("beads", cwd=isolated_env)
+    def test_errands_outputs_json(self, isolated_env):
+        """errands outputs valid JSON by default."""
+        result = run_layton("errands", cwd=isolated_env)
 
         assert result.returncode == 0
         data = json.loads(result.stdout)
         assert data["success"] is True
-        assert "beads" in data["data"]
+        assert "errands" in data["data"]
 
-    def test_beads_empty(self, temp_beads_dir):
-        """beads returns empty array when no bead templates."""
-        result = run_layton("beads", cwd=temp_beads_dir.parent.parent)
+    def test_errands_empty(self, temp_errands_dir):
+        """errands returns empty array when no errands."""
+        result = run_layton("errands", cwd=temp_errands_dir.parent.parent)
 
         assert result.returncode == 0
         data = json.loads(result.stdout)
-        assert data["data"]["beads"] == []
+        assert data["data"]["errands"] == []
         assert "next_steps" in data
 
-    def test_beads_lists_templates(self, temp_beads_dir):
-        """beads lists bead templates from .layton/beads/."""
-        # Create a bead template
-        (temp_beads_dir / "review.md").write_text(
+    def test_errands_lists_errands(self, temp_errands_dir):
+        """errands lists errands from .layton/errands/."""
+        (temp_errands_dir / "review.md").write_text(
             """---
 name: review
 description: Code review task
@@ -79,68 +78,68 @@ Review ${file_path}.
 """
         )
 
-        cwd = temp_beads_dir.parent.parent
-        result = run_layton("beads", cwd=cwd)
+        cwd = temp_errands_dir.parent.parent
+        result = run_layton("errands", cwd=cwd)
 
         assert result.returncode == 0
         data = json.loads(result.stdout)
-        assert len(data["data"]["beads"]) == 1
-        bead = data["data"]["beads"][0]
-        assert bead["name"] == "review"
-        assert bead["description"] == "Code review task"
-        assert bead["variables"]["file_path"] == "File to review"
+        assert len(data["data"]["errands"]) == 1
+        errand = data["data"]["errands"][0]
+        assert errand["name"] == "review"
+        assert errand["description"] == "Code review task"
+        assert errand["variables"]["file_path"] == "File to review"
 
 
-class TestBeadsAdd:
-    """E2E tests for layton beads add."""
+class TestErrandsAdd:
+    """E2E tests for layton errands add."""
 
     def test_add_creates_file(self, isolated_env):
-        """beads add creates bead template file."""
-        result = run_layton("beads", "add", "newbead", cwd=isolated_env)
+        """errands add creates errand file."""
+        result = run_layton("errands", "add", "newerrand", cwd=isolated_env)
 
         assert result.returncode == 0
         data = json.loads(result.stdout)
         assert data["success"] is True
-        assert "newbead" in data["data"]["created"]
+        assert "newerrand" in data["data"]["created"]
 
         # Verify file exists
-        bead_path = isolated_env / ".layton" / "beads" / "newbead.md"
-        assert bead_path.exists()
+        errand_path = isolated_env / ".layton" / "errands" / "newerrand.md"
+        assert errand_path.exists()
 
         # Verify content
-        content = bead_path.read_text()
-        assert "name: newbead" in content
+        content = errand_path.read_text()
+        assert "name: newerrand" in content
         assert "## Task" in content
         assert "## When Complete" in content
 
     def test_add_creates_directory(self, isolated_env):
-        """beads add creates .layton/beads/ if missing."""
-        beads_dir = isolated_env / ".layton" / "beads"
-        if beads_dir.exists():
-            beads_dir.rmdir()
+        """errands add creates .layton/errands/ if missing."""
+        errands_dir = isolated_env / ".layton" / "errands"
+        if errands_dir.exists():
+            errands_dir.rmdir()
 
-        result = run_layton("beads", "add", "newbead", cwd=isolated_env)
+        result = run_layton("errands", "add", "newerrand", cwd=isolated_env)
 
         assert result.returncode == 0
-        assert beads_dir.exists()
+        assert errands_dir.exists()
 
-    def test_add_error_if_exists(self, temp_beads_dir):
-        """beads add returns error if bead template exists."""
-        (temp_beads_dir / "existing.md").write_text("existing content")
-        cwd = temp_beads_dir.parent.parent
-        result = run_layton("beads", "add", "existing", cwd=cwd)
+    def test_add_error_if_exists(self, temp_errands_dir):
+        """errands add returns error if errand exists."""
+        (temp_errands_dir / "existing.md").write_text("existing content")
+        cwd = temp_errands_dir.parent.parent
+        result = run_layton("errands", "add", "existing", cwd=cwd)
 
         assert result.returncode == 1
         data = json.loads(result.stdout)
-        assert data["error"]["code"] == "BEAD_EXISTS"
+        assert data["error"]["code"] == "ERRAND_EXISTS"
 
 
-class TestBeadsEpic:
-    """E2E tests for layton beads epic."""
+class TestErrandsEpic:
+    """E2E tests for layton errands epic."""
 
     def test_epic_no_config(self, isolated_env):
-        """beads epic returns error when no epic configured."""
-        result = run_layton("beads", "epic", cwd=isolated_env)
+        """errands epic returns error when no epic configured."""
+        result = run_layton("errands", "epic", cwd=isolated_env)
 
         assert result.returncode == 1
         data = json.loads(result.stdout)
@@ -148,31 +147,31 @@ class TestBeadsEpic:
         assert "next_steps" in data
 
     def test_epic_set_and_get(self, temp_config):
-        """beads epic set stores epic ID and beads epic retrieves it."""
+        """errands epic set stores epic ID and errands epic retrieves it."""
         # Initialize config first
         temp_config.write_text("{}")
         cwd = temp_config.parent.parent
 
         # Set epic
-        result = run_layton("beads", "epic", "set", "test-epic-123", cwd=cwd)
+        result = run_layton("errands", "epic", "set", "test-epic-123", cwd=cwd)
         assert result.returncode == 0
         data = json.loads(result.stdout)
         assert data["data"]["epic"] == "test-epic-123"
 
         # Get epic
-        result = run_layton("beads", "epic", cwd=cwd)
+        result = run_layton("errands", "epic", cwd=cwd)
         assert result.returncode == 0
         data = json.loads(result.stdout)
         assert data["data"]["epic"] == "test-epic-123"
 
 
-class TestBeadsSchedule:
-    """E2E tests for layton beads schedule (full bd integration)."""
+class TestErrandsSchedule:
+    """E2E tests for layton errands schedule (full bd integration)."""
 
     def test_schedule_creates_bead_with_labels(
-        self, temp_beads_dir, temp_config, real_beads_isolated
+        self, temp_errands_dir, temp_config, real_beads_isolated
     ):
-        """beads schedule creates a bead via bd with correct labels and variable substitution."""
+        """errands schedule creates a bead via bd with correct labels and variable substitution."""
         cwd = temp_config.parent.parent
 
         # 1. Initialize beads database
@@ -190,11 +189,11 @@ class TestBeadsSchedule:
         epic_id = epic_data["id"]
 
         # 3. Set the epic via layton
-        result = run_layton("beads", "epic", "set", epic_id, cwd=cwd)
+        result = run_layton("errands", "epic", "set", epic_id, cwd=cwd)
         assert result.returncode == 0
 
-        # 4. Create a bead template with variables
-        (temp_beads_dir / "code-review.md").write_text(
+        # 4. Create an errand with variables
+        (temp_errands_dir / "code-review.md").write_text(
             """---
 name: code-review
 description: Review code for issues
@@ -214,13 +213,13 @@ Review the file at ${file_path} for ${focus_area}.
 """
         )
 
-        # 5. Schedule a bead with variables
+        # 5. Schedule the errand with variables
         variables = {
             "file_path": "src/auth.py",
             "focus_area": "security vulnerabilities",
         }
         result = run_layton(
-            "beads", "schedule", "code-review", json.dumps(variables), cwd=cwd
+            "errands", "schedule", "code-review", json.dumps(variables), cwd=cwd
         )
 
         assert result.returncode == 0, (
@@ -261,17 +260,17 @@ Review the file at ${file_path} for ${focus_area}.
         assert "${focus_area}" not in bead_data["description"]
 
     def test_schedule_without_epic_fails(
-        self, temp_beads_dir, temp_config, real_beads_isolated
+        self, temp_errands_dir, temp_config, real_beads_isolated
     ):
-        """beads schedule fails with NO_EPIC if epic not configured."""
+        """errands schedule fails with NO_EPIC if epic not configured."""
         cwd = temp_config.parent.parent
 
         # Initialize beads and config but don't set epic
         subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
         temp_config.write_text("{}")
 
-        # Create a simple template
-        (temp_beads_dir / "simple.md").write_text(
+        # Create a simple errand
+        (temp_errands_dir / "simple.md").write_text(
             """---
 name: simple
 description: Simple task
@@ -283,16 +282,14 @@ Do something.
 """
         )
 
-        result = run_layton("beads", "schedule", "simple", cwd=cwd)
+        result = run_layton("errands", "schedule", "simple", cwd=cwd)
 
         assert result.returncode == 1
         data = json.loads(result.stdout)
         assert data["error"]["code"] == "NO_EPIC"
 
-    def test_schedule_nonexistent_template_fails(
-        self, temp_config, real_beads_isolated
-    ):
-        """beads schedule fails with TEMPLATE_NOT_FOUND for missing template."""
+    def test_schedule_nonexistent_errand_fails(self, temp_config, real_beads_isolated):
+        """errands schedule fails with ERRAND_NOT_FOUND for missing errand."""
         cwd = temp_config.parent.parent
 
         # Initialize beads and set epic
@@ -306,28 +303,28 @@ Do something.
         )
         epic_id = extract_json(epic_result.stdout)["id"]
 
-        run_layton("beads", "epic", "set", epic_id, cwd=cwd)
+        run_layton("errands", "epic", "set", epic_id, cwd=cwd)
 
-        result = run_layton("beads", "schedule", "nonexistent", cwd=cwd)
+        result = run_layton("errands", "schedule", "nonexistent", cwd=cwd)
 
         assert result.returncode == 1
         data = json.loads(result.stdout)
-        assert data["error"]["code"] == "TEMPLATE_NOT_FOUND"
+        assert data["error"]["code"] == "ERRAND_NOT_FOUND"
 
 
-class TestOrientationIncludesBeads:
-    """E2E tests for orientation output with beads."""
+class TestOrientationIncludesErrands:
+    """E2E tests for orientation output with errands."""
 
-    def test_orientation_includes_beads_array(
-        self, temp_beads_dir, temp_config, real_beads_isolated
+    def test_orientation_includes_errands_array(
+        self, temp_errands_dir, temp_config, real_beads_isolated
     ):
-        """layton (no args) orientation includes beads field."""
+        """layton (no args) orientation includes errands field."""
         # Initialize beads via bd init
         cwd = temp_config.parent.parent
         subprocess.run(["bd", "init"], cwd=cwd, capture_output=True)
 
-        # Create a bead template
-        (temp_beads_dir / "standup.md").write_text(
+        # Create an errand
+        (temp_errands_dir / "standup.md").write_text(
             """---
 name: standup
 description: Daily standup notes
@@ -346,15 +343,15 @@ Capture standup notes.
 
         assert result.returncode == 0
         data = json.loads(result.stdout)
-        assert "bead_templates" in data["data"]
-        assert len(data["data"]["bead_templates"]) == 1
-        assert data["data"]["bead_templates"][0]["name"] == "standup"
+        assert "errands" in data["data"]
+        assert len(data["data"]["errands"]) == 1
+        assert data["data"]["errands"][0]["name"] == "standup"
         # Verify new orientation fields exist
         assert "beads_scheduled" in data["data"]
         assert "beads_pending_review" in data["data"]
 
     def test_orientation_includes_beads_scheduled(
-        self, temp_beads_dir, temp_config, real_beads_isolated
+        self, temp_errands_dir, temp_config, real_beads_isolated
     ):
         """layton (no args) shows scheduled beads from bd."""
         cwd = temp_config.parent.parent
@@ -374,10 +371,10 @@ Capture standup notes.
         epic_id = epic_data["id"]
 
         # Set epic
-        run_layton("beads", "epic", "set", epic_id, cwd=cwd)
+        run_layton("errands", "epic", "set", epic_id, cwd=cwd)
 
-        # Create a bead template and schedule it
-        (temp_beads_dir / "test-task.md").write_text(
+        # Create an errand and schedule it
+        (temp_errands_dir / "test-task.md").write_text(
             """---
 name: test-task
 description: A test task
@@ -389,7 +386,7 @@ Do something.
 """
         )
 
-        result = run_layton("beads", "schedule", "test-task", cwd=cwd)
+        result = run_layton("errands", "schedule", "test-task", cwd=cwd)
         assert result.returncode == 0
 
         # Now check orientation
@@ -404,7 +401,7 @@ Do something.
         assert any("test-task" in t for t in scheduled_titles)
 
     def test_orientation_includes_beads_pending_review(
-        self, temp_beads_dir, temp_config, real_beads_isolated
+        self, temp_errands_dir, temp_config, real_beads_isolated
     ):
         """layton (no args) shows beads pending review from bd."""
         cwd = temp_config.parent.parent
@@ -424,10 +421,10 @@ Do something.
         epic_id = epic_data["id"]
 
         # Set epic
-        run_layton("beads", "epic", "set", epic_id, cwd=cwd)
+        run_layton("errands", "epic", "set", epic_id, cwd=cwd)
 
-        # Create a bead template and schedule it
-        (temp_beads_dir / "review-me.md").write_text(
+        # Create an errand and schedule it
+        (temp_errands_dir / "review-me.md").write_text(
             """---
 name: review-me
 description: A task to review
@@ -439,7 +436,7 @@ Review this.
 """
         )
 
-        result = run_layton("beads", "schedule", "review-me", cwd=cwd)
+        result = run_layton("errands", "schedule", "review-me", cwd=cwd)
         assert result.returncode == 0
         scheduled_data = json.loads(result.stdout)
         bead_id = scheduled_data["data"]["scheduled"]["id"]

@@ -73,7 +73,7 @@ Bead descriptions SHALL follow a consistent format for AI parsing.
 
 ### Requirement: Querying Layton beads
 
-SKILL.md workflows SHALL query beads using standard `bd` commands with `--json` flag.
+SKILL.md protocols SHALL query beads using standard `bd` commands with `--json` flag.
 
 #### Scenario: List watched items
 
@@ -122,7 +122,7 @@ SKILL.md workflows SHALL query beads using standard `bd` commands with `--json` 
 
 ### Requirement: SKILL.md direct Beads usage
 
-SKILL.md workflows SHALL invoke `bd` directly, not via Layton CLI.
+SKILL.md protocols SHALL invoke `bd` directly, not via Layton CLI.
 
 #### Scenario: No layton track command
 

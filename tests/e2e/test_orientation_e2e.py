@@ -24,7 +24,7 @@ class TestOrientationCommand:
     """E2E tests for layton (no args) orientation output."""
 
     def test_no_args_returns_orientation(self, isolated_env, temp_config):
-        """layton (no args) returns orientation with checks, skills, workflows."""
+        """layton (no args) returns orientation with checks, rolodex, protocols."""
         # Create a valid config
         temp_config.write_text('{"timezone": "UTC"}')
 
@@ -34,8 +34,8 @@ class TestOrientationCommand:
         data = json.loads(result.stdout)
         if data.get("success"):
             assert "checks" in data["data"]
-            assert "skills" in data["data"]
-            assert "workflows" in data["data"]
+            assert "rolodex" in data["data"]
+            assert "protocols" in data["data"]
 
     def test_orientation_includes_checks(self, isolated_env, temp_config):
         """Orientation includes doctor checks."""
@@ -56,51 +56,51 @@ class TestOrientationCommand:
                 check_names = [c["name"] for c in checks]
                 assert "config_exists" in check_names
 
-    def test_orientation_includes_skills(
+    def test_orientation_includes_rolodex(
         self,
         isolated_env,
         temp_config,
-        sample_skill_file,
+        sample_rolodex_card,
     ):
-        """Orientation includes skills inventory."""
+        """Orientation includes rolodex card inventory."""
         temp_config.write_text('{"timezone": "UTC"}')
 
-        # sample_skill_file is created in isolated_env
+        # sample_rolodex_card is created in isolated_env
         result = run_layton(cwd=isolated_env)
         data = json.loads(result.stdout)
 
         if data.get("success"):
-            skills = data["data"]["skills"]
-            assert isinstance(skills, list)
-            assert len(skills) == 1
-            assert skills[0]["name"] == "sample"
+            rolodex = data["data"]["rolodex"]
+            assert isinstance(rolodex, list)
+            assert len(rolodex) == 1
+            assert rolodex[0]["name"] == "sample"
 
-    def test_orientation_includes_workflows(
-        self, isolated_env, temp_config, sample_workflow_file
+    def test_orientation_includes_protocols(
+        self, isolated_env, temp_config, sample_protocol_file
     ):
-        """Orientation includes workflows inventory."""
+        """Orientation includes protocols inventory."""
         temp_config.write_text('{"timezone": "UTC"}')
 
-        # sample_workflow_file is created in isolated_env
+        # sample_protocol_file is created in isolated_env
         result = run_layton(cwd=isolated_env)
         data = json.loads(result.stdout)
 
         if data.get("success"):
-            workflows = data["data"]["workflows"]
-            assert isinstance(workflows, list)
-            assert len(workflows) == 1
-            assert workflows[0]["name"] == "sample"
-            assert "triggers" in workflows[0]
+            protocols = data["data"]["protocols"]
+            assert isinstance(protocols, list)
+            assert len(protocols) == 1
+            assert protocols[0]["name"] == "sample"
+            assert "triggers" in protocols[0]
 
     def test_orientation_includes_next_steps(self, isolated_env, temp_config):
-        """Orientation includes next_steps when skills/workflows empty."""
+        """Orientation includes next_steps when rolodex/protocols empty."""
         temp_config.write_text('{"timezone": "UTC"}')
 
         result = run_layton(cwd=isolated_env)
         data = json.loads(result.stdout)
 
         if data.get("success"):
-            # With empty skills/workflows, should have next_steps
+            # With empty rolodex/protocols, should have next_steps
             assert "next_steps" in data["data"] or "next_steps" in data
 
     def test_orientation_human_output(self, isolated_env, temp_config):

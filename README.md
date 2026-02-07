@@ -24,11 +24,11 @@ Ask "What should I know?" and get an answer that respects your time.
 | Concept | What It Is |
 |---------|------------|
 | **Beads** | State backend - tracks items with labels (`watching`, `focus`, `layton`) |
-| **Skills** | Data source definitions (Gmail, Jira, Slack) - AI instructions for querying systems |
-| **Workflows** | Orchestration patterns (morning briefing, gather data) - AI instructions for synthesis |
-| **.layton/** | Your personalization directory - config, skills, workflows |
+| **Rolodex** | Data source cards (Gmail, Jira, Slack) - AI instructions for querying systems |
+| **Protocols** | Orchestration patterns (morning briefing, gather data) - AI instructions for synthesis |
+| **.layton/** | Your personalization directory - config, rolodex, protocols |
 
-Layton is a **knowledge repo skill** for building personalized AI workflows. Skills and workflows are AI instructions (markdown), not executable code - they tell Claude how to query your systems and synthesize information.
+Layton is a **knowledge repo skill** for building personalized AI protocols. Rolodex cards and protocols are AI instructions (markdown), not executable code - they tell Claude how to query your systems and synthesize information.
 
 ## Installation
 
@@ -55,11 +55,11 @@ After setup, your project will have a `.layton/` directory with your personalize
 your-project/
 ├── .layton/                  # YOUR personalizations
 │   ├── config.json          # Timezone, work hours, user info
-│   ├── skills/              # Data source definitions
+│   ├── rolodex/             # Data source cards
 │   │   ├── gmail.md         # How to query Gmail
 │   │   ├── jira.md          # How to query Jira
 │   │   └── slack.md         # How to query Slack
-│   └── workflows/           # Custom orchestrations
+│   └── protocols/           # Custom orchestrations
 │       ├── morning-briefing.md
 │       └── process-inbox.md
 ├── CLAUDE.md                # Project instructions (with Layton integration)
@@ -82,7 +82,7 @@ your-project/
 }
 ```text
 
-### Example: Skill File (.layton/skills/gmail.md)
+### Example: Rolodex Card (.layton/rolodex/gmail.md)
 
 ```markdown
 ---
@@ -112,7 +112,7 @@ mcp-cli google_workspace/search_gmail_messages '{"query": "is:starred"}'
 | starred_stale | Decision debt accumulating |
 ```text
 
-### Example: Workflow File (.layton/workflows/morning-briefing.md)
+### Example: Protocol File (.layton/protocols/morning-briefing.md)
 
 ```markdown
 ---
@@ -125,7 +125,7 @@ triggers: [morning briefing, good morning, what should I know today]
 1. Get temporal context: `layton context`
 1. Get current focus: `bd list --label focus --json`
 1. Get watching items: `bd list --label watching --json`
-1. Query configured skills
+1. Query configured rolodex cards
 1. Synthesize briefing adapted to time of day
 
 ## Context Adaptation
@@ -149,7 +149,7 @@ triggers: [morning briefing, good morning, what should I know today]
 Select "setup" or say "configure layton" - Layton will guide you through:
 
 1. Creating `.layton/config.json` with your preferences
-1. Discovering available skills
+1. Discovering available rolodex cards
 1. Setting up CLAUDE.md/AGENTS.md integration
 
 ### Daily Usage
@@ -158,14 +158,14 @@ Select "setup" or say "configure layton" - Layton will guide you through:
 /layton
 ```text
 
-This runs orientation: health checks + skills inventory + workflows inventory.
+This runs orientation: health checks + rolodex inventory + protocols inventory.
 
 ### Common Interactions
 
 | Say This | Layton Does |
 |----------|-------------|
 | "Good morning" | Context-aware briefing |
-| "What should I know?" | Synthesize status across all skills |
+| "What should I know?" | Synthesize status across all rolodex cards |
 | "I'm working on X" | Set focus (one item at a time) |
 | "Track this PR" | Add to watching list |
 | "What am I watching?" | List tracked items |
@@ -178,17 +178,17 @@ LAYTON=".claude/skills/layton/scripts/layton"
 
 | Command | Description |
 |---------|-------------|
-| `$LAYTON` | Full orientation (doctor + skills + workflows) |
+| `$LAYTON` | Full orientation (doctor + rolodex + protocols) |
 | `$LAYTON doctor` | Health checks (beads, config) |
 | `$LAYTON context` | Temporal context (time, work hours, day of week) |
 | `$LAYTON config show` | Display current config |
 | `$LAYTON config init` | Create default config |
 | `$LAYTON config set <key> <value>` | Set config value (dot notation) |
-| `$LAYTON skills` | List configured skills |
-| `$LAYTON skills --discover` | Find skills in `skills/*/SKILL.md` |
-| `$LAYTON skills add <name>` | Create skill file from template |
-| `$LAYTON workflows` | List configured workflows |
-| `$LAYTON workflows add <name>` | Create workflow from template |
+| `$LAYTON rolodex` | List configured rolodex cards |
+| `$LAYTON rolodex --discover` | Find rolodex cards in `skills/*/SKILL.md` |
+| `$LAYTON rolodex add <name>` | Create rolodex card from template |
+| `$LAYTON protocols` | List configured protocols |
+| `$LAYTON protocols add <name>` | Create protocol from template |
 
 ### Beads Commands (State Backend)
 
@@ -200,27 +200,27 @@ bd update <id> --add-label focus --json
 bd close <id> --reason "merged" --json
 ```text
 
-## Built-in Workflows
+## Built-in Protocols
 
-| Workflow | Purpose |
+| Protocol | Purpose |
 |----------|---------|
 | **setup** | First-time configuration and discovery |
 | **set-focus** | Designate current work (one item at a time) |
 | **track-item** | Add external item to attention list |
-| **retrospect** | Reflect on workflow and suggest improvements |
+| **retrospect** | Reflect on protocol and suggest improvements |
 
-### Example Workflows (in `examples/`)
+### Example Protocols (in `skills/layton/references/examples/`)
 
 | Example | Purpose |
 |---------|---------|
 | `morning-briefing.md` | Context-aware daily status |
-| `gather.md` | Aggregate data from all configured skills |
+| `gather.md` | Aggregate data from all configured rolodex cards |
 | `focus-suggestion.md` | Help decide what to work on next |
 
-To copy an example to your `.layton/workflows/`:
+To copy an example to your `.layton/protocols/`:
 
 ```bash
-$LAYTON workflows add morning-briefing
+$LAYTON protocols add morning-briefing
 ```text
 
 ## Integration with CLAUDE.md / AGENTS.md
