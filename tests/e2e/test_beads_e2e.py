@@ -312,13 +312,361 @@ Do something.
         assert data["error"]["code"] == "ERRAND_NOT_FOUND"
 
 
+class TestErrandsRun:
+    """E2E tests for layton errands run."""
+
+    def test_run_returns_bead_id_and_title(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """errands run returns bead_id and title, no prompt."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        # Create an errand
+        (temp_errands_dir / "review.md").write_text(
+            """---
+name: review
+description: Review code for issues
+---
+
+## Task
+
+Review the code.
+"""
+        )
+
+        result = run_layton("errands", "run", "review", cwd=cwd)
+
+        assert result.returncode == 0, f"Run failed: {result.stdout} {result.stderr}"
+        data = json.loads(result.stdout)
+        assert data["success"] is True
+        assert "bead_id" in data["data"]
+        assert "title" in data["data"]
+        # Must NOT contain prompt (token efficiency)
+        assert "prompt" not in data["data"]
+
+    def test_run_auto_creates_epic(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """errands run auto-creates epic if not configured."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+        temp_config.write_text("{}")
+
+        (temp_errands_dir / "simple.md").write_text(
+            """---
+name: simple
+description: Simple task
+---
+
+## Task
+
+Do something.
+"""
+        )
+
+        result = run_layton("errands", "run", "simple", cwd=cwd)
+        assert result.returncode == 0, f"Run failed: {result.stdout} {result.stderr}"
+
+        # Verify epic was auto-created
+        result = run_layton("errands", "epic", cwd=cwd)
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert data["data"]["epic"] is not None
+
+    def test_run_with_variables(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """errands run substitutes variables into bead description."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        (temp_errands_dir / "check.md").write_text(
+            """---
+name: check
+description: Check a file
+variables:
+  file_path: File to check
+---
+
+## Task
+
+Check the file at ${file_path}.
+"""
+        )
+
+        variables = {"file_path": "src/auth.py"}
+        result = run_layton(
+            "errands", "run", "check", json.dumps(variables), cwd=cwd
+        )
+
+        assert result.returncode == 0, f"Run failed: {result.stdout} {result.stderr}"
+        data = json.loads(result.stdout)
+        bead_id = data["data"]["bead_id"]
+
+        # Verify substitution via bd show
+        show_result = subprocess.run(
+            ["bd", "show", bead_id, "--json"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        bead_data = extract_json(show_result.stdout)[0]
+        assert "src/auth.py" in bead_data["description"]
+        assert "${file_path}" not in bead_data["description"]
+
+    def test_run_creates_bead_with_labels(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """errands run creates bead with scheduled and type:<name> labels."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        (temp_errands_dir / "sweep.md").write_text(
+            """---
+name: sweep
+description: Sweep the floor
+---
+
+## Task
+
+Sweep it.
+"""
+        )
+
+        result = run_layton("errands", "run", "sweep", cwd=cwd)
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        bead_id = data["data"]["bead_id"]
+
+        label_result = subprocess.run(
+            ["bd", "label", "list", bead_id, "--json"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        labels = extract_json(label_result.stdout)
+        assert "scheduled" in labels
+        assert "type:sweep" in labels
+
+    def test_run_nonexistent_errand(
+        self, temp_config, real_beads_isolated
+    ):
+        """errands run fails with ERRAND_NOT_FOUND for missing errand."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+        temp_config.write_text("{}")
+
+        result = run_layton("errands", "run", "nonexistent", cwd=cwd)
+
+        assert result.returncode == 1
+        data = json.loads(result.stdout)
+        assert data["error"]["code"] == "ERRAND_NOT_FOUND"
+
+
+class TestErrandsPrompt:
+    """E2E tests for layton errands prompt."""
+
+    def test_prompt_returns_full_execution_prompt(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """errands prompt returns prompt field with bead ID, title, and description."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        (temp_errands_dir / "review.md").write_text(
+            """---
+name: review
+description: Review code
+---
+
+## Task
+
+Review the code carefully.
+"""
+        )
+
+        # Schedule via run to get a bead
+        run_result = run_layton("errands", "run", "review", cwd=cwd)
+        assert run_result.returncode == 0
+        bead_id = json.loads(run_result.stdout)["data"]["bead_id"]
+
+        # Now get the prompt
+        result = run_layton("errands", "prompt", bead_id, cwd=cwd)
+
+        assert result.returncode == 0, f"Prompt failed: {result.stdout} {result.stderr}"
+        data = json.loads(result.stdout)
+        assert data["data"]["bead_id"] == bead_id
+        prompt = data["data"]["prompt"]
+        assert bead_id in prompt
+        assert "review" in prompt.lower()
+        assert "Review the code carefully." in prompt
+
+    def test_prompt_includes_completion_protocol(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """Prompt contains bd close, bd label add, bd comments add with correct bead ID."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        (temp_errands_dir / "task.md").write_text(
+            """---
+name: task
+description: A task
+---
+
+## Task
+
+Do it.
+"""
+        )
+
+        run_result = run_layton("errands", "run", "task", cwd=cwd)
+        assert run_result.returncode == 0
+        bead_id = json.loads(run_result.stdout)["data"]["bead_id"]
+
+        result = run_layton("errands", "prompt", bead_id, cwd=cwd)
+        assert result.returncode == 0
+        prompt = json.loads(result.stdout)["data"]["prompt"]
+
+        assert f"bd close {bead_id}" in prompt
+        assert f"bd label add {bead_id} needs-review" in prompt
+        assert f"bd comments add {bead_id}" in prompt
+
+    def test_prompt_includes_comments_as_context(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """Prompt includes Context section when bead has comments."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        (temp_errands_dir / "ctx.md").write_text(
+            """---
+name: ctx
+description: Context test
+---
+
+## Task
+
+Test context.
+"""
+        )
+
+        run_result = run_layton("errands", "run", "ctx", cwd=cwd)
+        assert run_result.returncode == 0
+        bead_id = json.loads(run_result.stdout)["data"]["bead_id"]
+
+        # Add a comment
+        subprocess.run(
+            ["bd", "comments", "add", bead_id, "test context info"],
+            cwd=cwd,
+            capture_output=True,
+            check=True,
+        )
+
+        result = run_layton("errands", "prompt", bead_id, cwd=cwd)
+        assert result.returncode == 0
+        prompt = json.loads(result.stdout)["data"]["prompt"]
+
+        assert "Context (prior comments)" in prompt
+        assert "test context info" in prompt
+
+    def test_prompt_omits_context_when_no_comments(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """Prompt omits Context section when bead has no comments."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        (temp_errands_dir / "noctx.md").write_text(
+            """---
+name: noctx
+description: No context test
+---
+
+## Task
+
+No context here.
+"""
+        )
+
+        run_result = run_layton("errands", "run", "noctx", cwd=cwd)
+        assert run_result.returncode == 0
+        bead_id = json.loads(run_result.stdout)["data"]["bead_id"]
+
+        result = run_layton("errands", "prompt", bead_id, cwd=cwd)
+        assert result.returncode == 0
+        prompt = json.loads(result.stdout)["data"]["prompt"]
+
+        assert "Context (prior comments)" not in prompt
+
+    def test_prompt_includes_substituted_variables(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """Prompt contains substituted variable values, not placeholders."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        (temp_errands_dir / "vartest.md").write_text(
+            """---
+name: vartest
+description: Variable test
+variables:
+  file_path: File to check
+---
+
+## Task
+
+Check ${file_path} for issues.
+"""
+        )
+
+        variables = {"file_path": "src/auth.py"}
+        run_result = run_layton(
+            "errands", "run", "vartest", json.dumps(variables), cwd=cwd
+        )
+        assert run_result.returncode == 0
+        bead_id = json.loads(run_result.stdout)["data"]["bead_id"]
+
+        result = run_layton("errands", "prompt", bead_id, cwd=cwd)
+        assert result.returncode == 0
+        prompt = json.loads(result.stdout)["data"]["prompt"]
+
+        assert "src/auth.py" in prompt
+        assert "${file_path}" not in prompt
+
+    def test_prompt_nonexistent_bead(self, temp_config, real_beads_isolated):
+        """errands prompt fails with BEAD_NOT_FOUND for missing bead."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        result = run_layton("errands", "prompt", "nonexistent-id", cwd=cwd)
+
+        assert result.returncode == 1
+        data = json.loads(result.stdout)
+        assert data["error"]["code"] == "BEAD_NOT_FOUND"
+
+
 class TestOrientationIncludesErrands:
     """E2E tests for orientation output with errands."""
 
-    def test_orientation_includes_errands_array(
+    def test_orientation_includes_errands_templates(
         self, temp_errands_dir, temp_config, real_beads_isolated
     ):
-        """layton (no args) orientation includes errands field."""
+        """layton (no args) orientation includes errands.templates field."""
         # Initialize beads via bd init
         cwd = temp_config.parent.parent
         subprocess.run(["bd", "init"], cwd=cwd, capture_output=True)
@@ -343,17 +691,20 @@ Capture standup notes.
 
         assert result.returncode == 0
         data = json.loads(result.stdout)
-        assert "errands" in data["data"]
-        assert len(data["data"]["errands"]) == 1
-        assert data["data"]["errands"][0]["name"] == "standup"
-        # Verify new orientation fields exist
-        assert "beads_scheduled" in data["data"]
-        assert "beads_pending_review" in data["data"]
+        errands = data["data"]["errands"]
+        assert "templates" in errands
+        assert len(errands["templates"]) == 1
+        assert errands["templates"][0]["name"] == "standup"
+        # Verify queue structure exists
+        assert "queue" in errands
+        assert "scheduled" in errands["queue"]
+        assert "in_progress" in errands["queue"]
+        assert "pending_review" in errands["queue"]
 
     def test_orientation_includes_beads_scheduled(
         self, temp_errands_dir, temp_config, real_beads_isolated
     ):
-        """layton (no args) shows scheduled beads from bd."""
+        """layton (no args) shows scheduled beads in errands.queue.scheduled."""
         cwd = temp_config.parent.parent
 
         # Initialize beads
@@ -394,16 +745,16 @@ Do something.
         assert result.returncode == 0
         data = json.loads(result.stdout)
 
-        # Should have at least one scheduled bead
-        assert "beads_scheduled" in data["data"]
-        assert len(data["data"]["beads_scheduled"]) >= 1
-        scheduled_titles = [b["title"] for b in data["data"]["beads_scheduled"]]
+        # Should have at least one scheduled bead in the queue
+        scheduled = data["data"]["errands"]["queue"]["scheduled"]
+        assert len(scheduled) >= 1
+        scheduled_titles = [b["title"] for b in scheduled]
         assert any("test-task" in t for t in scheduled_titles)
 
     def test_orientation_includes_beads_pending_review(
         self, temp_errands_dir, temp_config, real_beads_isolated
     ):
-        """layton (no args) shows beads pending review from bd."""
+        """layton (no args) shows beads pending review in errands.queue.pending_review."""
         cwd = temp_config.parent.parent
 
         # Initialize beads
@@ -457,8 +808,160 @@ Review this.
         assert result.returncode == 0
         data = json.loads(result.stdout)
 
-        # Should have one bead pending review
-        assert "beads_pending_review" in data["data"]
-        assert len(data["data"]["beads_pending_review"]) >= 1
-        pending_ids = [b["id"] for b in data["data"]["beads_pending_review"]]
+        # Should have one bead pending review in the queue
+        pending_review = data["data"]["errands"]["queue"]["pending_review"]
+        assert len(pending_review) >= 1
+        pending_ids = [b["id"] for b in pending_review]
         assert bead_id in pending_ids
+
+    def test_orientation_includes_beads_in_progress(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """layton (no args) shows in-progress beads in errands.queue.in_progress."""
+        cwd = temp_config.parent.parent
+
+        # Initialize beads
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        # Create an epic
+        epic_result = subprocess.run(
+            ["bd", "create", "--title", "Test Epic", "--type", "epic", "--json"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        epic_data = extract_json(epic_result.stdout)
+        epic_id = epic_data["id"]
+
+        # Set epic
+        run_layton("errands", "epic", "set", epic_id, cwd=cwd)
+
+        # Create an errand and schedule it
+        (temp_errands_dir / "running.md").write_text(
+            """---
+name: running
+description: A running task
+---
+
+## Task
+
+Do something.
+"""
+        )
+
+        result = run_layton("errands", "schedule", "running", cwd=cwd)
+        assert result.returncode == 0
+        scheduled_data = json.loads(result.stdout)
+        bead_id = scheduled_data["data"]["scheduled"]["id"]
+
+        # Manually transition to in-progress (simulating what build_prompt does)
+        subprocess.run(
+            ["bd", "label", "remove", bead_id, "scheduled"],
+            cwd=cwd,
+            capture_output=True,
+            check=True,
+        )
+        subprocess.run(
+            ["bd", "label", "add", bead_id, "in-progress"],
+            cwd=cwd,
+            capture_output=True,
+            check=True,
+        )
+
+        # Now check orientation
+        result = run_layton(cwd=cwd)
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+
+        # Should have one bead in progress
+        in_progress = data["data"]["errands"]["queue"]["in_progress"]
+        assert len(in_progress) >= 1
+        in_progress_ids = [b["id"] for b in in_progress]
+        assert bead_id in in_progress_ids
+
+
+class TestErrandsPromptTransition:
+    """E2E tests for label transition during errands prompt."""
+
+    def test_prompt_transitions_labels(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """errands prompt swaps scheduled → in-progress labels."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        (temp_errands_dir / "trans.md").write_text(
+            """---
+name: trans
+description: Transition test
+---
+
+## Task
+
+Test label transition.
+"""
+        )
+
+        # Schedule via run
+        run_result = run_layton("errands", "run", "trans", cwd=cwd)
+        assert run_result.returncode == 0
+        bead_id = json.loads(run_result.stdout)["data"]["bead_id"]
+
+        # Verify initially has scheduled label
+        label_result = subprocess.run(
+            ["bd", "label", "list", bead_id, "--json"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        labels_before = extract_json(label_result.stdout)
+        assert "scheduled" in labels_before
+
+        # Get the prompt (should trigger transition)
+        result = run_layton("errands", "prompt", bead_id, cwd=cwd)
+        assert result.returncode == 0
+
+        # Verify labels after: should have in-progress, not scheduled
+        label_result = subprocess.run(
+            ["bd", "label", "list", bead_id, "--json"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        labels_after = extract_json(label_result.stdout)
+        assert "in-progress" in labels_after
+        assert "scheduled" not in labels_after
+
+    def test_prompt_includes_remove_in_progress_step(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """Completion protocol includes step to remove in-progress label."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        (temp_errands_dir / "proto.md").write_text(
+            """---
+name: proto
+description: Protocol test
+---
+
+## Task
+
+Test protocol.
+"""
+        )
+
+        run_result = run_layton("errands", "run", "proto", cwd=cwd)
+        assert run_result.returncode == 0
+        bead_id = json.loads(run_result.stdout)["data"]["bead_id"]
+
+        result = run_layton("errands", "prompt", bead_id, cwd=cwd)
+        assert result.returncode == 0
+        prompt = json.loads(result.stdout)["data"]["prompt"]
+
+        assert f"bd label remove {bead_id} in-progress" in prompt

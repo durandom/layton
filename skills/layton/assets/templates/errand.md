@@ -26,10 +26,16 @@ variables:
    bd comments add "## Summary\n\n<your findings>"
    ```
 
-2. Close the errand and signal for review:
+2. Close the errand:
 
    ```bash
-   bd close --add-label needs-review
+   bd close
+   ```
+
+3. Signal for review:
+
+   ```bash
+   bd label add needs-review
    ```
 
    The `needs-review` label signals that a human should review the completed work.

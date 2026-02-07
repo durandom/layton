@@ -19,6 +19,7 @@ from laytonlib.doctor import get_layton_dir
 
 # Fixed labels for bead state management
 LABEL_SCHEDULED = "scheduled"
+LABEL_IN_PROGRESS = "in-progress"
 LABEL_NEEDS_REVIEW = "needs-review"
 
 
@@ -358,6 +359,15 @@ def get_beads_scheduled() -> list[dict]:
     return get_beads_by_label(LABEL_SCHEDULED, status="open")
 
 
+def get_beads_in_progress() -> list[dict]:
+    """Get open beads with the in-progress label.
+
+    Returns:
+        List of bead dicts that are currently being executed
+    """
+    return get_beads_by_label(LABEL_IN_PROGRESS, status="open")
+
+
 def schedule_errand(name: str, variables: dict[str, str] | None = None) -> dict:
     """Schedule an errand for execution.
 
@@ -405,6 +415,166 @@ def schedule_errand(name: str, variables: dict[str, str] | None = None) -> dict:
         labels=[LABEL_SCHEDULED, f"type:{name}"],
         description=rendered_body,
     )
+
+
+def get_bead(bead_id: str) -> dict | None:
+    """Fetch a single bead by ID via bd show.
+
+    Args:
+        bead_id: The bead ID to fetch
+
+    Returns:
+        Bead dict or None if not found / bd unavailable
+    """
+    if not shutil.which("bd"):
+        return None
+
+    try:
+        result = subprocess.run(
+            ["bd", "show", bead_id, "--json"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        output = result.stdout
+        # bd show --json returns an array with one element
+        arr_start = output.find("[")
+        if arr_start == -1:
+            # Try parsing as object
+            obj_start = output.find("{")
+            if obj_start == -1:
+                return None
+            data = json.loads(output[obj_start:])
+            return data
+        data = json.loads(output[arr_start:])
+        if isinstance(data, list) and len(data) > 0:
+            return data[0]
+        return None
+    except (subprocess.CalledProcessError, json.JSONDecodeError):
+        return None
+
+
+def get_bead_comments(bead_id: str) -> str:
+    """Fetch comments for a bead via bd comments.
+
+    Args:
+        bead_id: The bead ID
+
+    Returns:
+        Raw comments text, or empty string if none / bd unavailable
+    """
+    if not shutil.which("bd"):
+        return ""
+
+    try:
+        result = subprocess.run(
+            ["bd", "comments", bead_id],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        text = result.stdout.strip()
+        # Filter out bd warning/note lines and check for "no comments" sentinel
+        lines = [
+            line for line in text.split("\n")
+            if not line.startswith(("Note:", "Warning:", "⚠"))
+        ]
+        filtered = "\n".join(lines).strip()
+        if filtered.startswith("No comments on"):
+            return ""
+        return filtered
+    except subprocess.CalledProcessError:
+        return ""
+
+
+def _transition_to_in_progress(bead_id: str) -> bool:
+    """Swap scheduled label to in-progress on a bead.
+
+    Best-effort: never blocks prompt delivery. Returns False on any failure.
+
+    Args:
+        bead_id: The bead ID to transition
+
+    Returns:
+        True if both label commands succeeded, False otherwise
+    """
+    if not shutil.which("bd"):
+        return False
+
+    try:
+        subprocess.run(
+            ["bd", "label", "remove", bead_id, LABEL_SCHEDULED],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        subprocess.run(
+            ["bd", "label", "add", bead_id, LABEL_IN_PROGRESS],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
+def build_prompt(bead_id: str) -> str | None:
+    """Assemble an execution prompt for a scheduled bead.
+
+    Fetches the bead and its comments, then builds a self-contained
+    prompt that a subagent can follow to execute the errand.
+    Transitions the bead from scheduled to in-progress (best-effort).
+
+    Args:
+        bead_id: The bead ID
+
+    Returns:
+        Execution prompt string, or None if bead not found
+    """
+    bead = get_bead(bead_id)
+    if not bead:
+        return None
+
+    _transition_to_in_progress(bead_id)
+
+    title = bead.get("title", "Untitled")
+    description = bead.get("description", "")
+    comments = get_bead_comments(bead_id)
+
+    parts = [f"# Errand: {bead_id} — {title}", "", description]
+
+    if comments:
+        parts.extend(["", "## Context (prior comments)", "", comments])
+
+    parts.extend([
+        "",
+        "## Completion Protocol",
+        "",
+        "1. Add findings:",
+        f'   ```bash',
+        f'   bd comments add {bead_id} "## Summary\\n\\n<findings>"',
+        f'   ```',
+        "",
+        "2. Remove in-progress label:",
+        f'   ```bash',
+        f'   bd label remove {bead_id} in-progress',
+        f'   ```',
+        "",
+        "3. Close:",
+        f'   ```bash',
+        f'   bd close {bead_id}',
+        f'   ```',
+        "",
+        "4. Label for review:",
+        f'   ```bash',
+        f'   bd label add {bead_id} needs-review',
+        f'   ```',
+        "",
+        f'If BLOCKED: `bd comments add {bead_id} "BLOCKED: <reason>"` — do NOT close.',
+    ])
+
+    return "\n".join(parts)
 
 
 def bd_create(
