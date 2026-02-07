@@ -13,7 +13,7 @@
 The `/layton` skill provides:
 
 - **checks**: Status of integrations and config
-- **skills**: Available data sources
-- **workflows**: Available workflows with trigger phrases
+- **rolodex**: Available data sources
+- **protocols**: Available protocols with trigger phrases
 
-Layton provides context-aware briefings and orchestrates other skills.
+Layton provides context-aware briefings and orchestrates rolodex cards, protocols, and errands.

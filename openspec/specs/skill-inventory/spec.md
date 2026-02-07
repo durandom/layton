@@ -1,32 +1,32 @@
 ## ADDED Requirements
 
-### Requirement: Skill file format
+### Requirement: Rolodex card format
 
-Skill files SHALL use YAML frontmatter with markdown body, stored in `.layton/skills/<name>.md`.
+Rolodex cards SHALL use YAML frontmatter with markdown body, stored in `.layton/rolodex/<name>.md`.
 
-#### Scenario: Valid skill file structure
+#### Scenario: Valid rolodex card structure
 
-- **WHEN** a skill file exists at `.layton/skills/gtd.md`
+- **WHEN** a rolodex card exists at `.layton/rolodex/gtd.md`
 - **THEN** it SHALL have YAML frontmatter with `name`, `description`, and `source` fields
 - **AND** the markdown body SHALL contain instructions for querying the skill
 
 #### Scenario: Frontmatter fields
 
-- **WHEN** parsing a skill file's frontmatter
+- **WHEN** parsing a rolodex card's frontmatter
 - **THEN** `name` SHALL be a lowercase identifier matching the filename (without `.md`)
 - **AND** `description` SHALL describe when/why to query this skill
 - **AND** `source` SHALL be the path to the source SKILL.md (e.g., `skills/gtd/SKILL.md`)
 
 ---
 
-### Requirement: Skill file template
+### Requirement: Rolodex card template
 
-The CLI SHALL provide a template for bootstrapping new skill files.
+The CLI SHALL provide a template for bootstrapping new rolodex cards.
 
 #### Scenario: Template content
 
-- **WHEN** `layton skills add <name>` is run
-- **THEN** CLI SHALL create `.layton/skills/<name>.md` with this template:
+- **WHEN** `layton rolodex add <name>` is run
+- **THEN** CLI SHALL create `.layton/rolodex/<name>.md` with this template:
 
 ```markdown
 ---
@@ -65,15 +65,15 @@ source: skills/<name>/SKILL.md
 
 #### Scenario: Template sections purpose
 
-- **WHEN** AI reads a skill file
+- **WHEN** AI reads a rolodex card
 - **THEN** `## Commands` SHALL contain bash commands to execute for data gathering
 - **AND** `## What to Extract` SHALL guide what information matters from the output
 - **AND** `## Key Metrics` SHALL define important indicators for briefings
 
 #### Scenario: Template does not overwrite
 
-- **WHEN** `layton skills add <name>` is run AND `.layton/skills/<name>.md` exists
-- **THEN** CLI SHALL return error with code `SKILL_EXISTS`
+- **WHEN** `layton rolodex add <name>` is run AND `.layton/rolodex/<name>.md` exists
+- **THEN** CLI SHALL return error with code `CARD_EXISTS`
 - **AND** error message SHALL suggest reviewing existing file
 
 ---
@@ -84,10 +84,10 @@ The CLI SHALL discover external skills by scanning the `skills/` directory.
 
 #### Scenario: Discover available skills
 
-- **WHEN** `layton skills --discover` is run
+- **WHEN** `layton rolodex --discover` is run
 - **THEN** CLI SHALL scan `skills/*/SKILL.md` for available skills
-- **AND** output SHALL include `known` array (skills with files in `.layton/skills/`)
-- **AND** output SHALL include `unknown` array (skills without files)
+- **AND** output SHALL include `known` array (skills with cards in `.layton/rolodex/`)
+- **AND** output SHALL include `unknown` array (skills without cards)
 
 #### Scenario: Discovery extracts metadata
 
@@ -102,29 +102,29 @@ The CLI SHALL discover external skills by scanning the `skills/` directory.
 
 ---
 
-### Requirement: List known skills
+### Requirement: List known rolodex cards
 
-The CLI SHALL list skills from `.layton/skills/`.
+The CLI SHALL list rolodex cards from `.layton/rolodex/`.
 
 #### Scenario: List with JSON output
 
-- **WHEN** `layton skills` is run
-- **THEN** output SHALL be JSON with `success` and `skills` array
-- **AND** each skill SHALL include `name`, `description`, `source` from frontmatter
+- **WHEN** `layton rolodex` is run
+- **THEN** output SHALL be JSON with `success` and `rolodex` array
+- **AND** each card SHALL include `name`, `description`, `source` from frontmatter
 
-#### Scenario: Empty skills directory
+#### Scenario: Empty rolodex directory
 
-- **WHEN** `layton skills` is run AND `.layton/skills/` is empty or missing
-- **THEN** output SHALL have empty `skills` array
-- **AND** `next_steps` SHALL suggest `layton skills --discover` and `layton skills add`
+- **WHEN** `layton rolodex` is run AND `.layton/rolodex/` is empty or missing
+- **THEN** output SHALL have empty `rolodex` array
+- **AND** `next_steps` SHALL suggest `layton rolodex --discover` and `layton rolodex add`
 
 ---
 
-### Requirement: Skills directory creation
+### Requirement: Rolodex directory creation
 
-The CLI SHALL create `.layton/skills/` directory when needed.
+The CLI SHALL create `.layton/rolodex/` directory when needed.
 
 #### Scenario: Auto-create on add
 
-- **WHEN** `layton skills add <name>` is run AND `.layton/skills/` doesn't exist
-- **THEN** CLI SHALL create the directory before creating the skill file
+- **WHEN** `layton rolodex add <name>` is run AND `.layton/rolodex/` doesn't exist
+- **THEN** CLI SHALL create the directory before creating the rolodex card

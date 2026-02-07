@@ -276,7 +276,7 @@ def run_doctor(formatter: OutputFormatter, fix: bool = False) -> int:
 
     # Build next_steps
     if config_missing:
-        next_steps.append("Follow references/workflows/setup.md for guided onboarding")
+        next_steps.append("Follow references/protocols/setup.md for guided onboarding")
         next_steps.append("Or run 'layton doctor --fix' for quick setup with defaults")
 
     if config_invalid:

@@ -11,7 +11,7 @@ triggers:
 
 ## Objective
 
-Help the user decide what to focus on by considering temporal context, energy levels, and available tasks from their integrated skills. Present 2-3 options with clear rationale.
+Help the user decide what to focus on by considering temporal context, energy levels, and available tasks from their integrated rolodex cards. Present 2-3 options with clear rationale.
 
 ## Steps
 
@@ -45,17 +45,17 @@ If focus exists, ask if user wants to:
 
 ### 3. Query Available Work
 
-Gather available tasks from configured skills.
+Gather available tasks from configured rolodex cards.
 
 **From GTD (if configured):**
 
-Read `.layton/skills/gtd.md` and execute its commands to get:
+Read `.layton/rolodex/gtd.md` and execute its commands to get:
 
 - Active next actions
 - Task contexts (focus, async, meetings)
 - High-priority items
 
-**From Beads:**
+**From Errands:**
 
 ```bash
 bd list --label watching --json
@@ -84,7 +84,7 @@ Based on your current context, here are my suggestions:
 
 ## Option 1: [Task Name] ⭐ Recommended
 **Why now**: [Time/energy match rationale]
-**From**: [GTD/Beads/etc]
+**From**: [GTD/Errands/etc]
 **Estimated effort**: [Quick/Medium/Deep work]
 
 ## Option 2: [Task Name]
@@ -102,9 +102,9 @@ What would you like to focus on?
 
 ### 6. Set Focus
 
-When user selects an option, use the set-focus workflow:
+When user selects an option, use the set-focus protocol:
 
-Read `skills/layton/references/workflows/set-focus.md` and follow its steps to:
+Read `skills/layton/references/protocols/set-focus.md` and follow its steps to:
 
 - Clear any existing focus
 - Set the new focus item
@@ -124,4 +124,4 @@ Read `skills/layton/references/workflows/set-focus.md` and follow its steps to:
 - 2-3 options presented with clear rationale
 - Energy level matched to task difficulty
 - Source of each task is clear
-- User can select and focus is set via set-focus workflow
+- User can select and focus is set via set-focus protocol

@@ -59,7 +59,7 @@ AGENTS.md contains everything the AI assistant needs to know.
 1. Run `/layton` first
 
 ## Primary Entry Point: Layton
-The `/layton` skill provides checks, skills, and workflows.
+The `/layton` skill provides checks, rolodex cards, and protocols.
 
 ## Issue Tracking with Beads
 ```bash
@@ -109,8 +109,9 @@ repository/
 ├── AGENTS.md           # All agent instructions
 └── .layton/
     ├── config.json     # Layton configuration
-    ├── skills/         # Data source integrations
-    └── workflows/      # Workflow definitions
+    ├── rolodex/        # Data source integrations
+    ├── protocols/      # Protocol definitions
+    └── errands/        # Autonomous task definitions
 
 ```
 

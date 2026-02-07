@@ -1,34 +1,34 @@
 ---
 name: gather
-description: Aggregate data from all configured skills into a unified view
+description: Aggregate data from all configured rolodex cards into a unified view
 triggers:
   - gather data
-  - collect skill data
-  - aggregate skills
+  - collect rolodex data
+  - aggregate cards
   - what's happening across my tools
 ---
 
 ## Objective
 
-Read all skill files from `.layton/skills/`, execute their documented commands, and aggregate the results into a unified view. This workflow is a building block for other workflows like morning-briefing and focus-suggestion.
+Read all rolodex cards from `.layton/rolodex/`, execute their documented commands, and aggregate the results into a unified view. This protocol is a building block for other protocols like morning-briefing and focus-suggestion.
 
 ## Steps
 
-### 1. List Configured Skills
+### 1. List Configured Cards
 
-Get the list of configured skills:
+Get the list of configured rolodex cards:
 
 ```bash
-layton skills
+layton rolodex
 ```
 
-If no skills are configured, suggest running `layton skills --discover` and `layton skills add <name>`.
+If no cards are configured, suggest running `layton rolodex --discover` and `layton rolodex add <name>`.
 
-### 2. Iterate Over Skill Files
+### 2. Iterate Over Rolodex Cards
 
-For each skill in `.layton/skills/`:
+For each card in `.layton/rolodex/`:
 
-1. **Read the skill file** to understand:
+1. **Read the card file** to understand:
    - `## Commands` section: what to execute
    - `## What to Extract` section: what information matters
    - `## Key Metrics` section: important numbers to surface
@@ -45,16 +45,16 @@ For each skill in `.layton/skills/`:
 
 ### 3. Handle Failures Gracefully
 
-When a skill command fails:
+When a card's command fails:
 
 - Note the failure in results (don't stop gathering)
 - Include the error message for context
-- Continue with remaining skills
-- Flag skills with errors in final summary
+- Continue with remaining cards
+- Flag cards with errors in final summary
 
 ### 4. Aggregate Results
 
-Organize gathered data by skill:
+Organize gathered data by card:
 
 ```text
 Gathered Data
@@ -66,26 +66,26 @@ Gathered Data
 - Waiting For: 5 items
 - Status: OK
 
-## Beads
+## Errands
 - Watching: 8 items
-- Focus: "Implement skill integration"
+- Focus: "Implement card integration"
 - Status: OK
 
-## <Other Skills>
+## <Other Cards>
 ...
 ```
 
 ## Context Adaptation
 
-- **If a skill has no commands**: Skip it but note in output
-- **If all commands fail for a skill**: Mark as "unavailable" but continue
+- **If a card has no commands**: Skip it but note in output
+- **If all commands fail for a card**: Mark as "unavailable" but continue
 - **If JSON output available**: Prefer structured data over text parsing
 - **If gathering takes too long**: Report partial results with note
 
 ## Success Criteria
 
-- All configured skills are queried
+- All configured cards are queried
 - Failures don't stop the gather process
-- Results are organized by skill name
-- Key metrics extracted per skill file guidance
-- Errors are clearly noted but don't crash the workflow
+- Results are organized by card name
+- Key metrics extracted per card file guidance
+- Errors are clearly noted but don't crash the protocol

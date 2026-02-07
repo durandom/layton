@@ -70,64 +70,64 @@ def create_parser() -> argparse.ArgumentParser:
     # context command
     subparsers.add_parser("context", help="Show temporal context")
 
-    # skills command
-    skills_parser = subparsers.add_parser("skills", help="Manage skill inventory")
-    skills_parser.add_argument(
+    # rolodex command
+    rolodex_parser = subparsers.add_parser("rolodex", help="Manage rolodex cards")
+    rolodex_parser.add_argument(
         "--discover",
         action="store_true",
-        help="Discover skills from skills/*/SKILL.md",
+        help="Discover cards from skills/*/SKILL.md",
     )
-    skills_subparsers = skills_parser.add_subparsers(dest="skills_command")
+    rolodex_subparsers = rolodex_parser.add_subparsers(dest="rolodex_command")
 
-    # skills add
-    skills_add = skills_subparsers.add_parser("add", help="Create new skill file")
-    skills_add.add_argument("name", help="Skill name (lowercase identifier)")
+    # rolodex add
+    rolodex_add = rolodex_subparsers.add_parser("add", help="Create new rolodex card")
+    rolodex_add.add_argument("name", help="Card name (lowercase identifier)")
 
-    # workflows command
-    workflows_parser = subparsers.add_parser("workflows", help="Manage workflows")
-    workflows_subparsers = workflows_parser.add_subparsers(dest="workflows_command")
+    # protocols command
+    protocols_parser = subparsers.add_parser("protocols", help="Manage protocols")
+    protocols_subparsers = protocols_parser.add_subparsers(dest="protocols_command")
 
-    # workflows add
-    workflows_add = workflows_subparsers.add_parser(
-        "add", help="Create new workflow file"
+    # protocols add
+    protocols_add = protocols_subparsers.add_parser(
+        "add", help="Create new protocol file"
     )
-    workflows_add.add_argument("name", help="Workflow name (lowercase identifier)")
+    protocols_add.add_argument("name", help="Protocol name (lowercase identifier)")
 
-    # beads command
-    beads_parser = subparsers.add_parser("beads", help="Manage bead templates")
-    beads_subparsers = beads_parser.add_subparsers(dest="beads_command")
+    # errands command
+    errands_parser = subparsers.add_parser("errands", help="Manage errands")
+    errands_subparsers = errands_parser.add_subparsers(dest="errands_command")
 
-    # beads add
-    beads_add = beads_subparsers.add_parser("add", help="Create new bead template")
-    beads_add.add_argument("name", help="Bead template name (lowercase identifier)")
+    # errands add
+    errands_add = errands_subparsers.add_parser("add", help="Create new errand")
+    errands_add.add_argument("name", help="Errand name (lowercase identifier)")
 
-    # beads schedule
-    beads_schedule = beads_subparsers.add_parser(
-        "schedule", help="Schedule a bead from template"
+    # errands schedule
+    errands_schedule = errands_subparsers.add_parser(
+        "schedule", help="Schedule an errand"
     )
-    beads_schedule.add_argument("name", help="Bead template name")
-    beads_schedule.add_argument(
+    errands_schedule.add_argument("name", help="Errand name")
+    errands_schedule.add_argument(
         "json_vars",
         nargs="?",
         default=None,
         help="Variables as JSON (or pipe via stdin)",
     )
 
-    # beads epic (get/set)
-    beads_epic = beads_subparsers.add_parser("epic", help="Manage epic ID")
-    beads_epic.add_argument(
+    # errands epic (get/set)
+    errands_epic = errands_subparsers.add_parser("epic", help="Manage epic ID")
+    errands_epic.add_argument(
         "action",
         nargs="?",
         choices=["set"],
         help="Action (omit to show current epic)",
     )
-    beads_epic.add_argument("epic_id", nargs="?", help="Epic ID to set")
+    errands_epic.add_argument("epic_id", nargs="?", help="Epic ID to set")
 
     return parser
 
 
 def run_orientation(formatter: OutputFormatter) -> int:
-    """Run orientation - combined doctor + skills + workflows + beads.
+    """Run orientation - combined doctor + rolodex + protocols + errands.
 
     Args:
         formatter: Output formatter
@@ -135,10 +135,10 @@ def run_orientation(formatter: OutputFormatter) -> int:
     Returns:
         Exit code (0=success, 1=fixable, 2=critical)
     """
-    from laytonlib.beads import (
+    from laytonlib.errands import (
         get_beads_pending_review,
         get_beads_scheduled,
-        list_beads,
+        list_errands,
     )
     from laytonlib.doctor import (
         check_beads_available,
@@ -146,8 +146,8 @@ def run_orientation(formatter: OutputFormatter) -> int:
         check_config_exists,
         check_config_valid,
     )
-    from laytonlib.skills import list_skills
-    from laytonlib.workflows import list_workflows
+    from laytonlib.rolodex import list_cards
+    from laytonlib.protocols import list_protocols
 
     # Run doctor checks
     checks = []
@@ -179,50 +179,50 @@ def run_orientation(formatter: OutputFormatter) -> int:
         checks.append(config_valid_check)
 
     if needs_setup:
-        next_steps.append("Follow references/workflows/setup.md for guided onboarding")
+        next_steps.append("Follow references/protocols/setup.md for guided onboarding")
         next_steps.append("Or run 'layton config init' for quick setup")
 
-    # Get skills inventory
-    skills = list_skills()
-    skills_data = [{"name": s.name, "description": s.description} for s in skills]
+    # Get rolodex cards inventory
+    cards = list_cards()
+    cards_data = [{"name": c.name, "description": c.description} for c in cards]
 
-    if not skills:
-        next_steps.append("Run 'layton skills --discover' to find available skills")
+    if not cards:
+        next_steps.append("Run 'layton rolodex --discover' to find available cards")
 
-    # Get workflows inventory
-    workflows = list_workflows()
-    workflows_data = [
+    # Get protocols inventory
+    protocols = list_protocols()
+    protocols_data = [
         {"name": w.name, "description": w.description, "triggers": w.triggers}
-        for w in workflows
+        for w in protocols
     ]
 
-    if not workflows:
-        next_steps.append("Run 'layton workflows add <name>' to create a workflow")
+    if not protocols:
+        next_steps.append("Run 'layton protocols add <name>' to create a protocol")
 
-    # Get bead templates inventory
-    bead_templates = list_beads()
-    bead_templates_data = [
-        {"name": b.name, "description": b.description, "variables": b.variables}
-        for b in bead_templates
+    # Get errands inventory
+    errands = list_errands()
+    errands_data = [
+        {"name": e.name, "description": e.description, "variables": e.variables}
+        for e in errands
     ]
 
     # Get scheduled and pending review beads (from bd)
     beads_scheduled = get_beads_scheduled()
     beads_pending_review = get_beads_pending_review()
 
-    # Add workflow hints based on beads status
+    # Add protocol hints based on beads status
     if beads_pending_review:
         next_steps.append(
-            f"{len(beads_pending_review)} bead(s) pending review - see references/workflows/review-beads.md"
+            f"{len(beads_pending_review)} bead(s) pending review - see references/protocols/review-beads.md"
         )
 
     # Build output
     data = {
         "needs_setup": needs_setup,
         "checks": [c.to_dict() for c in checks],
-        "skills": skills_data,
-        "workflows": workflows_data,
-        "bead_templates": bead_templates_data,
+        "rolodex": cards_data,
+        "protocols": protocols_data,
+        "errands": errands_data,
         "beads_scheduled": beads_scheduled,
         "beads_pending_review": beads_pending_review,
     }
@@ -234,127 +234,127 @@ def run_orientation(formatter: OutputFormatter) -> int:
     return 0
 
 
-def run_skills(
+def run_rolodex(
     formatter: OutputFormatter,
     command: str | None,
     discover: bool,
     name: str | None,
 ) -> int:
-    """Run skills command.
+    """Run rolodex command.
 
     Args:
         formatter: Output formatter
         command: Subcommand (add, or None for list)
         discover: Whether to run discovery
-        name: Skill name for add command
+        name: Card name for add command
 
     Returns:
         Exit code (0=success, 1=error)
     """
-    from laytonlib.skills import add_skill, discover_skills, list_skills
+    from laytonlib.rolodex import add_card, discover_cards, list_cards
 
     if command == "add":
         if not name:
-            formatter.error("MISSING_NAME", "Skill name is required")
+            formatter.error("MISSING_NAME", "Card name is required")
             return 1
 
         try:
-            path = add_skill(name)
+            path = add_card(name)
             formatter.success(
                 {"created": str(path), "name": name},
-                next_steps=[f"Edit {path} to configure the skill"],
+                next_steps=[f"Edit {path} to configure the card"],
             )
             return 0
         except FileExistsError as e:
             formatter.error(
-                "SKILL_EXISTS",
+                "CARD_EXISTS",
                 str(e),
-                next_steps=["Review existing skill file or choose a different name"],
+                next_steps=["Review existing card or choose a different name"],
             )
             return 1
 
     elif discover:
-        known, unknown = discover_skills()
+        known, unknown = discover_cards()
         next_steps = []
         if unknown:
             next_steps.append(
-                f"Run 'layton skills add <name>' to create skill files for: "
-                f"{', '.join(s.name for s in unknown)}"
+                f"Run 'layton rolodex add <name>' to create cards for: "
+                f"{', '.join(c.name for c in unknown)}"
             )
         formatter.success(
             {
-                "known": [s.to_dict() for s in known],
-                "unknown": [s.to_dict() for s in unknown],
+                "known": [c.to_dict() for c in known],
+                "unknown": [c.to_dict() for c in unknown],
             },
             next_steps=next_steps if next_steps else None,
         )
         return 0
 
     else:
-        # Default: list skills
-        skills = list_skills()
+        # Default: list cards
+        cards = list_cards()
         next_steps = []
-        if not skills:
-            next_steps.append("Run 'layton skills --discover' to find available skills")
-            next_steps.append("Run 'layton skills add <name>' to create a skill file")
+        if not cards:
+            next_steps.append("Run 'layton rolodex --discover' to find available cards")
+            next_steps.append("Run 'layton rolodex add <name>' to create a card")
         formatter.success(
-            {"skills": [s.to_dict() for s in skills]},
+            {"rolodex": [c.to_dict() for c in cards]},
             next_steps=next_steps if next_steps else None,
         )
         return 0
 
 
-def run_workflows(
+def run_protocols(
     formatter: OutputFormatter,
     command: str | None,
     name: str | None,
 ) -> int:
-    """Run workflows command.
+    """Run protocols command.
 
     Args:
         formatter: Output formatter
         command: Subcommand (add, or None for list)
-        name: Workflow name for add command
+        name: Protocol name for add command
 
     Returns:
         Exit code (0=success, 1=error)
     """
-    from laytonlib.workflows import add_workflow, list_workflows
+    from laytonlib.protocols import add_protocol, list_protocols
 
     if command == "add":
         if not name:
-            formatter.error("MISSING_NAME", "Workflow name is required")
+            formatter.error("MISSING_NAME", "Protocol name is required")
             return 1
 
         try:
-            path = add_workflow(name)
+            path = add_protocol(name)
             formatter.success(
                 {"created": str(path), "name": name},
-                next_steps=[f"Edit {path} to configure the workflow"],
+                next_steps=[f"Edit {path} to configure the protocol"],
             )
             return 0
         except FileExistsError as e:
             formatter.error(
-                "WORKFLOW_EXISTS",
+                "PROTOCOL_EXISTS",
                 str(e),
-                next_steps=["Review existing workflow file or choose a different name"],
+                next_steps=["Review existing protocol file or choose a different name"],
             )
             return 1
 
     else:
-        # Default: list workflows
-        workflows = list_workflows()
+        # Default: list protocols
+        protocols = list_protocols()
         next_steps = []
-        if not workflows:
-            next_steps.append("Run 'layton workflows add <name>' to create a workflow")
+        if not protocols:
+            next_steps.append("Run 'layton protocols add <name>' to create a protocol")
         formatter.success(
-            {"workflows": [w.to_dict() for w in workflows]},
+            {"protocols": [w.to_dict() for w in protocols]},
             next_steps=next_steps if next_steps else None,
         )
         return 0
 
 
-def run_beads(
+def run_errands(
     formatter: OutputFormatter,
     command: str | None,
     name: str | None,
@@ -362,12 +362,12 @@ def run_beads(
     epic_action: str | None,
     epic_id: str | None,
 ) -> int:
-    """Run beads command.
+    """Run errands command.
 
     Args:
         formatter: Output formatter
         command: Subcommand (add, schedule, epic, or None for list)
-        name: Bead template name for add/schedule
+        name: Errand name for add/schedule
         json_vars: JSON variables for schedule (or read from stdin)
         epic_action: Epic action (set, or None for show)
         epic_id: Epic ID for set action
@@ -379,37 +379,37 @@ def run_beads(
     import select
     import sys
 
-    from laytonlib.beads import (
-        add_bead,
+    from laytonlib.errands import (
+        add_errand,
         get_epic,
-        list_beads,
-        schedule_bead,
+        list_errands,
+        schedule_errand,
         set_epic,
     )
 
     if command == "add":
         if not name:
-            formatter.error("MISSING_NAME", "Bead template name is required")
+            formatter.error("MISSING_NAME", "Errand name is required")
             return 1
 
         try:
-            path = add_bead(name)
+            path = add_errand(name)
             formatter.success(
                 {"created": str(path), "name": name},
-                next_steps=[f"Edit {path} to configure the bead template"],
+                next_steps=[f"Edit {path} to configure the errand"],
             )
             return 0
         except FileExistsError as e:
             formatter.error(
-                "BEAD_EXISTS",
+                "ERRAND_EXISTS",
                 str(e),
-                next_steps=["Review existing template or choose a different name"],
+                next_steps=["Review existing errand or choose a different name"],
             )
             return 1
 
     elif command == "schedule":
         if not name:
-            formatter.error("MISSING_NAME", "Bead template name is required")
+            formatter.error("MISSING_NAME", "Errand name is required")
             return 1
 
         # Parse variables from JSON arg or stdin
@@ -432,14 +432,14 @@ def run_beads(
                 return 1
 
         try:
-            result = schedule_bead(name, variables)
+            result = schedule_errand(name, variables)
             formatter.success({"scheduled": result})
             return 0
         except FileNotFoundError:
             formatter.error(
-                "TEMPLATE_NOT_FOUND",
-                f"Bead template '{name}' not found",
-                next_steps=["Run 'layton beads' to list available templates"],
+                "ERRAND_NOT_FOUND",
+                f"Errand '{name}' not found",
+                next_steps=["Run 'layton errands' to list available errands"],
             )
             return 1
         except RuntimeError as e:
@@ -456,7 +456,7 @@ def run_beads(
                 formatter.error(
                     "NO_EPIC",
                     "Epic not configured",
-                    next_steps=["Run 'layton beads epic set <id>' to configure epic"],
+                    next_steps=["Run 'layton errands epic set <id>' to configure epic"],
                 )
             else:
                 formatter.error("BD_ERROR", error_str)
@@ -483,22 +483,22 @@ def run_beads(
                 formatter.error(
                     "NO_EPIC",
                     "Epic not configured",
-                    next_steps=["Run 'layton beads epic set <id>' to configure epic"],
+                    next_steps=["Run 'layton errands epic set <id>' to configure epic"],
                 )
                 return 1
 
     else:
-        # Default: list beads
-        beads = list_beads()
+        # Default: list errands
+        errands = list_errands()
         next_steps = []
-        if not beads:
-            next_steps.append("Run 'layton beads add <name>' to create a bead template")
+        if not errands:
+            next_steps.append("Run 'layton errands add <name>' to create an errand")
         else:
             next_steps.append(
-                "See references/workflows/schedule-bead.md for scheduling workflow"
+                "See references/protocols/schedule-errand.md for scheduling protocol"
             )
         formatter.success(
-            {"beads": [b.to_dict() for b in beads]},
+            {"errands": [e.to_dict() for e in errands]},
             next_steps=next_steps if next_steps else None,
         )
         return 0
@@ -519,7 +519,7 @@ def main(argv: list[str] | None = None) -> int:
     # Create formatter based on --human flag
     formatter = OutputFormatter(human=args.human, verbose=args.verbose)
 
-    # No-arg default: run orientation (doctor + skills + workflows)
+    # No-arg default: run orientation (doctor + rolodex + protocols)
     if args.command is None:
         return run_orientation(formatter)
 
@@ -547,25 +547,25 @@ def main(argv: list[str] | None = None) -> int:
 
         return run_context(formatter)
 
-    elif args.command == "skills":
-        return run_skills(
+    elif args.command == "rolodex":
+        return run_rolodex(
             formatter,
-            command=getattr(args, "skills_command", None),
+            command=getattr(args, "rolodex_command", None),
             discover=getattr(args, "discover", False),
             name=getattr(args, "name", None),
         )
 
-    elif args.command == "workflows":
-        return run_workflows(
+    elif args.command == "protocols":
+        return run_protocols(
             formatter,
-            command=getattr(args, "workflows_command", None),
+            command=getattr(args, "protocols_command", None),
             name=getattr(args, "name", None),
         )
 
-    elif args.command == "beads":
-        return run_beads(
+    elif args.command == "errands":
+        return run_errands(
             formatter,
-            command=getattr(args, "beads_command", None),
+            command=getattr(args, "errands_command", None),
             name=getattr(args, "name", None),
             json_vars=getattr(args, "json_vars", None),
             epic_action=getattr(args, "action", None),

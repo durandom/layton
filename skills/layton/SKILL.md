@@ -4,7 +4,7 @@ description: Personal AI secretary for attention management. Manages focus, trac
 ---
 
 <objective>
-Layton is your personal secretary—managing attention, synthesizing information from multiple systems, and providing context-aware briefings. It uses three primitives (skill files, workflows, bead templates) and a thin CLI for orientation, health checks, temporal context, configuration, and discovery.
+Layton is your personal secretary—managing attention, synthesizing information from multiple systems, and providing context-aware briefings. It uses three primitives (rolodex cards, protocols, errands) and a thin CLI for orientation, health checks, temporal context, configuration, and discovery.
 </objective>
 
 <essential_principles>
@@ -13,12 +13,12 @@ Layton is your personal secretary—managing attention, synthesizing information
 - Always include `--json` flag for machine-readable output
 - Always include `layton` label on beads Layton creates
 - Only ONE bead should have `focus` label at any time
-- Workflows are AI instructions—Layton follows them, not executes them as code
-- Skill files in `.layton/skills/` define how to query external tools
-- User workflows in `.layton/workflows/` are customizable by users
+- Protocols are AI instructions—Layton follows them, not executes them as code
+- Rolodex cards in `.layton/rolodex/` define how to query external tools
+- User protocols in `.layton/protocols/` are customizable by users
 - **ALWAYS** run `$LAYTON` at session start before any other action
-- **NEVER** query external tools without first reading their skill file in `.layton/skills/`
-- **NEVER** skip a workflow if the routing table matches the user's intent
+- **NEVER** query external tools without first reading their rolodex card in `.layton/rolodex/`
+- **NEVER** skip a protocol if the routing table matches the user's intent
 </essential_principles>
 
 <primitives>
@@ -29,34 +29,34 @@ Layton has three building blocks. Each serves a distinct role:
 
 | Primitive | What it is | Execution model | Stored in |
 | --- | --- | --- | --- |
-| **Skill** | How to query an external tool (Gmail, Jira, calendar) | Referenced by workflows and beads | `.layton/skills/` |
-| **Workflow** | Interactive multi-step process (briefings, reviews, authoring) | AI + human in conversation — can pause, branch, ask questions | `.layton/workflows/` |
-| **Bead template** | Autonomous background task (syncs, checks, reviews) | AI alone, no human — runs unattended, results reviewed later | `.layton/beads/` |
+| **Rolodex card** | How to query an external tool (Gmail, Jira, calendar) | Referenced by protocols and errands | `.layton/rolodex/` |
+| **Protocol** | Interactive multi-step process (briefings, reviews, authoring) | AI + human in conversation — can pause, branch, ask questions | `.layton/protocols/` |
+| **Errand** | Autonomous background task (syncs, checks, reviews) | AI alone, no human — runs unattended, results reviewed later | `.layton/errands/` |
 
 **When to use which:**
 
-- Need to **query data** from an external system? → Write a **skill** file.
-- Need to **guide a conversation** with decision points? → Write a **workflow**.
-- Need to **run something unattended** and review the result later? → Write a **bead template**.
+- Need to **query data** from an external system? → Write a **rolodex card**.
+- Need to **guide a conversation** with decision points? → Write a **protocol**.
+- Need to **run something unattended** and review the result later? → Write an **errand**.
 
-Workflows and beads both reference skills for external tool access. The key difference is human involvement: workflows are interactive, beads are autonomous.
+Protocols and errands both reference rolodex cards for external tool access. The key difference is human involvement: protocols are interactive, errands are autonomous.
 
-See `references/skill-authoring.md`, `references/workflow-authoring.md`, and `references/bead-authoring.md` for authoring guides.
+See `references/rolodex-authoring.md`, `references/protocol-authoring.md`, and `references/errand-authoring.md` for authoring guides.
 
 </primitives>
 
 <decision_framework>
 
-## WORKFLOW-FIRST DECISION FRAMEWORK
+## PROTOCOL-FIRST DECISION FRAMEWORK
 
 Before taking ANY action, follow this sequence:
 
-1. **Orient:** Run `$LAYTON` to discover state, skills, and workflows.
-2. **Route:** Scan `<routing>` for intent matches. If found, read the workflow file and follow it exactly.
-3. **Skill lookup:** If the task involves an external tool, read its skill file in `.layton/skills/` before querying. Never guess commands.
-4. **Fallback:** Only if no routing match — clarify intent with user, then select a workflow.
+1. **Orient:** Run `$LAYTON` to discover state, rolodex cards, and protocols.
+2. **Route:** Scan `<routing>` for intent matches. If found, read the protocol file and follow it exactly.
+3. **Rolodex lookup:** If the task involves an external tool, read its rolodex card in `.layton/rolodex/` before querying. Never guess commands.
+4. **Fallback:** Only if no routing match — clarify intent with user, then select a protocol.
 
-**Never skip orientation. Never query external tools without reading their skill file first.**
+**Never skip orientation. Never query external tools without reading their rolodex card first.**
 
 </decision_framework>
 
@@ -74,43 +74,43 @@ What would you like to do?
 1. Get oriented (full status check)
 2. Track something (add to attention list)
 3. Set focus (designate current work item)
-4. Retrospect on workflow (reflect on what worked)
+4. Retrospect on protocol (reflect on what worked)
 5. Something else
 
 **Wait for response before proceeding.**
 </intake>
 
 <routing>
-| Response | Workflow |
+| Response | Protocol |
 | --- | --- |
 | 1, "orient", "status", "check", "what's going on" | Run `$LAYTON` (no args) |
-| 2, "track", "watch", "monitor", "keep eye on" | `references/workflows/track-item.md` |
-| 3, "focus", "working on", "what should I do", "next task", "priority" | `references/workflows/set-focus.md` |
-| 4, "retrospect", "reflect", "retro", "what worked" | `references/workflows/retrospect.md` |
+| 2, "track", "watch", "monitor", "keep eye on" | `references/protocols/track-item.md` |
+| 3, "focus", "working on", "what should I do", "next task", "priority" | `references/protocols/set-focus.md` |
+| 4, "retrospect", "reflect", "retro", "what worked" | `references/protocols/retrospect.md` |
 | 5, other | Clarify intent, then select |
 
 **Intent-based routing (bypass menu):**
 
-| Intent / Trigger Phrases | Workflow |
+| Intent / Trigger Phrases | Protocol |
 | --- | --- |
-| "setup", "configure", "onboard", "first time" | `references/workflows/setup.md` |
-| "audit", "review instructions", "check CLAUDE.md" | `references/workflows/audit-project-instructions.md` |
-| "skill", "add skill", "create skill", "capture skill", "new skill" | `references/workflows/author-skill.md` |
-| "workflow", "add workflow", "create workflow", "capture workflow", "new workflow" | `references/workflows/author-workflow.md` |
-| "bead template", "create bead template", "new bead template", "author bead" | `references/workflows/author-bead-template.md` |
-| "schedule bead", "run template", "background task" | `references/workflows/schedule-bead.md` |
-| "review beads", "pending review", "check completed", "what finished" | `references/workflows/review-beads.md` |
+| "setup", "configure", "onboard", "first time" | `references/protocols/setup.md` |
+| "audit", "review instructions", "check CLAUDE.md" | `references/protocols/audit-project-instructions.md` |
+| "rolodex card", "add rolodex card", "create rolodex card", "capture rolodex card", "new rolodex card" | `references/protocols/author-rolodex.md` |
+| "protocol", "add protocol", "create protocol", "capture protocol", "new protocol" | `references/protocols/author-protocol.md` |
+| "errand", "create errand", "new errand", "author errand" | `references/protocols/author-errand.md` |
+| "schedule errand", "run errand", "background task" | `references/protocols/schedule-errand.md` |
+| "review beads", "pending review", "check completed", "what finished" | `references/protocols/review-beads.md` |
 
 **External tool queries (calendar, tasks, email, etc.):**
 
 | Intent / Trigger Phrases | Action |
 | --- | --- |
-| "calendar", "schedule", "meetings", "agenda" | Check `.layton/skills/` for calendar skill |
-| "tasks", "todos", "inbox", "gtd", "things to do" | Check `.layton/skills/` for task skill |
-| "email", "messages", "mail" | Check `.layton/skills/` for email skill |
-| "git", "commits", "PRs", "code" | Check `.layton/skills/` for git skill |
+| "calendar", "schedule", "meetings", "agenda" | Check `.layton/rolodex/` for calendar rolodex card |
+| "tasks", "todos", "inbox", "gtd", "things to do" | Check `.layton/rolodex/` for task rolodex card |
+| "email", "messages", "mail" | Check `.layton/rolodex/` for email rolodex card |
+| "git", "commits", "PRs", "code" | Check `.layton/rolodex/` for git rolodex card |
 
-**After selecting a workflow, read and follow it exactly.**
+**After selecting a protocol, read and follow it exactly.**
 </routing>
 
 <quick_start>
@@ -121,15 +121,15 @@ What would you like to do?
 $LAYTON
 ```
 
-**Setup for first-time users**: Run workflow in `references/workflows/setup.md`
+**Setup for first-time users**: Run protocol in `references/protocols/setup.md`
 
-**Morning briefing**: Follow `references/examples/morning-briefing.md` (or create your own via `layton workflows add morning-briefing`)
+**Morning briefing**: Follow `references/examples/morning-briefing.md` (or create your own via `layton protocols add morning-briefing`)
 
-**Track something**: Run workflow in `references/workflows/track-item.md`
+**Track something**: Run protocol in `references/protocols/track-item.md`
 
-**Set focus**: Run workflow in `references/workflows/set-focus.md`
+**Set focus**: Run protocol in `references/protocols/set-focus.md`
 
-**Gather data from skills**: Follow `references/examples/gather.md`
+**Gather data from rolodex**: Follow `references/examples/gather.md`
 
 **Focus suggestions**: Follow `references/examples/focus-suggestion.md`
 </quick_start>
@@ -158,7 +158,7 @@ LAYTON="/path/to/skills/layton/scripts/layton"  # Use the actual path
 $LAYTON
 ```
 
-Returns combined doctor checks + skills inventory + workflows inventory. Use this for full AI orientation at start of any briefing or workflow.
+Returns combined doctor checks + rolodex inventory + protocols inventory. Use this for full AI orientation at start of any briefing or protocol.
 
 **Health check:**
 
@@ -183,46 +183,46 @@ $LAYTON config get <key>  # Get specific value
 $LAYTON config set <key> <value>  # Set value
 ```
 
-**Skills:**
+**Rolodex:**
 
 ```bash
-$LAYTON skills                 # List known skills from .layton/skills/
-$LAYTON skills --discover      # Find skills in skills/*/SKILL.md
-$LAYTON skills add <name>      # Create new skill file from template
+$LAYTON rolodex                 # List known rolodex cards from .layton/rolodex/
+$LAYTON rolodex --discover      # Find rolodex cards in skills/*/SKILL.md
+$LAYTON rolodex add <name>      # Create new rolodex card from template
 ```
 
-**Workflows:**
+**Protocols:**
 
 ```bash
-$LAYTON workflows              # List workflows from .layton/workflows/
-$LAYTON workflows add <name>   # Create new workflow file from template
+$LAYTON protocols              # List protocols from .layton/protocols/
+$LAYTON protocols add <name>   # Create new protocol file from template
 ```
 
-**Bead Templates:**
+**Errands:**
 
 ```bash
-$LAYTON beads                  # List bead templates from .layton/beads/
-$LAYTON beads add <name>       # Create new bead template from skeleton
-$LAYTON beads schedule <name> [json]  # Schedule bead from template with variables
+$LAYTON errands                  # List errands from .layton/errands/
+$LAYTON errands add <name>       # Create new errand from skeleton
+$LAYTON errands schedule <name> [json]  # Schedule errand with variables
 ```
 
 </cli_commands>
 
 <file_index>
 
-**Workflows** (in `references/workflows/`):
+**Protocols** (in `references/protocols/`):
 
 | File | Purpose |
 | --- | --- |
 | setup.md | Interactive onboarding for new users |
 | track-item.md | Add item to attention list |
 | set-focus.md | Set current focus (only one at a time) |
-| retrospect.md | Reflect on a completed workflow |
+| retrospect.md | Reflect on a completed protocol |
 | audit-project-instructions.md | Review CLAUDE.md/AGENTS.md against best practices |
-| author-skill.md | Create or capture a skill file |
-| author-workflow.md | Create or capture a workflow file |
-| author-bead-template.md | Create or capture a bead template |
-| schedule-bead.md | Schedule a bead from a template for background execution |
+| author-rolodex.md | Create or capture a rolodex card |
+| author-protocol.md | Create or capture a protocol file |
+| author-errand.md | Create or capture an errand |
+| schedule-errand.md | Schedule an errand for background execution |
 | review-beads.md | Find and review completed beads needing attention |
 
 **References** (in `references/`):
@@ -231,11 +231,11 @@ $LAYTON beads schedule <name> [json]  # Schedule bead from template with variabl
 | --- | --- |
 | persona.md | Layton's voice and persona characteristics |
 | beads-commands.md | bd CLI command reference for state operations |
-| bead-authoring.md | Guide for writing bead templates |
+| errand-authoring.md | Guide for writing errands |
 | project-instructions.md | Best practices for CLAUDE.md/AGENTS.md files |
-| skill-authoring.md | Guide for writing skill files |
-| workflow-authoring.md | Guide for writing workflow files |
+| rolodex-authoring.md | Guide for writing rolodex cards |
+| protocol-authoring.md | Guide for writing protocol files |
 
-**Examples** (in `references/examples/`): `morning-briefing.md`, `gather.md`, `focus-suggestion.md` — study for patterns, then create your own via `$LAYTON workflows add <name>`.
+**Examples** (in `references/examples/`): `morning-briefing.md`, `gather.md`, `focus-suggestion.md` — study for patterns, then create your own via `$LAYTON protocols add <name>`.
 
 </file_index>

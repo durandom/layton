@@ -45,13 +45,13 @@ Check if there's an active focus item:
 bd list --label focus --json
 ```
 
-### 4. Gather Skill Data (Optional)
+### 4. Gather Rolodex Data (Optional)
 
-If user has skill files configured, run the gather pattern:
+If user has rolodex cards configured, run the gather pattern:
 
-For each file in `.layton/skills/`:
+For each file in `.layton/rolodex/`:
 
-- Read the skill file
+- Read the rolodex card
 - Execute commands from `## Commands` section
 - Extract information per `## What to Extract` guidance
 

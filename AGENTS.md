@@ -16,7 +16,7 @@ bd sync               # Sync with git
 
 **When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.
 
-**MANDATORY WORKFLOW:**
+**MANDATORY PROTOCOL:**
 
 1. **File issues for remaining work** - Create issues for anything that needs follow-up
 2. **Run quality gates** (if code changed) - Tests, linters, builds
