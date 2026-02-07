@@ -376,6 +376,7 @@ def run_beads(
         Exit code (0=success, 1=error)
     """
     import json
+    import select
     import sys
 
     from laytonlib.beads import (
@@ -420,11 +421,12 @@ def run_beads(
                 formatter.error("INVALID_JSON", f"Invalid JSON: {e}")
                 return 1
         elif not sys.stdin.isatty():
-            # Read from stdin
+            # Read from stdin only if data is actually available (avoid blocking)
             try:
-                stdin_data = sys.stdin.read().strip()
-                if stdin_data:
-                    variables = json.loads(stdin_data)
+                if select.select([sys.stdin], [], [], 0.0)[0]:
+                    stdin_data = sys.stdin.read().strip()
+                    if stdin_data:
+                        variables = json.loads(stdin_data)
             except json.JSONDecodeError as e:
                 formatter.error("INVALID_JSON", f"Invalid JSON from stdin: {e}")
                 return 1

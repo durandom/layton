@@ -30,6 +30,30 @@ Layton is your personal secretary—managing attention, synthesizing information
 - **NEVER** skip a workflow if the routing table matches the user's intent
 </essential_principles>
 
+<primitives>
+
+## Three Primitives
+
+Layton has three building blocks. Each serves a distinct role:
+
+| Primitive | What it is | Execution model | Stored in |
+|-----------|-----------|-----------------|-----------|
+| **Skill** | How to query an external tool (Gmail, Jira, calendar) | Referenced by workflows and beads | `.layton/skills/` |
+| **Workflow** | Interactive multi-step process (briefings, reviews, authoring) | AI + human in conversation — can pause, branch, ask questions | `.layton/workflows/` |
+| **Bead template** | Autonomous background task (syncs, checks, reviews) | AI alone, no human — runs unattended, results reviewed later | `.layton/beads/` |
+
+**When to use which:**
+
+- Need to **query data** from an external system? → Write a **skill** file.
+- Need to **guide a conversation** with decision points? → Write a **workflow**.
+- Need to **run something unattended** and review the result later? → Write a **bead template**.
+
+Workflows and beads both reference skills for external tool access. The key difference is human involvement: workflows are interactive, beads are autonomous.
+
+See `references/skill-authoring.md`, `references/workflow-authoring.md`, and `references/bead-authoring.md` for authoring guides.
+
+</primitives>
+
 <decision_framework>
 
 ## ⚠️ CRITICAL: WORKFLOW-FIRST DECISION FRAMEWORK
@@ -275,6 +299,7 @@ $LAYTON beads schedule <name> [json]  # Schedule bead from template with variabl
 | --- | --- |
 | persona.md | Layton's voice and persona characteristics |
 | beads-commands.md | bd CLI command reference for state operations |
+| bead-authoring.md | Template and guide for writing bead templates |
 | project-instructions.md | Best practices for CLAUDE.md/AGENTS.md files |
 | skill-authoring.md | Template and guide for writing skill files |
 | workflow-authoring.md | Template and guide for writing workflow files |

@@ -92,6 +92,16 @@ The CLI SHALL provide a skeleton template for new beads.
 - **AND** SHALL include `bd close` command with `--add-label needs-review`
 - **AND** SHALL explain that the `needs-review` label signals human review needed
 
+#### Scenario: Retrospective section in skeleton
+
+- **WHEN** skeleton is created
+- **THEN** skeleton SHALL contain a "Retrospective" section after "When Complete"
+- **AND** SHALL instruct executor to add issue comments during execution when steps fail
+- **AND** SHALL instruct executor to always add a retrospective comment after closing
+- **AND** retrospective comment SHALL include status, issues encountered count, and proposed updates table
+- **AND** proposed updates table SHALL list targets (bead, skill, workflow) with file, change, and reason columns
+- **AND** SHALL state that `None` should be written if no updates are needed
+
 #### Scenario: Add duplicate template
 
 - **WHEN** user runs `layton beads add code-review` and `.layton/beads/code-review.md` exists

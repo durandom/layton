@@ -17,6 +17,7 @@ triggers:
 **Read before starting:**
 
 1. templates/bead.md - The skeleton template structure
+2. references/bead-authoring.md - Authoring guide with field descriptions, examples, and common mistakes
 </required_reading>
 
 ## Objective
@@ -182,6 +183,7 @@ This creates a file from `templates/bead.md`. Edit it to replace the skeleton pl
 - Add variables to `variables:` section (name: description format)
 - Fill in `## Task` with AI instructions
 - Fill in `## Acceptance Criteria` with checkbox items
+- Customize the `## Retrospective` proposed-updates table with relevant file targets (the bead itself, related skills, related workflows)
 
 ### 8. Validate and Confirm
 

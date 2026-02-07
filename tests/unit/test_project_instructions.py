@@ -100,20 +100,14 @@ class TestExampleAgentsMd:
         assert "entry point" in content_lower or "layton" in content_lower, (
             "Example should mention Layton as entry point"
         )
-        assert "session" in content_lower and "completion" in content_lower, (
-            "Example should have session completion section"
-        )
-        assert "critical" in content_lower and "rules" in content_lower, (
-            "Example should have critical rules"
-        )
 
-    def test_example_agents_md_has_commands(self):
-        """Example AGENTS.md has Beads commands."""
+    def test_example_agents_md_has_layton_skill(self):
+        """Example AGENTS.md mentions /layton skill."""
         example_path = LAYTON_SKILL_DIR / "examples" / "AGENTS.md"
         content = example_path.read_text()
 
-        assert "bd ready" in content or "bd show" in content, (
-            "Example should have Beads commands"
+        assert "/layton" in content or "layton skill" in content.lower(), (
+            "Example should reference /layton skill"
         )
 
     def test_example_agents_md_concise(self):

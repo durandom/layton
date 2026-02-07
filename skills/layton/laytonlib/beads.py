@@ -438,6 +438,7 @@ def bd_create(
             capture_output=True,
             text=True,
             check=True,
+            stdin=subprocess.DEVNULL,
         )
         # Parse bd output - typically returns JSON with bead ID
         try:
