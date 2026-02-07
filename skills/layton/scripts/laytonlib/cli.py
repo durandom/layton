@@ -123,6 +123,24 @@ def create_parser() -> argparse.ArgumentParser:
     )
     errands_epic.add_argument("epic_id", nargs="?", help="Epic ID to set")
 
+    # errands run — schedule + return bead ID (subagent fetches prompt separately)
+    errands_run = errands_subparsers.add_parser(
+        "run", help="Schedule errand for execution"
+    )
+    errands_run.add_argument("name", help="Errand name")
+    errands_run.add_argument(
+        "json_vars",
+        nargs="?",
+        default=None,
+        help="Variables as JSON",
+    )
+
+    # errands prompt — subagent calls this to get execution instructions
+    errands_prompt = errands_subparsers.add_parser(
+        "prompt", help="Get execution prompt for a scheduled bead"
+    )
+    errands_prompt.add_argument("bead_id", help="Bead ID")
+
     return parser
 
 
@@ -354,6 +372,36 @@ def run_protocols(
         return 0
 
 
+def _parse_json_vars(json_vars_arg: str | None) -> dict | None:
+    """Parse JSON variables from argument or stdin.
+
+    Args:
+        json_vars_arg: JSON string from CLI argument, or None
+
+    Returns:
+        Parsed dict, empty dict if no input, or None on parse error
+        (caller should emit INVALID_JSON error on None)
+    """
+    import json
+    import select
+    import sys
+
+    if json_vars_arg:
+        try:
+            return json.loads(json_vars_arg)
+        except json.JSONDecodeError:
+            return None
+    elif not sys.stdin.isatty():
+        try:
+            if select.select([sys.stdin], [], [], 0.0)[0]:
+                stdin_data = sys.stdin.read().strip()
+                if stdin_data:
+                    return json.loads(stdin_data)
+        except json.JSONDecodeError:
+            return None
+    return {}
+
+
 def run_errands(
     formatter: OutputFormatter,
     command: str | None,
@@ -361,26 +409,26 @@ def run_errands(
     json_vars: str | None,
     epic_action: str | None,
     epic_id: str | None,
+    bead_id: str | None = None,
 ) -> int:
     """Run errands command.
 
     Args:
         formatter: Output formatter
-        command: Subcommand (add, schedule, epic, or None for list)
-        name: Errand name for add/schedule
-        json_vars: JSON variables for schedule (or read from stdin)
+        command: Subcommand (add, schedule, run, prompt, epic, or None for list)
+        name: Errand name for add/schedule/run
+        json_vars: JSON variables for schedule/run (or read from stdin)
         epic_action: Epic action (set, or None for show)
         epic_id: Epic ID for set action
+        bead_id: Bead ID for prompt command
 
     Returns:
         Exit code (0=success, 1=error)
     """
-    import json
-    import select
-    import sys
-
     from laytonlib.errands import (
         add_errand,
+        build_prompt,
+        ensure_epic,
         get_epic,
         list_errands,
         schedule_errand,
@@ -412,24 +460,10 @@ def run_errands(
             formatter.error("MISSING_NAME", "Errand name is required")
             return 1
 
-        # Parse variables from JSON arg or stdin
-        variables = {}
-        if json_vars:
-            try:
-                variables = json.loads(json_vars)
-            except json.JSONDecodeError as e:
-                formatter.error("INVALID_JSON", f"Invalid JSON: {e}")
-                return 1
-        elif not sys.stdin.isatty():
-            # Read from stdin only if data is actually available (avoid blocking)
-            try:
-                if select.select([sys.stdin], [], [], 0.0)[0]:
-                    stdin_data = sys.stdin.read().strip()
-                    if stdin_data:
-                        variables = json.loads(stdin_data)
-            except json.JSONDecodeError as e:
-                formatter.error("INVALID_JSON", f"Invalid JSON from stdin: {e}")
-                return 1
+        variables = _parse_json_vars(json_vars)
+        if variables is None:
+            formatter.error("INVALID_JSON", "Invalid JSON variables")
+            return 1
 
         try:
             result = schedule_errand(name, variables)
@@ -486,6 +520,67 @@ def run_errands(
                     next_steps=["Run 'layton errands epic set <id>' to configure epic"],
                 )
                 return 1
+
+    elif command == "run":
+        if not name:
+            formatter.error("MISSING_NAME", "Errand name is required")
+            return 1
+
+        variables = _parse_json_vars(json_vars)
+        if variables is None:
+            formatter.error("INVALID_JSON", "Invalid JSON variables")
+            return 1
+
+        try:
+            ensure_epic()
+        except RuntimeError as e:
+            error_str = str(e)
+            if "BD_UNAVAILABLE" in error_str:
+                formatter.error(
+                    "BD_UNAVAILABLE",
+                    "bd CLI not found",
+                    next_steps=[
+                        "Install Beads CLI: https://github.com/steveyegge/beads"
+                    ],
+                )
+            else:
+                formatter.error("BD_ERROR", error_str)
+            return 1
+
+        try:
+            result = schedule_errand(name, variables)
+            # Return only bead_id and title — NO prompt (subagent fetches that)
+            bead_id_val = result.get("id") or result.get("number")
+            title = result.get("title", "")
+            formatter.success({"bead_id": bead_id_val, "title": title})
+            return 0
+        except FileNotFoundError:
+            formatter.error(
+                "ERRAND_NOT_FOUND",
+                f"Errand '{name}' not found",
+                next_steps=["Run 'layton errands' to list available errands"],
+            )
+            return 1
+        except RuntimeError as e:
+            formatter.error("BD_ERROR", str(e))
+            return 1
+
+    elif command == "prompt":
+        if not bead_id:
+            formatter.error("MISSING_BEAD_ID", "Bead ID is required")
+            return 1
+
+        prompt = build_prompt(bead_id)
+        if prompt is None:
+            formatter.error(
+                "BEAD_NOT_FOUND",
+                f"Bead '{bead_id}' not found",
+                next_steps=["Check bead ID with 'bd show <id>'"],
+            )
+            return 1
+
+        formatter.success({"bead_id": bead_id, "prompt": prompt})
+        return 0
 
     else:
         # Default: list errands
@@ -570,6 +665,7 @@ def main(argv: list[str] | None = None) -> int:
             json_vars=getattr(args, "json_vars", None),
             epic_action=getattr(args, "action", None),
             epic_id=getattr(args, "epic_id", None),
+            bead_id=getattr(args, "bead_id", None),
         )
 
     else:

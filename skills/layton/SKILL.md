@@ -98,7 +98,8 @@ What would you like to do?
 | "rolodex card", "add rolodex card", "create rolodex card", "capture rolodex card", "new rolodex card" | `references/protocols/author-rolodex.md` |
 | "protocol", "add protocol", "create protocol", "capture protocol", "new protocol" | `references/protocols/author-protocol.md` |
 | "errand", "create errand", "new errand", "author errand" | `references/protocols/author-errand.md` |
-| "schedule errand", "run errand", "background task" | `references/protocols/schedule-errand.md` |
+| "run errand", "execute errand", "spawn errand", "background task" | `references/protocols/run-errand.md` |
+| "schedule errand" | `references/protocols/schedule-errand.md` |
 | "review beads", "pending review", "check completed", "what finished" | `references/protocols/review-beads.md` |
 
 **External tool queries (calendar, tasks, email, etc.):**
@@ -204,6 +205,8 @@ $LAYTON protocols add <name>   # Create new protocol file from template
 $LAYTON errands                  # List errands from .layton/errands/
 $LAYTON errands add <name>       # Create new errand from skeleton
 $LAYTON errands schedule <name> [json]  # Schedule errand with variables
+$LAYTON errands run <name> [json]       # Schedule errand for execution (returns bead ID)
+$LAYTON errands prompt <bead-id>        # Get execution prompt (for subagent use)
 ```
 
 </cli_commands>
@@ -223,6 +226,7 @@ $LAYTON errands schedule <name> [json]  # Schedule errand with variables
 | author-protocol.md | Create or capture a protocol file |
 | author-errand.md | Create or capture an errand |
 | schedule-errand.md | Schedule an errand for background execution |
+| run-errand.md | Execute errands via background Task agents |
 | review-beads.md | Find and review completed beads needing attention |
 
 **References** (in `references/`):

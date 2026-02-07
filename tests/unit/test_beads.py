@@ -13,10 +13,13 @@ from laytonlib.errands import (
     ERRAND_TEMPLATE,
     ErrandInfo,
     add_errand,
+    build_prompt,
+    get_bead,
     list_errands,
     parse_frontmatter,
     schedule_errand,
 )
+from laytonlib.cli import _parse_json_vars
 
 
 class TestParseFrontmatter:
@@ -284,7 +287,8 @@ class TestErrandTemplate:
     def test_has_closing_instructions(self):
         """Template has standard closing instructions."""
         assert "bd comments add" in ERRAND_TEMPLATE
-        assert "bd close --add-label needs-review" in ERRAND_TEMPLATE
+        assert "bd close" in ERRAND_TEMPLATE
+        assert "bd label add needs-review" in ERRAND_TEMPLATE
 
 
 class TestErrandInfo:
@@ -317,3 +321,149 @@ class TestErrandInfo:
 
         assert d["name"] == "test"
         assert "path" not in d
+
+
+class TestGetBead:
+    """Tests for get_bead function."""
+
+    def test_returns_bead_dict(self, monkeypatch):
+        """Parses bd show --json output into dict."""
+        import shutil
+        import subprocess
+
+        monkeypatch.setattr(
+            shutil, "which", lambda cmd: "/usr/bin/bd" if cmd == "bd" else None
+        )
+
+        def mock_run(cmd, *args, **kwargs):
+            class Result:
+                stdout = '[{"id": "abc-123", "title": "Test", "description": "Body"}]'
+                returncode = 0
+
+            return Result()
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+
+        result = get_bead("abc-123")
+        assert result is not None
+        assert result["id"] == "abc-123"
+        assert result["title"] == "Test"
+
+    def test_returns_none_when_not_found(self, monkeypatch):
+        """Returns None when bd show fails (bead not found)."""
+        import shutil
+        import subprocess
+
+        monkeypatch.setattr(
+            shutil, "which", lambda cmd: "/usr/bin/bd" if cmd == "bd" else None
+        )
+
+        def mock_run(cmd, *args, **kwargs):
+            raise subprocess.CalledProcessError(1, cmd)
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+
+        result = get_bead("nonexistent")
+        assert result is None
+
+    def test_returns_none_when_bd_unavailable(self, monkeypatch):
+        """Returns None when bd CLI is not installed."""
+        import shutil
+
+        monkeypatch.setattr(shutil, "which", lambda cmd: None)
+
+        result = get_bead("abc-123")
+        assert result is None
+
+
+class TestBuildPrompt:
+    """Tests for build_prompt function."""
+
+    def test_builds_prompt_with_all_sections(self, monkeypatch):
+        """Prompt contains bead ID, title, description, and completion protocol."""
+        from laytonlib import errands as errands_module
+
+        monkeypatch.setattr(
+            errands_module,
+            "get_bead",
+            lambda bid: {
+                "id": "bead-42",
+                "title": "[review] Code review",
+                "description": "## Task\n\nReview src/auth.py",
+            },
+        )
+        monkeypatch.setattr(
+            errands_module, "get_bead_comments", lambda bid: "Previous finding here"
+        )
+
+        result = build_prompt("bead-42")
+        assert result is not None
+        assert "bead-42" in result
+        assert "[review] Code review" in result
+        assert "## Task" in result
+        assert "Review src/auth.py" in result
+        # Completion protocol commands with correct bead ID
+        assert "bd close bead-42" in result
+        assert "bd label add bead-42 needs-review" in result
+        assert 'bd comments add bead-42' in result
+        # Context section with comments
+        assert "## Context (prior comments)" in result
+        assert "Previous finding here" in result
+
+    def test_returns_none_for_missing_bead(self, monkeypatch):
+        """Returns None when bead not found."""
+        from laytonlib import errands as errands_module
+
+        monkeypatch.setattr(errands_module, "get_bead", lambda bid: None)
+
+        result = build_prompt("nonexistent")
+        assert result is None
+
+    def test_omits_context_when_no_comments(self, monkeypatch):
+        """Context section is omitted when there are no comments."""
+        from laytonlib import errands as errands_module
+
+        monkeypatch.setattr(
+            errands_module,
+            "get_bead",
+            lambda bid: {
+                "id": "bead-99",
+                "title": "Test bead",
+                "description": "Do something",
+            },
+        )
+        monkeypatch.setattr(errands_module, "get_bead_comments", lambda bid: "")
+
+        result = build_prompt("bead-99")
+        assert result is not None
+        assert "## Context (prior comments)" not in result
+        # But completion protocol is still there
+        assert "bd close bead-99" in result
+
+
+class TestParseJsonVars:
+    """Tests for _parse_json_vars helper."""
+
+    def test_parses_json_string(self):
+        """Parses valid JSON argument."""
+        result = _parse_json_vars('{"key": "value"}')
+        assert result == {"key": "value"}
+
+    def test_returns_empty_dict_when_no_input(self, monkeypatch):
+        """Returns empty dict when no argument and stdin is a tty."""
+        import io
+
+        monkeypatch.setattr("sys.stdin", io.StringIO(""))
+        monkeypatch.setattr("sys.stdin.isatty", lambda: True)
+        result = _parse_json_vars(None)
+        assert result == {}
+
+    def test_returns_none_on_invalid_json(self):
+        """Returns None for invalid JSON (caller should emit error)."""
+        result = _parse_json_vars("not json")
+        assert result is None
+
+    def test_parses_empty_object(self):
+        """Parses empty JSON object."""
+        result = _parse_json_vars("{}")
+        assert result == {}
