@@ -19,6 +19,7 @@ from laytonlib.doctor import get_layton_dir
 
 # Fixed labels for bead state management
 LABEL_SCHEDULED = "scheduled"
+LABEL_IN_PROGRESS = "in-progress"
 LABEL_NEEDS_REVIEW = "needs-review"
 
 
@@ -358,6 +359,15 @@ def get_beads_scheduled() -> list[dict]:
     return get_beads_by_label(LABEL_SCHEDULED, status="open")
 
 
+def get_beads_in_progress() -> list[dict]:
+    """Get open beads with the in-progress label.
+
+    Returns:
+        List of bead dicts that are currently being executed
+    """
+    return get_beads_by_label(LABEL_IN_PROGRESS, status="open")
+
+
 def schedule_errand(name: str, variables: dict[str, str] | None = None) -> dict:
     """Schedule an errand for execution.
 
@@ -477,11 +487,44 @@ def get_bead_comments(bead_id: str) -> str:
         return ""
 
 
+def _transition_to_in_progress(bead_id: str) -> bool:
+    """Swap scheduled label to in-progress on a bead.
+
+    Best-effort: never blocks prompt delivery. Returns False on any failure.
+
+    Args:
+        bead_id: The bead ID to transition
+
+    Returns:
+        True if both label commands succeeded, False otherwise
+    """
+    if not shutil.which("bd"):
+        return False
+
+    try:
+        subprocess.run(
+            ["bd", "label", "remove", bead_id, LABEL_SCHEDULED],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        subprocess.run(
+            ["bd", "label", "add", bead_id, LABEL_IN_PROGRESS],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return True
+    except subprocess.CalledProcessError:
+        return False
+
+
 def build_prompt(bead_id: str) -> str | None:
     """Assemble an execution prompt for a scheduled bead.
 
     Fetches the bead and its comments, then builds a self-contained
     prompt that a subagent can follow to execute the errand.
+    Transitions the bead from scheduled to in-progress (best-effort).
 
     Args:
         bead_id: The bead ID
@@ -492,6 +535,8 @@ def build_prompt(bead_id: str) -> str | None:
     bead = get_bead(bead_id)
     if not bead:
         return None
+
+    _transition_to_in_progress(bead_id)
 
     title = bead.get("title", "Untitled")
     description = bead.get("description", "")
@@ -511,12 +556,17 @@ def build_prompt(bead_id: str) -> str | None:
         f'   bd comments add {bead_id} "## Summary\\n\\n<findings>"',
         f'   ```',
         "",
-        "2. Close:",
+        "2. Remove in-progress label:",
+        f'   ```bash',
+        f'   bd label remove {bead_id} in-progress',
+        f'   ```',
+        "",
+        "3. Close:",
         f'   ```bash',
         f'   bd close {bead_id}',
         f'   ```',
         "",
-        "3. Label for review:",
+        "4. Label for review:",
         f'   ```bash',
         f'   bd label add {bead_id} needs-review',
         f'   ```',

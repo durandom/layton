@@ -154,6 +154,7 @@ def run_orientation(formatter: OutputFormatter) -> int:
         Exit code (0=success, 1=fixable, 2=critical)
     """
     from laytonlib.errands import (
+        get_beads_in_progress,
         get_beads_pending_review,
         get_beads_scheduled,
         list_errands,
@@ -224,8 +225,9 @@ def run_orientation(formatter: OutputFormatter) -> int:
         for e in errands
     ]
 
-    # Get scheduled and pending review beads (from bd)
+    # Get errand queue states (from bd)
     beads_scheduled = get_beads_scheduled()
+    beads_in_progress = get_beads_in_progress()
     beads_pending_review = get_beads_pending_review()
 
     # Add protocol hints based on beads status
@@ -240,9 +242,14 @@ def run_orientation(formatter: OutputFormatter) -> int:
         "checks": [c.to_dict() for c in checks],
         "rolodex": cards_data,
         "protocols": protocols_data,
-        "errands": errands_data,
-        "beads_scheduled": beads_scheduled,
-        "beads_pending_review": beads_pending_review,
+        "errands": {
+            "templates": errands_data,
+            "queue": {
+                "scheduled": beads_scheduled,
+                "in_progress": beads_in_progress,
+                "pending_review": beads_pending_review,
+            },
+        },
     }
 
     if next_steps:
@@ -388,16 +395,18 @@ def _parse_json_vars(json_vars_arg: str | None) -> dict | None:
 
     if json_vars_arg:
         try:
-            return json.loads(json_vars_arg)
+            parsed = json.loads(json_vars_arg)
         except json.JSONDecodeError:
             return None
+        return parsed if isinstance(parsed, dict) else None
     elif not sys.stdin.isatty():
         try:
             if select.select([sys.stdin], [], [], 0.0)[0]:
                 stdin_data = sys.stdin.read().strip()
                 if stdin_data:
-                    return json.loads(stdin_data)
-        except json.JSONDecodeError:
+                    parsed = json.loads(stdin_data)
+                    return parsed if isinstance(parsed, dict) else None
+        except (json.JSONDecodeError, OSError, ValueError, AttributeError):
             return None
     return {}
 
@@ -552,6 +561,12 @@ def run_errands(
             # Return only bead_id and title — NO prompt (subagent fetches that)
             bead_id_val = result.get("id") or result.get("number")
             title = result.get("title", "")
+            if not bead_id_val:
+                formatter.error(
+                    "BD_ERROR",
+                    "Failed to schedule errand: missing bead ID in response",
+                )
+                return 1
             formatter.success({"bead_id": bead_id_val, "title": title})
             return 0
         except FileNotFoundError:

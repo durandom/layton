@@ -12,9 +12,11 @@ sys.path.insert(
 from laytonlib.errands import (
     ERRAND_TEMPLATE,
     ErrandInfo,
+    _transition_to_in_progress,
     add_errand,
     build_prompt,
     get_bead,
+    get_beads_in_progress,
     list_errands,
     parse_frontmatter,
     schedule_errand,
@@ -376,6 +378,105 @@ class TestGetBead:
         assert result is None
 
 
+class TestGetBeadsInProgress:
+    """Tests for get_beads_in_progress function."""
+
+    def test_returns_empty_when_bd_unavailable(self, monkeypatch):
+        """Returns empty list when bd CLI is not installed."""
+        import shutil
+
+        monkeypatch.setattr(shutil, "which", lambda cmd: None)
+
+        result = get_beads_in_progress()
+        assert result == []
+
+    def test_queries_correct_label(self, monkeypatch):
+        """Queries bd with in-progress label and open status."""
+        import shutil
+        import subprocess
+
+        monkeypatch.setattr(
+            shutil, "which", lambda cmd: "/usr/bin/bd" if cmd == "bd" else None
+        )
+
+        captured_cmd = []
+
+        def mock_run(cmd, *args, **kwargs):
+            captured_cmd.extend(cmd)
+
+            class Result:
+                stdout = '[{"id": "bead-1", "title": "Test"}]'
+                returncode = 0
+
+            return Result()
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+
+        result = get_beads_in_progress()
+        assert len(result) == 1
+        assert result[0]["id"] == "bead-1"
+        assert "in-progress" in captured_cmd
+        assert "open" in captured_cmd
+
+
+class TestTransitionToInProgress:
+    """Tests for _transition_to_in_progress helper."""
+
+    def test_returns_false_when_bd_unavailable(self, monkeypatch):
+        """Returns False when bd CLI is not installed."""
+        import shutil
+
+        monkeypatch.setattr(shutil, "which", lambda cmd: None)
+
+        result = _transition_to_in_progress("bead-42")
+        assert result is False
+
+    def test_swaps_labels(self, monkeypatch):
+        """Removes scheduled label and adds in-progress label."""
+        import shutil
+        import subprocess
+
+        monkeypatch.setattr(
+            shutil, "which", lambda cmd: "/usr/bin/bd" if cmd == "bd" else None
+        )
+
+        captured_cmds = []
+
+        def mock_run(cmd, *args, **kwargs):
+            captured_cmds.append(list(cmd))
+
+            class Result:
+                stdout = ""
+                returncode = 0
+
+            return Result()
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+
+        result = _transition_to_in_progress("bead-42")
+        assert result is True
+        assert len(captured_cmds) == 2
+        assert captured_cmds[0] == ["bd", "label", "remove", "bead-42", "scheduled"]
+        assert captured_cmds[1] == ["bd", "label", "add", "bead-42", "in-progress"]
+
+    def test_returns_false_on_subprocess_error(self, monkeypatch):
+        """Returns False when bd label command fails."""
+        import shutil
+        import subprocess
+
+        monkeypatch.setattr(
+            shutil, "which", lambda cmd: "/usr/bin/bd" if cmd == "bd" else None
+        )
+
+        def mock_run(cmd, *args, **kwargs):
+            raise subprocess.CalledProcessError(1, cmd)
+
+        monkeypatch.setattr(subprocess, "run", mock_run)
+
+        result = _transition_to_in_progress("bead-42")
+        assert result is False
+
+
 class TestBuildPrompt:
     """Tests for build_prompt function."""
 
@@ -395,6 +496,9 @@ class TestBuildPrompt:
         monkeypatch.setattr(
             errands_module, "get_bead_comments", lambda bid: "Previous finding here"
         )
+        monkeypatch.setattr(
+            errands_module, "_transition_to_in_progress", lambda bid: True
+        )
 
         result = build_prompt("bead-42")
         assert result is not None
@@ -406,6 +510,8 @@ class TestBuildPrompt:
         assert "bd close bead-42" in result
         assert "bd label add bead-42 needs-review" in result
         assert 'bd comments add bead-42' in result
+        # New step: remove in-progress label
+        assert "bd label remove bead-42 in-progress" in result
         # Context section with comments
         assert "## Context (prior comments)" in result
         assert "Previous finding here" in result
@@ -433,12 +539,58 @@ class TestBuildPrompt:
             },
         )
         monkeypatch.setattr(errands_module, "get_bead_comments", lambda bid: "")
+        monkeypatch.setattr(
+            errands_module, "_transition_to_in_progress", lambda bid: True
+        )
 
         result = build_prompt("bead-99")
         assert result is not None
         assert "## Context (prior comments)" not in result
         # But completion protocol is still there
         assert "bd close bead-99" in result
+
+    def test_calls_transition_to_in_progress(self, monkeypatch):
+        """build_prompt calls _transition_to_in_progress with the bead ID."""
+        from laytonlib import errands as errands_module
+
+        transition_calls = []
+
+        monkeypatch.setattr(
+            errands_module,
+            "get_bead",
+            lambda bid: {"id": bid, "title": "Test", "description": "Body"},
+        )
+        monkeypatch.setattr(errands_module, "get_bead_comments", lambda bid: "")
+
+        def mock_transition(bid):
+            transition_calls.append(bid)
+            return True
+
+        monkeypatch.setattr(
+            errands_module, "_transition_to_in_progress", mock_transition
+        )
+
+        build_prompt("bead-77")
+        assert transition_calls == ["bead-77"]
+
+    def test_prompt_still_returned_when_transition_fails(self, monkeypatch):
+        """Prompt is still returned even if label transition fails."""
+        from laytonlib import errands as errands_module
+
+        monkeypatch.setattr(
+            errands_module,
+            "get_bead",
+            lambda bid: {"id": bid, "title": "Test", "description": "Body"},
+        )
+        monkeypatch.setattr(errands_module, "get_bead_comments", lambda bid: "")
+        monkeypatch.setattr(
+            errands_module, "_transition_to_in_progress", lambda bid: False
+        )
+
+        result = build_prompt("bead-88")
+        assert result is not None
+        assert "bead-88" in result
+        assert "bd close bead-88" in result
 
 
 class TestParseJsonVars:
@@ -467,3 +619,18 @@ class TestParseJsonVars:
         """Parses empty JSON object."""
         result = _parse_json_vars("{}")
         assert result == {}
+
+    def test_rejects_non_dict_json_array(self):
+        """Returns None for valid JSON that isn't a dict (e.g. array)."""
+        result = _parse_json_vars("[]")
+        assert result is None
+
+    def test_rejects_non_dict_json_string(self):
+        """Returns None for valid JSON string literal."""
+        result = _parse_json_vars('"hello"')
+        assert result is None
+
+    def test_rejects_non_dict_json_number(self):
+        """Returns None for valid JSON number."""
+        result = _parse_json_vars("42")
+        assert result is None

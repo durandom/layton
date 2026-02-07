@@ -663,10 +663,10 @@ Check ${file_path} for issues.
 class TestOrientationIncludesErrands:
     """E2E tests for orientation output with errands."""
 
-    def test_orientation_includes_errands_array(
+    def test_orientation_includes_errands_templates(
         self, temp_errands_dir, temp_config, real_beads_isolated
     ):
-        """layton (no args) orientation includes errands field."""
+        """layton (no args) orientation includes errands.templates field."""
         # Initialize beads via bd init
         cwd = temp_config.parent.parent
         subprocess.run(["bd", "init"], cwd=cwd, capture_output=True)
@@ -691,17 +691,20 @@ Capture standup notes.
 
         assert result.returncode == 0
         data = json.loads(result.stdout)
-        assert "errands" in data["data"]
-        assert len(data["data"]["errands"]) == 1
-        assert data["data"]["errands"][0]["name"] == "standup"
-        # Verify new orientation fields exist
-        assert "beads_scheduled" in data["data"]
-        assert "beads_pending_review" in data["data"]
+        errands = data["data"]["errands"]
+        assert "templates" in errands
+        assert len(errands["templates"]) == 1
+        assert errands["templates"][0]["name"] == "standup"
+        # Verify queue structure exists
+        assert "queue" in errands
+        assert "scheduled" in errands["queue"]
+        assert "in_progress" in errands["queue"]
+        assert "pending_review" in errands["queue"]
 
     def test_orientation_includes_beads_scheduled(
         self, temp_errands_dir, temp_config, real_beads_isolated
     ):
-        """layton (no args) shows scheduled beads from bd."""
+        """layton (no args) shows scheduled beads in errands.queue.scheduled."""
         cwd = temp_config.parent.parent
 
         # Initialize beads
@@ -742,16 +745,16 @@ Do something.
         assert result.returncode == 0
         data = json.loads(result.stdout)
 
-        # Should have at least one scheduled bead
-        assert "beads_scheduled" in data["data"]
-        assert len(data["data"]["beads_scheduled"]) >= 1
-        scheduled_titles = [b["title"] for b in data["data"]["beads_scheduled"]]
+        # Should have at least one scheduled bead in the queue
+        scheduled = data["data"]["errands"]["queue"]["scheduled"]
+        assert len(scheduled) >= 1
+        scheduled_titles = [b["title"] for b in scheduled]
         assert any("test-task" in t for t in scheduled_titles)
 
     def test_orientation_includes_beads_pending_review(
         self, temp_errands_dir, temp_config, real_beads_isolated
     ):
-        """layton (no args) shows beads pending review from bd."""
+        """layton (no args) shows beads pending review in errands.queue.pending_review."""
         cwd = temp_config.parent.parent
 
         # Initialize beads
@@ -805,8 +808,160 @@ Review this.
         assert result.returncode == 0
         data = json.loads(result.stdout)
 
-        # Should have one bead pending review
-        assert "beads_pending_review" in data["data"]
-        assert len(data["data"]["beads_pending_review"]) >= 1
-        pending_ids = [b["id"] for b in data["data"]["beads_pending_review"]]
+        # Should have one bead pending review in the queue
+        pending_review = data["data"]["errands"]["queue"]["pending_review"]
+        assert len(pending_review) >= 1
+        pending_ids = [b["id"] for b in pending_review]
         assert bead_id in pending_ids
+
+    def test_orientation_includes_beads_in_progress(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """layton (no args) shows in-progress beads in errands.queue.in_progress."""
+        cwd = temp_config.parent.parent
+
+        # Initialize beads
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        # Create an epic
+        epic_result = subprocess.run(
+            ["bd", "create", "--title", "Test Epic", "--type", "epic", "--json"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        epic_data = extract_json(epic_result.stdout)
+        epic_id = epic_data["id"]
+
+        # Set epic
+        run_layton("errands", "epic", "set", epic_id, cwd=cwd)
+
+        # Create an errand and schedule it
+        (temp_errands_dir / "running.md").write_text(
+            """---
+name: running
+description: A running task
+---
+
+## Task
+
+Do something.
+"""
+        )
+
+        result = run_layton("errands", "schedule", "running", cwd=cwd)
+        assert result.returncode == 0
+        scheduled_data = json.loads(result.stdout)
+        bead_id = scheduled_data["data"]["scheduled"]["id"]
+
+        # Manually transition to in-progress (simulating what build_prompt does)
+        subprocess.run(
+            ["bd", "label", "remove", bead_id, "scheduled"],
+            cwd=cwd,
+            capture_output=True,
+            check=True,
+        )
+        subprocess.run(
+            ["bd", "label", "add", bead_id, "in-progress"],
+            cwd=cwd,
+            capture_output=True,
+            check=True,
+        )
+
+        # Now check orientation
+        result = run_layton(cwd=cwd)
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+
+        # Should have one bead in progress
+        in_progress = data["data"]["errands"]["queue"]["in_progress"]
+        assert len(in_progress) >= 1
+        in_progress_ids = [b["id"] for b in in_progress]
+        assert bead_id in in_progress_ids
+
+
+class TestErrandsPromptTransition:
+    """E2E tests for label transition during errands prompt."""
+
+    def test_prompt_transitions_labels(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """errands prompt swaps scheduled → in-progress labels."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        (temp_errands_dir / "trans.md").write_text(
+            """---
+name: trans
+description: Transition test
+---
+
+## Task
+
+Test label transition.
+"""
+        )
+
+        # Schedule via run
+        run_result = run_layton("errands", "run", "trans", cwd=cwd)
+        assert run_result.returncode == 0
+        bead_id = json.loads(run_result.stdout)["data"]["bead_id"]
+
+        # Verify initially has scheduled label
+        label_result = subprocess.run(
+            ["bd", "label", "list", bead_id, "--json"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        labels_before = extract_json(label_result.stdout)
+        assert "scheduled" in labels_before
+
+        # Get the prompt (should trigger transition)
+        result = run_layton("errands", "prompt", bead_id, cwd=cwd)
+        assert result.returncode == 0
+
+        # Verify labels after: should have in-progress, not scheduled
+        label_result = subprocess.run(
+            ["bd", "label", "list", bead_id, "--json"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        labels_after = extract_json(label_result.stdout)
+        assert "in-progress" in labels_after
+        assert "scheduled" not in labels_after
+
+    def test_prompt_includes_remove_in_progress_step(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """Completion protocol includes step to remove in-progress label."""
+        cwd = temp_config.parent.parent
+
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        (temp_errands_dir / "proto.md").write_text(
+            """---
+name: proto
+description: Protocol test
+---
+
+## Task
+
+Test protocol.
+"""
+        )
+
+        run_result = run_layton("errands", "run", "proto", cwd=cwd)
+        assert run_result.returncode == 0
+        bead_id = json.loads(run_result.stdout)["data"]["bead_id"]
+
+        result = run_layton("errands", "prompt", bead_id, cwd=cwd)
+        assert result.returncode == 0
+        prompt = json.loads(result.stdout)["data"]["prompt"]
+
+        assert f"bd label remove {bead_id} in-progress" in prompt

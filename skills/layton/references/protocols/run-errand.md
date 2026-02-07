@@ -15,8 +15,8 @@
    Use the Task tool with `subagent_type: "general-purpose"` and this bootstrap prompt:
 
    > You are an errand executor. Your bead ID is {bead_id}.
-   > Run `{LAYTON_PATH} errands prompt {bead_id}` to get your full instructions, then follow them exactly.
-   > The LAYTON CLI is at: {LAYTON_PATH}
+   > Run `$LAYTON errands prompt {bead_id}` to get your full instructions, then follow them exactly.
+   > The LAYTON CLI is at: `$LAYTON`
 
    **Critical**: Include the `$LAYTON` CLI path in the subagent prompt — the subagent has no other way to discover it.
 
@@ -36,7 +36,7 @@
 <variants>
 
 **Already-scheduled beads** (from orientation):
-Skip step 1. The `beads_scheduled` array from `$LAYTON` output already contains bead IDs. Proceed directly to step 2.
+Skip step 1. The `errands.queue.scheduled` array from `$LAYTON` output already contains bead IDs. Proceed directly to step 2.
 
 **Batch execution**:
 Iterate over `beads_scheduled` from orientation output. Spawn one Task agent per bead, all with `run_in_background: true` for parallel execution.
@@ -63,7 +63,7 @@ User: "Execute all scheduled errands"
 ```bash
 # Get scheduled beads from orientation
 $LAYTON
-# → beads_scheduled: [{id: "abc-123", ...}, {id: "def-456", ...}]
+# → errands.queue.scheduled: [{id: "abc-123", ...}, {id: "def-456", ...}]
 
 # Spawn one Task agent per bead (all in background)
 # Task(general-purpose, "Executor for abc-123. Run `$LAYTON errands prompt abc-123`...", run_in_background: true)
@@ -76,8 +76,8 @@ $LAYTON
 
 - Errand bead created with `scheduled` label
 - Task agent spawned with correct bead ID and LAYTON path
-- Agent fetches its own instructions via `errands prompt`
-- On completion: bead closed with `needs-review` label
+- Agent fetches its own instructions via `errands prompt` (transitions to `in-progress`)
+- On completion: `in-progress` label removed, bead closed with `needs-review` label
 - On failure: bead tagged `needs-human` in post-flight check
 </success_criteria>
 </protocol>
