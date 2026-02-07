@@ -2,12 +2,12 @@
 
 ### Requirement: Setup protocol location
 
-The setup protocol SHALL be a core skill protocol at `skills/layton/protocols/setup.md`.
+The setup protocol SHALL be a core skill protocol at `skills/layton/references/protocols/setup.md`.
 
 #### Scenario: Protocol exists in skill
 
 - **WHEN** Layton skill is loaded
-- **THEN** `skills/layton/protocols/setup.md` SHALL exist
+- **THEN** `skills/layton/references/protocols/setup.md` SHALL exist
 - **AND** it SHALL be an AI-readable protocol document
 
 ---

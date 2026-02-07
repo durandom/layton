@@ -60,7 +60,7 @@ bd comments add <bead-id> "## Retrospective
 |--------|------|--------|--------|
 | errand | .layton/errands/{name}.md | ... | ... |
 | rolodex | ... | ... | ... |
-| workflow | ... | ... | ... |
+| protocol | ... | ... | ... |
 
 **Notes:**
 - <observations, edge cases, things that were confusing or slow>"

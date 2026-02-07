@@ -73,7 +73,7 @@ The CLI SHALL provide a skeleton template for new errands.
 #### Scenario: Skeleton source location
 
 - **WHEN** `layton errands add` needs the skeleton template
-- **THEN** CLI SHALL load skeleton from `skills/layton/templates/bead.md`
+- **THEN** CLI SHALL load skeleton from `skills/layton/assets/templates/errand.md`
 - **AND** skeleton SHALL use `{name}` placeholder for `.format()` substitution
 
 #### Scenario: Skeleton content

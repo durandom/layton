@@ -2,13 +2,13 @@
 
 ### Requirement: Focus protocol is an example
 
-The focus protocol SHALL be an example protocol at `skills/layton/examples/focus-suggestion.md`.
+The focus protocol SHALL be an example protocol at `skills/layton/references/examples/focus-suggestion.md`.
 
 #### Scenario: Example location
 
 - **WHEN** user wants focus suggestions
 - **THEN** they SHALL first create a protocol using `layton protocols add focus-suggestion`
-- **AND** they MAY reference `skills/layton/examples/focus-suggestion.md` for guidance
+- **AND** they MAY reference `skills/layton/references/examples/focus-suggestion.md` for guidance
 
 ---
 

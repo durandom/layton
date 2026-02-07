@@ -117,10 +117,10 @@ The CLI SHALL create `.layton/protocols/` directory when needed.
 
 ### Requirement: Example protocols
 
-Example protocols SHALL exist in `skills/layton/examples/` as reference patterns.
+Example protocols SHALL exist in `skills/layton/references/examples/` as reference patterns.
 
 #### Scenario: Examples are reference only
 
 - **WHEN** AI needs to help user create a protocol
-- **THEN** AI MAY read examples from `skills/layton/examples/` for inspiration
+- **THEN** AI MAY read examples from `skills/layton/references/examples/` for inspiration
 - **AND** AI SHALL use `layton protocols add` to create user's protocol (not copy examples)

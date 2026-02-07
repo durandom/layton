@@ -6,7 +6,7 @@
    ```bash
    layton
    ```
-   Look at the `errands_pending_review` field for closed errands with `needs-review` label
+   Look at the `beads_pending_review` field for closed beads with `needs-review` label
 
 1. For each errand pending review:
    a. Show errand details:

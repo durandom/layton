@@ -185,7 +185,7 @@ LAYTON=".claude/skills/layton/scripts/layton"
 | `$LAYTON config init` | Create default config |
 | `$LAYTON config set <key> <value>` | Set config value (dot notation) |
 | `$LAYTON rolodex` | List configured rolodex cards |
-| `$LAYTON rolodex --discover` | Find rolodex cards in `rolodex/*/CARD.md` |
+| `$LAYTON rolodex --discover` | Find rolodex cards in `skills/*/SKILL.md` |
 | `$LAYTON rolodex add <name>` | Create rolodex card from template |
 | `$LAYTON protocols` | List configured protocols |
 | `$LAYTON protocols add <name>` | Create protocol from template |
@@ -209,7 +209,7 @@ bd close <id> --reason "merged" --json
 | **track-item** | Add external item to attention list |
 | **retrospect** | Reflect on protocol and suggest improvements |
 
-### Example Protocols (in `examples/`)
+### Example Protocols (in `skills/layton/references/examples/`)
 
 | Example | Purpose |
 |---------|---------|

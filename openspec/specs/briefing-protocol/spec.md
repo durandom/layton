@@ -2,13 +2,13 @@
 
 ### Requirement: Briefing protocol is an example
 
-The briefing protocol SHALL be an example protocol at `skills/layton/examples/morning-briefing.md`.
+The briefing protocol SHALL be an example protocol at `skills/layton/references/examples/morning-briefing.md`.
 
 #### Scenario: Example location
 
 - **WHEN** user wants morning briefings
 - **THEN** they SHALL first create a protocol using `layton protocols add morning-briefing`
-- **AND** they MAY reference `skills/layton/examples/morning-briefing.md` for guidance
+- **AND** they MAY reference `skills/layton/references/examples/morning-briefing.md` for guidance
 
 ---
 

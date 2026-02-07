@@ -7,7 +7,7 @@ A protocol SHALL guide users through scheduling beads from errands.
 #### Scenario: Protocol file exists
 
 - **WHEN** Layton is installed
-- **THEN** `skills/layton/protocols/schedule-bead.md` SHALL exist
+- **THEN** `skills/layton/references/protocols/schedule-errand.md` SHALL exist
 - **AND** protocol SHALL include steps for listing errands, selecting one, providing variables, and scheduling
 
 #### Scenario: Protocol references errands CLI
@@ -25,7 +25,7 @@ A protocol SHALL guide users through reviewing completed beads.
 #### Scenario: Protocol file exists (review)
 
 - **WHEN** Layton is installed
-- **THEN** `skills/layton/protocols/review-beads.md` SHALL exist
+- **THEN** `skills/layton/references/protocols/review-beads.md` SHALL exist
 - **AND** protocol SHALL include steps for finding beads pending review and processing them
 
 #### Scenario: Protocol uses orientation
@@ -43,7 +43,7 @@ The main skill file SHALL reference bead protocols and errand CLI commands.
 #### Scenario: Routing includes bead intents
 
 - **WHEN** SKILL.md routing section is read
-- **THEN** it SHALL include routing for "schedule bead" intent to `protocols/schedule-bead.md`
+- **THEN** it SHALL include routing for "schedule bead" intent to `protocols/schedule-errand.md`
 - **AND** SHALL include routing for "review beads" intent to `protocols/review-beads.md`
 
 #### Scenario: CLI commands include errands

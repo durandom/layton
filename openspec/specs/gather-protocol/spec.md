@@ -2,13 +2,13 @@
 
 ### Requirement: Gather protocol is an example
 
-The gather protocol SHALL be an example protocol at `skills/layton/examples/gather.md`.
+The gather protocol SHALL be an example protocol at `skills/layton/references/examples/gather.md`.
 
 #### Scenario: Example location
 
 - **WHEN** user wants to gather data from rolodex cards
 - **THEN** they SHALL first create a protocol using `layton protocols add gather`
-- **AND** they MAY reference `skills/layton/examples/gather.md` for guidance
+- **AND** they MAY reference `skills/layton/references/examples/gather.md` for guidance
 
 ---
 
