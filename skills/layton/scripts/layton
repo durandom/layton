@@ -9,7 +9,7 @@ from pathlib import Path
 
 # Add laytonlib to path (sibling directory)
 script_dir = Path(__file__).parent.resolve()
-laytonlib_dir = script_dir.parent / "laytonlib"
+laytonlib_dir = script_dir / "laytonlib"
 sys.path.insert(0, str(laytonlib_dir.parent))
 
 from laytonlib.cli import main  # noqa: E402

@@ -35,12 +35,12 @@ If either file is missing, note this as a finding.
 **If CLAUDE.md is missing:**
 
 > "**Suggestion**: Create a CLAUDE.md file to provide project context for AI assistants.
-> See `skills/layton/examples/CLAUDE.md` for a template to adapt."
+> See `skills/layton/references/examples/CLAUDE.md` for a template to adapt."
 
 **If AGENTS.md is missing:**
 
 > "**Suggestion**: Create an AGENTS.md file for quick command references and session protocols.
-> See `skills/layton/examples/AGENTS.md` for a concise example."
+> See `skills/layton/references/examples/AGENTS.md` for a concise example."
 
 ## Step 3: Analyze Verbosity
 

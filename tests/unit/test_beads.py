@@ -6,7 +6,7 @@ from pathlib import Path
 # Add laytonlib to path for testing
 sys.path.insert(
     0,
-    str(Path(__file__).parent.parent.parent / "skills" / "layton"),
+    str(Path(__file__).parent.parent.parent / "skills" / "layton" / "scripts"),
 )
 
 from laytonlib.beads import (

@@ -4,7 +4,7 @@ This reference explains how to create skill files for Layton. Skill files define
 
 ## Template
 
-The skill template is in `templates/skill.md`. The CLI uses this when you run:
+The skill template is in `assets/templates/skill.md`. The CLI uses this when you run:
 
 ```bash
 layton skills add <name>

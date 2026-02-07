@@ -16,7 +16,7 @@ triggers:
 <required_reading>
 **Read before starting:**
 
-1. templates/bead.md - The skeleton template structure
+1. assets/templates/bead.md - The skeleton template structure
 2. references/bead-authoring.md - Authoring guide with field descriptions, examples, and common mistakes
 </required_reading>
 
@@ -177,7 +177,7 @@ If template name already exists, ask if user wants to overwrite or pick a differ
 layton beads add <name>
 ```
 
-This creates a file from `templates/bead.md`. Edit it to replace the skeleton placeholders with the gathered/captured information:
+This creates a file from `assets/templates/bead.md`. Edit it to replace the skeleton placeholders with the gathered/captured information:
 
 - Set `name` and `description` in frontmatter
 - Add variables to `variables:` section (name: description format)

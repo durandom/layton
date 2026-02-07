@@ -6,7 +6,7 @@ from pathlib import Path
 # Add laytonlib to path for testing
 sys.path.insert(
     0,
-    str(Path(__file__).parent.parent.parent / "skills" / "layton"),
+    str(Path(__file__).parent.parent.parent / "skills" / "layton" / "scripts"),
 )
 
 from laytonlib.workflows import (
@@ -250,12 +250,22 @@ class TestBuiltinWorkflows:
 
     def test_audit_workflow_exists(self):
         """Audit workflow file exists at expected path."""
-        workflow_path = LAYTON_SKILL_DIR / "workflows" / "audit-project-instructions.md"
+        workflow_path = (
+            LAYTON_SKILL_DIR
+            / "references"
+            / "workflows"
+            / "audit-project-instructions.md"
+        )
         assert workflow_path.exists(), f"Missing workflow at {workflow_path}"
 
     def test_audit_workflow_triggers(self):
         """Audit workflow has appropriate triggers."""
-        workflow_path = LAYTON_SKILL_DIR / "workflows" / "audit-project-instructions.md"
+        workflow_path = (
+            LAYTON_SKILL_DIR
+            / "references"
+            / "workflows"
+            / "audit-project-instructions.md"
+        )
         content = workflow_path.read_text()
         fm = parse_frontmatter(content)
 
@@ -273,12 +283,12 @@ class TestBuiltinWorkflows:
 
     def test_retrospect_workflow_exists(self):
         """Retrospect workflow file exists at expected path."""
-        workflow_path = LAYTON_SKILL_DIR / "workflows" / "retrospect.md"
+        workflow_path = LAYTON_SKILL_DIR / "references" / "workflows" / "retrospect.md"
         assert workflow_path.exists(), f"Missing workflow at {workflow_path}"
 
     def test_retrospect_workflow_triggers(self):
         """Retrospect workflow has appropriate triggers."""
-        workflow_path = LAYTON_SKILL_DIR / "workflows" / "retrospect.md"
+        workflow_path = LAYTON_SKILL_DIR / "references" / "workflows" / "retrospect.md"
         content = workflow_path.read_text()
         fm = parse_frontmatter(content)
 
@@ -293,7 +303,7 @@ class TestBuiltinWorkflows:
 
     def test_setup_mentions_audit_workflow(self):
         """Setup workflow mentions audit workflow as optional step."""
-        workflow_path = LAYTON_SKILL_DIR / "workflows" / "setup.md"
+        workflow_path = LAYTON_SKILL_DIR / "references" / "workflows" / "setup.md"
         content = workflow_path.read_text().lower()
 
         assert "audit" in content, "Setup workflow should mention audit workflow"

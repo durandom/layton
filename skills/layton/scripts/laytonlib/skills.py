@@ -51,8 +51,10 @@ def get_skill_template() -> str:
     Returns:
         The skill template content with {name} placeholder.
     """
-    # Template is in templates/skill.md relative to this file's parent
-    template_path = Path(__file__).parent.parent / "templates" / "skill.md"
+    # Template is in assets/templates/ relative to the skill root
+    template_path = (
+        Path(__file__).parent.parent.parent / "assets" / "templates" / "skill.md"
+    )
     return template_path.read_text()
 
 

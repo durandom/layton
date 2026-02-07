@@ -96,7 +96,7 @@ If user is interested, guide them to create their first workflow:
 layton workflows add <workflow-name>
 ```
 
-Point them to examples in `skills/layton/examples/` for inspiration.
+Point them to examples in `skills/layton/references/examples/` for inspiration.
 
 ## Step 5: Integrate with Project Instructions
 
@@ -116,14 +116,14 @@ test -f AGENTS.md && echo "AGENTS.md exists" || echo "AGENTS.md missing"
 > - Beads issue tracking commands
 > - Session completion checklist"
 
-If yes, create files based on `skills/layton/examples/`:
+If yes, create files based on `skills/layton/references/examples/`:
 
-- Copy `examples/CLAUDE.md` to repo root
-- Copy `examples/AGENTS.md` to repo root
+- Copy `references/examples/CLAUDE.md` to repo root
+- Copy `references/examples/AGENTS.md` to repo root
 
 ### If Files Exist
 
-Read the existing files and compare against `skills/layton/examples/AGENTS.md`.
+Read the existing files and compare against `skills/layton/references/examples/AGENTS.md`.
 
 **Check for these Layton integration elements:**
 

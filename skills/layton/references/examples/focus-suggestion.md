@@ -104,7 +104,7 @@ What would you like to focus on?
 
 When user selects an option, use the set-focus workflow:
 
-Read `skills/layton/workflows/set-focus.md` and follow its steps to:
+Read `skills/layton/references/workflows/set-focus.md` and follow its steps to:
 
 - Clear any existing focus
 - Set the new focus item

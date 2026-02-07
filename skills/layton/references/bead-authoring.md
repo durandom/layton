@@ -16,7 +16,7 @@ This reference explains how to create bead templates for Layton. Bead templates 
 
 ## Template
 
-The bead skeleton is in `templates/bead.md`. The CLI uses this when you run:
+The bead skeleton is in `assets/templates/bead.md`. The CLI uses this when you run:
 
 ```bash
 layton beads add <name>
@@ -61,27 +61,19 @@ Good example:
 ```markdown
 ## Task
 
-1. Read `.layton/skills/gmail.md` for Gmail query commands.
+1. Read `.layton/skills/gmail.md` for Gmail query commands. Query starred emails from the last `${date_range}`:
 
-2. Query starred emails from the last ${date_range}:
+       mcp-cli google_workspace/search_gmail_messages '{"query": "is:starred newer_than:${date_range}"}'
 
-   ```bash
-   mcp-cli google_workspace/search_gmail_messages '{"query": "is:starred newer_than:${date_range}"}'
-   ```
+2. For each starred email, check if a bd item already exists:
 
-3. For each starred email, check if a bd item already exists:
+       bd list --label email --json | jq '.[] | select(.external_ref == "gmail:<message_id>")'
 
-   ```bash
-   bd list --label email --json | jq '.[] | select(.external_ref == "gmail:<message_id>")'
-   ```
+3. Create bd items for new starred emails:
 
-4. Create bd items for new starred emails:
+       bd create "<Subject>" --type task --label email --external-ref "gmail:<message_id>" --json
 
-   ```bash
-   bd create "<Subject>" --type task --label email --external-ref "gmail:<message_id>" --json
-   ```
-
-5. Close bd items for emails that are no longer starred.
+4. Close bd items for emails that are no longer starred.
 ```
 
 Bad example:
@@ -141,45 +133,36 @@ variables:
 
 1. Query watching items:
 
-   ```bash
-   bd list --label watching --json
-   ```
+       bd list --label watching --json
 
 2. For each item, check `updated_at`. If older than 7 days, add a comment:
 
-   ```bash
-   bd comments add <id> "Stale: no update in 7+ days. Still relevant?"
-   ```
+       bd comments add <id> "Stale: no update in 7+ days. Still relevant?"
 
 3. Add `stale` label to flagged items:
 
-   ```bash
-   bd update <id> --add-label stale
-   ```
+       bd update <id> --add-label stale
 
-## Acceptance Criteria
+## Acceptance Criteria (Minimal)
 
 - [ ] All watching items checked for staleness
 - [ ] Stale items labeled and commented
 - [ ] Summary includes count of stale vs active items
 
-## When Complete
+## When Complete (Minimal)
 
 1. Add your findings as comments:
 
-   ```bash
-   bd comments add "## Summary\n\nChecked N watching items. M flagged as stale."
-   ```
+       bd comments add "## Summary\n\nChecked N watching items. M flagged as stale."
 
 2. Close the bead and signal for review:
 
-   ```bash
-   bd close --add-label needs-review
-   ```
+       bd close --add-label needs-review
 
-## Retrospective
+## Retrospective (Minimal)
 
 (standard retrospective section — see skeleton template)
+
 ```
 
 ### Template with Variables
@@ -197,9 +180,7 @@ variables:
 
 1. Read the target:
 
-   ```bash
-   cat ${file_path}
-   ```
+       cat ${file_path}
 
 2. Review with focus on **${focus_area}**. For each issue found, note:
    - File and line number
@@ -210,30 +191,27 @@ variables:
    - Files changed recently (check git log)
    - Files with high complexity
 
-## Acceptance Criteria
+## Acceptance Criteria (With Variables)
 
 - [ ] All files in ${file_path} reviewed
 - [ ] Each issue has severity, location, and recommendation
 - [ ] Summary includes issue counts by severity
 - [ ] No false positives from standard patterns (e.g., test fixtures)
 
-## When Complete
+## When Complete (With Variables)
 
 1. Add findings:
 
-   ```bash
-   bd comments add "## Code Review: ${file_path}\n\nFocus: ${focus_area}\n\n### Issues\n\n<table of issues>\n\n### Summary\n\nN critical, M warnings, K info"
-   ```
+       bd comments add "## Code Review: ${file_path}\n\nFocus: ${focus_area}\n\n### Issues\n\n<table of issues>\n\n### Summary\n\nN critical, M warnings, K info"
 
 2. Close:
 
-   ```bash
-   bd close --add-label needs-review
-   ```
+       bd close --add-label needs-review
 
-## Retrospective
+## Retrospective (With Variables)
 
 (standard retrospective section — customize proposed-updates table)
+
 ```
 
 ## Common Mistakes

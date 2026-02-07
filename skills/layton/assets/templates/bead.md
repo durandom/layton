@@ -38,7 +38,7 @@ variables:
 
 **During execution**, whenever a step fails or produces unexpected results, immediately add a comment:
 
-```
+```bash
 bd comments add <bead-id> "## Issue: <brief description>
 
 **Step:** <which step failed>
@@ -49,7 +49,7 @@ bd comments add <bead-id> "## Issue: <brief description>
 
 **After closing**, always add a retrospective comment — even if everything went smoothly:
 
-```
+```bash
 bd comments add <bead-id> "## Retrospective
 
 **Status:** clean run | had issues

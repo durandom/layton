@@ -117,7 +117,7 @@ repository/
 </file_locations>
 
 <examples>
-See the `examples/` directory for:
+See the `references/examples/` directory for:
 
 - `CLAUDE.md` - Minimal file with just `@AGENTS.md`
 - `AGENTS.md` - Complete agent instructions (~50 lines)

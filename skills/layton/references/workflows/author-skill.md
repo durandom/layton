@@ -149,7 +149,7 @@ If skill name already exists, ask if user wants to overwrite or pick a different
 layton skills add <name>
 ```
 
-This creates a file from `templates/skill.md`. Edit it to replace the skeleton placeholders with the gathered/captured information.
+This creates a file from `assets/templates/skill.md`. Edit it to replace the skeleton placeholders with the gathered/captured information.
 
 Reference `references/skill-authoring.md` for field guidance and optional sections.
 

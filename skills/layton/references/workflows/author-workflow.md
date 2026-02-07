@@ -169,7 +169,7 @@ If workflow name already exists, ask if user wants to overwrite or pick a differ
 layton workflows add <name>
 ```
 
-This creates a file from `templates/workflow.md`. Edit it to replace the skeleton placeholders with the gathered/captured information.
+This creates a file from `assets/templates/workflow.md`. Edit it to replace the skeleton placeholders with the gathered/captured information.
 
 Reference `references/workflow-authoring.md` for field guidance and optional sections.
 

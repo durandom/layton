@@ -48,7 +48,9 @@ def get_bead_template() -> str:
     Returns:
         The bead template content with {name} placeholder.
     """
-    template_path = Path(__file__).parent.parent / "templates" / "bead.md"
+    template_path = (
+        Path(__file__).parent.parent.parent / "assets" / "templates" / "bead.md"
+    )
     return template_path.read_text()
 
 

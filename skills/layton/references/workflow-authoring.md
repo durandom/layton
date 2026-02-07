@@ -4,7 +4,7 @@ This reference explains how to create workflow files for Layton. Workflow files 
 
 ## Template
 
-The workflow template is in `templates/workflow.md`. The CLI uses this when you run:
+The workflow template is in `assets/templates/workflow.md`. The CLI uses this when you run:
 
 ```bash
 layton workflows add <name>

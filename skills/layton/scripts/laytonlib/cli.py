@@ -179,7 +179,7 @@ def run_orientation(formatter: OutputFormatter) -> int:
         checks.append(config_valid_check)
 
     if needs_setup:
-        next_steps.append("Follow workflows/setup.md for guided onboarding")
+        next_steps.append("Follow references/workflows/setup.md for guided onboarding")
         next_steps.append("Or run 'layton config init' for quick setup")
 
     # Get skills inventory
@@ -213,7 +213,7 @@ def run_orientation(formatter: OutputFormatter) -> int:
     # Add workflow hints based on beads status
     if beads_pending_review:
         next_steps.append(
-            f"{len(beads_pending_review)} bead(s) pending review - see workflows/review-beads.md"
+            f"{len(beads_pending_review)} bead(s) pending review - see references/workflows/review-beads.md"
         )
 
     # Build output
@@ -494,7 +494,9 @@ def run_beads(
         if not beads:
             next_steps.append("Run 'layton beads add <name>' to create a bead template")
         else:
-            next_steps.append("See workflows/schedule-bead.md for scheduling workflow")
+            next_steps.append(
+                "See references/workflows/schedule-bead.md for scheduling workflow"
+            )
         formatter.success(
             {"beads": [b.to_dict() for b in beads]},
             next_steps=next_steps if next_steps else None,
