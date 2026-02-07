@@ -288,9 +288,7 @@ Do something.
         data = json.loads(result.stdout)
         assert data["error"]["code"] == "NO_EPIC"
 
-    def test_schedule_nonexistent_errand_fails(
-        self, temp_config, real_beads_isolated
-    ):
+    def test_schedule_nonexistent_errand_fails(self, temp_config, real_beads_isolated):
         """errands schedule fails with ERRAND_NOT_FOUND for missing errand."""
         cwd = temp_config.parent.parent
 
