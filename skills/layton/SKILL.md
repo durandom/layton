@@ -93,6 +93,7 @@ What would you like to do?
 | "run errand", "execute errand", "spawn errand", "background task" | `references/protocols/run-errand.md` |
 | "schedule errand" | `references/protocols/schedule-errand.md` |
 | "review beads", "pending review", "check completed", "what finished" | `references/protocols/review-beads.md` |
+| "extract", "capture this", "refine card", "that should be a card/protocol/errand" | `references/protocols/extract.md` |
 
 **External tool queries (calendar, tasks, email, etc.):**
 
@@ -204,6 +205,7 @@ scripts/layton errands prompt <bead-id>        # Get execution prompt (for subag
 | schedule-errand.md | Schedule an errand for background execution |
 | run-errand.md | Execute errands via background Task agents |
 | review-beads.md | Find and review completed beads needing attention |
+| extract.md | Extract or refine a primitive from conversation context |
 
 **References** (in `references/`):
 
@@ -219,12 +221,3 @@ scripts/layton errands prompt <bead-id>        # Get execution prompt (for subag
 **Examples** (in `references/examples/`): `morning-briefing.md`, `gather.md`, `focus-suggestion.md` — study for patterns, then create your own via `scripts/layton protocols add <name>`.
 
 </file_index>
-
-<success_criteria>
-
-- `scripts/layton` executed and orientation data returned
-- Protocol routing matched user intent or clarifying question asked
-- External tool queries referenced appropriate rolodex card first
-- All `bd` commands included `--json` flag and `layton` label where appropriate
-- If protocol was selected, it was read and followed exactly
-</success_criteria>
