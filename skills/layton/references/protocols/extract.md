@@ -164,7 +164,9 @@ Present the draft:
 If approved, create the file:
 
 ```bash
-layton {type} add {name}
+layton rolodex add {name}     # for a rolodex card
+layton protocols add {name}   # for a protocol
+layton errands add {name}     # for an errand
 ```
 
 Then overwrite the skeleton with the drafted content.
