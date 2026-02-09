@@ -94,6 +94,7 @@ What would you like to do?
 | "schedule errand" | `references/protocols/schedule-errand.md` |
 | "review beads", "pending review", "check completed", "what finished" | `references/protocols/review-beads.md` |
 | "extract", "capture this", "refine card", "that should be a card/protocol/errand" | `references/protocols/extract.md` |
+| "upgrade", "migrate", "update layton", "v1", "rename primitives" | `references/upgrade.md` |
 
 **External tool queries (calendar, tasks, email, etc.):**
 
@@ -217,6 +218,7 @@ scripts/layton errands prompt <bead-id>        # Get execution prompt (for subag
 | project-instructions.md | Best practices for CLAUDE.md/AGENTS.md files |
 | rolodex-authoring.md | Guide for writing rolodex cards |
 | protocol-authoring.md | Guide for writing protocol files |
+| upgrade.md | Migration guide from pre-1.0 naming to secretary metaphor |
 
 **Examples** (in `references/examples/`): `morning-briefing.md`, `gather.md`, `focus-suggestion.md` — study for patterns, then create your own via `scripts/layton protocols add <name>`.
 
