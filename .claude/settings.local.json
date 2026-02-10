@@ -2,6 +2,7 @@
   "enabledPlugins": {
     "essentials@essentials-claude-code": true,
     "tcrd@tcrd": true,
-    "ds@ds": true
+    "ds@ds": true,
+    "ds@durandom": true
   }
 }
