@@ -34,7 +34,7 @@ Layton is a **knowledge repo skill** for building personalized AI protocols. Rol
 
 ```bash
 claude plugin marketplace add durandom/layton
-claude plugin install --scope project layton@layton
+claude plugin install --scope project layton@secretary
 ```
 
 ## Prerequisites
