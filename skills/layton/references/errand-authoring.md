@@ -55,6 +55,7 @@ What to include:
 - Decision logic the AI should apply
 - What to do with edge cases
 - References to rolodex cards if external tools are needed ("Read `.layton/rolodex/gmail.md` for commands")
+- Delegation to existing Claude Code skills when the task overlaps with one — check installed skills before writing domain logic from scratch
 
 Good example:
 
@@ -223,3 +224,4 @@ variables:
 5. **Skipping the retrospective table customization** — Generic `...` rows don't help. List the actual errand, rolodex card, and protocol files this template relates to.
 6. **Using `{variable}` instead of `${variable}`** — Single braces are consumed by `.format()` at template creation time. Use `${variable}` for scheduling-time substitution.
 7. **Overloading a single errand** — If an errand has 10+ steps spanning multiple domains, split it into separate errands. Each errand should have a single, clear purpose.
+8. **Reinventing existing skills** — Before writing domain logic (code review, debugging, planning, etc.), check if an installed Claude Code skill already handles it. Layton orchestrates and tracks; it doesn't replicate. Delegate the domain work, keep the errand focused on scheduling and state management.

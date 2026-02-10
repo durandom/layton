@@ -77,6 +77,8 @@ An errand is the *recipe* ("how to do a code review"). A bead is the *instance* 
 
 5. **Self-extending.** Layton can author new rolodex cards, protocols, and errands through its own authoring protocols. The framework grows itself.
 
+6. **Delegate, don't replicate.** Layton orchestrates — it doesn't redo what existing Claude Code skills already do well. If a task overlaps with an installed skill (code review, debugging, planning, auditing, etc.), the protocol or errand should delegate to that skill rather than reinvent the workflow. Layton's value is attention management, synthesis, and scheduling — not domain expertise that lives elsewhere.
+
 ## What's Built
 
 - **CLI infrastructure** — doctor (health checks), context (temporal awareness), config (preferences), orientation (single-command status)

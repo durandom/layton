@@ -316,3 +316,4 @@ This is especially valuable for:
 1. **Rigid structure** - Leave room for AI judgment within steps
 1. **No success criteria** - How do you know when it's done?
 1. **No example output** - For briefings/reports, show what good looks like
+1. **Reinventing existing skills** — Before writing a protocol that does code review, debugging, planning, or auditing from scratch, check if an installed Claude Code skill already handles it. Delegate the domain work; keep the protocol focused on orchestration and context.
