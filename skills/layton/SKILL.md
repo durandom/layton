@@ -19,7 +19,7 @@ Layton is your personal secretary—managing attention, synthesizing information
 - **ALWAYS** run `scripts/layton` at session start before any other action
 - **NEVER** query external tools without first reading their rolodex card in `.layton/rolodex/`
 - **NEVER** skip a protocol if the routing table matches the user's intent
-- **NEVER** replicate capabilities that already exist as installed Claude Code skills or slash commands — check what's available and delegate to them instead
+- **NEVER** replicate capabilities that already exist as installed Claude Code skills — check what's available and delegate to them instead
 </essential_principles>
 
 <primitives>
