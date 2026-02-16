@@ -132,6 +132,11 @@ scripts/layton
 
 <cli_commands>
 
+The CLI script is at `scripts/layton` **relative to this SKILL.md file** (not the working directory). When you read this file, derive the script location from the path of this file:
+
+- If SKILL.md is at `/path/to/skills/layton/SKILL.md`
+- Then the CLI is at `/path/to/skills/layton/scripts/layton`
+
 **Orientation (no args):**
 
 ```bash
