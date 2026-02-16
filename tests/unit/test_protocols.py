@@ -302,6 +302,7 @@ class TestBuiltinProtocols:
             "Should have trigger with 'retrospect' or 'reflect'"
         )
 
+
 class TestListInternalProtocols:
     """Tests for list_internal_protocols function."""
 
@@ -369,7 +370,6 @@ triggers:
         result = list_internal_protocols()
         names = [p.name for p in result]
         assert "user-custom" not in names
-
 
     def test_setup_mentions_audit_protocol(self):
         """Setup protocol mentions audit protocol as optional step."""

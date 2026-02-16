@@ -219,7 +219,9 @@ class TestOrientationPriming:
             assert "internal" in protocols, "protocols should have 'internal' key"
             internal = protocols["internal"]
             assert isinstance(internal, list)
-            assert len(internal) >= 10, f"Expected >= 10 internal protocols, got {len(internal)}"
+            assert len(internal) >= 10, (
+                f"Expected >= 10 internal protocols, got {len(internal)}"
+            )
 
             # Spot-check key protocols
             names = [p["name"] for p in internal]
@@ -258,7 +260,9 @@ class TestOrientationPriming:
             internal = data["data"]["protocols"]["internal"]
             for p in internal:
                 assert "triggers" in p, f"Protocol '{p['name']}' missing triggers"
-                assert len(p["triggers"]) > 0, f"Protocol '{p['name']}' has empty triggers"
+                assert len(p["triggers"]) > 0, (
+                    f"Protocol '{p['name']}' has empty triggers"
+                )
 
     def test_orientation_includes_references(self, isolated_env, temp_config):
         """Orientation includes reference documents inventory."""
@@ -268,7 +272,9 @@ class TestOrientationPriming:
         data = json.loads(result.stdout)
 
         if data.get("success"):
-            assert "references" in data["data"], "orientation should include 'references'"
+            assert "references" in data["data"], (
+                "orientation should include 'references'"
+            )
             refs = data["data"]["references"]
             assert isinstance(refs, list)
             names = [r["name"] for r in refs]
@@ -277,7 +283,9 @@ class TestOrientationPriming:
             assert "persona" in names
             assert "rolodex-authoring" in names
             for r in refs:
-                assert "description" in r, f"Reference '{r['name']}' missing description"
+                assert "description" in r, (
+                    f"Reference '{r['name']}' missing description"
+                )
 
     def test_orientation_includes_examples(self, isolated_env, temp_config):
         """Orientation includes example protocol inventory."""

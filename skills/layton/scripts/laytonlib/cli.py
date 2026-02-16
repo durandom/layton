@@ -654,7 +654,9 @@ def main(argv: list[str] | None = None) -> int:
     formatter = OutputFormatter(human=args.human, verbose=args.verbose)
 
     # Check for vault (except for 'config init' which creates one)
-    is_config_init = args.command == "config" and getattr(args, "config_command", None) == "init"
+    is_config_init = (
+        args.command == "config" and getattr(args, "config_command", None) == "init"
+    )
     if not is_config_init:
         from laytonlib.config import detect_skill_directory, find_vault_root
 
