@@ -1,6 +1,6 @@
 [project]
 name = "layton"
-version = "2.1.0"
+version = "2.2.0"
 description = "Personal AI secretary for attention management - Claude Code skill"
 readme = "README.md"
 requires-python = ">=3.11"
