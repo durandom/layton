@@ -509,7 +509,7 @@ class TestBuildPrompt:
         # Completion protocol commands with correct bead ID
         assert "bd close bead-42" in result
         assert "bd label add bead-42 needs-review" in result
-        assert 'bd comments add bead-42' in result
+        assert "bd comments add bead-42" in result
         # New step: remove in-progress label
         assert "bd label remove bead-42 in-progress" in result
         # Context section with comments

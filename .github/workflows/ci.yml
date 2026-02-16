@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit-tests:
+    name: Unit Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: pip install pytest syrupy
+
+      - name: Run unit tests
+        run: python -m pytest tests/unit/ -v
+
+  e2e-tests:
+    name: E2E Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            beads-asset: beads_*_linux_amd64.tar.gz
+          - os: macos-latest
+            beads-asset: beads_*_darwin_arm64.tar.gz
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install pytest syrupy
+
+      - name: Install beads CLI
+        run: |
+          # Download latest beads release
+          gh release download --repo steveyegge/beads --pattern '${{ matrix.beads-asset }}' --dir /tmp/beads
+          tar -xzf /tmp/beads/beads_*.tar.gz -C /tmp/beads
+          sudo mv /tmp/beads/bd /usr/local/bin/bd
+          bd version
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Configure git (required by beads)
+        run: |
+          git config --global user.name "CI Bot"
+          git config --global user.email "ci@layton.test"
+
+      - name: Run E2E tests
+        run: python -m pytest tests/e2e/ -v
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Check formatting
+        run: ruff format --check skills/layton/scripts/ tests/
+
+      - name: Check linting
+        run: ruff check skills/layton/scripts/ tests/

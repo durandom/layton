@@ -166,7 +166,12 @@ def run_orientation(formatter: OutputFormatter) -> int:
         check_config_valid,
     )
     from laytonlib.rolodex import list_cards
-    from laytonlib.protocols import list_protocols
+    from laytonlib.protocols import (
+        list_internal_examples,
+        list_internal_protocols,
+        list_internal_references,
+        list_protocols,
+    )
 
     # Run doctor checks
     checks = []
@@ -208,14 +213,21 @@ def run_orientation(formatter: OutputFormatter) -> int:
     if not cards:
         next_steps.append("Run 'layton rolodex --discover' to find available cards")
 
-    # Get protocols inventory
-    protocols = list_protocols()
-    protocols_data = [
+    # Get user protocols inventory
+    user_protocols = list_protocols()
+    user_protocols_data = [
         {"name": w.name, "description": w.description, "triggers": w.triggers}
-        for w in protocols
+        for w in user_protocols
     ]
 
-    if not protocols:
+    # Get internal (built-in) protocols inventory
+    internal_protocols = list_internal_protocols()
+    internal_protocols_data = [
+        {"name": w.name, "description": w.description, "triggers": w.triggers}
+        for w in internal_protocols
+    ]
+
+    if not user_protocols:
         next_steps.append("Run 'layton protocols add <name>' to create a protocol")
 
     # Get errands inventory
@@ -230,6 +242,13 @@ def run_orientation(formatter: OutputFormatter) -> int:
     beads_in_progress = get_beads_in_progress()
     beads_pending_review = get_beads_pending_review()
 
+    # Get reference docs and examples
+    references = list_internal_references()
+    references_data = [r.to_dict() for r in references]
+
+    examples = list_internal_examples()
+    examples_data = [e.to_dict() for e in examples]
+
     # Add protocol hints based on beads status
     if beads_pending_review:
         next_steps.append(
@@ -241,7 +260,10 @@ def run_orientation(formatter: OutputFormatter) -> int:
         "needs_setup": needs_setup,
         "checks": [c.to_dict() for c in checks],
         "rolodex": cards_data,
-        "protocols": protocols_data,
+        "protocols": {
+            "user": user_protocols_data,
+            "internal": internal_protocols_data,
+        },
         "errands": {
             "templates": errands_data,
             "queue": {
@@ -250,6 +272,8 @@ def run_orientation(formatter: OutputFormatter) -> int:
                 "pending_review": beads_pending_review,
             },
         },
+        "references": references_data,
+        "examples": examples_data,
     }
 
     if next_steps:
@@ -630,7 +654,9 @@ def main(argv: list[str] | None = None) -> int:
     formatter = OutputFormatter(human=args.human, verbose=args.verbose)
 
     # Check for vault (except for 'config init' which creates one)
-    is_config_init = args.command == "config" and getattr(args, "config_command", None) == "init"
+    is_config_init = (
+        args.command == "config" and getattr(args, "config_command", None) == "init"
+    )
     if not is_config_init:
         from laytonlib.config import detect_skill_directory, find_vault_root
 

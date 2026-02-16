@@ -1,3 +1,8 @@
+---
+name: beads-commands
+description: Command reference for the bd CLI used by Layton for state operations
+---
+
 <overview>
 Command reference for the `bd` (errands) CLI used by Layton for state operations.
 </overview>

@@ -2,6 +2,16 @@
 
 This project uses **bd** (beads) for issue tracking. Run `bd onboard` to get started.
 
+## Version Files
+
+All three files MUST be updated in sync on every version bump:
+
+| File | Field |
+|---|---|
+| `pyproject.toml` | `version` (source of truth) |
+| `skills/layton/scripts/laytonlib/__init__.py` | `__version__` |
+| `.claude-plugin/marketplace.json` | `version` (appears twice: top-level and in plugins[0]) |
+
 ## Quick Reference
 
 ```bash

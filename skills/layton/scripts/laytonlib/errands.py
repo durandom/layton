@@ -13,7 +13,13 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from string import Template
 
-from laytonlib.config import get_layton_dir, get_nested, load_config, save_config, set_nested
+from laytonlib.config import (
+    get_layton_dir,
+    get_nested,
+    load_config,
+    save_config,
+    set_nested,
+)
 
 
 # Fixed labels for bead state management
@@ -475,7 +481,8 @@ def get_bead_comments(bead_id: str) -> str:
         text = result.stdout.strip()
         # Filter out bd warning/note lines and check for "no comments" sentinel
         lines = [
-            line for line in text.split("\n")
+            line
+            for line in text.split("\n")
             if not line.startswith(("Note:", "Warning:", "⚠"))
         ]
         filtered = "\n".join(lines).strip()
@@ -546,32 +553,34 @@ def build_prompt(bead_id: str) -> str | None:
     if comments:
         parts.extend(["", "## Context (prior comments)", "", comments])
 
-    parts.extend([
-        "",
-        "## Completion Protocol",
-        "",
-        "1. Add findings:",
-        f'   ```bash',
-        f'   bd comments add {bead_id} "## Summary\\n\\n<findings>"',
-        f'   ```',
-        "",
-        "2. Remove in-progress label:",
-        f'   ```bash',
-        f'   bd label remove {bead_id} in-progress',
-        f'   ```',
-        "",
-        "3. Close:",
-        f'   ```bash',
-        f'   bd close {bead_id}',
-        f'   ```',
-        "",
-        "4. Label for review:",
-        f'   ```bash',
-        f'   bd label add {bead_id} needs-review',
-        f'   ```',
-        "",
-        f'If BLOCKED: `bd comments add {bead_id} "BLOCKED: <reason>"` — do NOT close.',
-    ])
+    parts.extend(
+        [
+            "",
+            "## Completion Protocol",
+            "",
+            "1. Add findings:",
+            "   ```bash",
+            f'   bd comments add {bead_id} "## Summary\\n\\n<findings>"',
+            "   ```",
+            "",
+            "2. Remove in-progress label:",
+            "   ```bash",
+            f"   bd label remove {bead_id} in-progress",
+            "   ```",
+            "",
+            "3. Close:",
+            "   ```bash",
+            f"   bd close {bead_id}",
+            "   ```",
+            "",
+            "4. Label for review:",
+            "   ```bash",
+            f"   bd label add {bead_id} needs-review",
+            "   ```",
+            "",
+            f'If BLOCKED: `bd comments add {bead_id} "BLOCKED: <reason>"` — do NOT close.',
+        ]
+    )
 
     return "\n".join(parts)
 

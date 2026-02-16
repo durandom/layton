@@ -1,3 +1,8 @@
+---
+name: protocol-authoring
+description: Guide for writing interactive protocol files
+---
+
 # Protocol Authoring Guide
 
 This reference explains how to create protocol files for Layton. Protocol files are AI-readable instructions that define multi-step processes like briefings, reviews, and data gathering.

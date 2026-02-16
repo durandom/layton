@@ -78,7 +78,7 @@ class TestOrientationCommand:
     def test_orientation_includes_protocols(
         self, isolated_env, temp_config, sample_protocol_file
     ):
-        """Orientation includes protocols inventory."""
+        """Orientation includes protocols inventory with user/internal split."""
         temp_config.write_text('{"timezone": "UTC"}')
 
         # sample_protocol_file is created in isolated_env
@@ -87,10 +87,15 @@ class TestOrientationCommand:
 
         if data.get("success"):
             protocols = data["data"]["protocols"]
-            assert isinstance(protocols, list)
-            assert len(protocols) == 1
-            assert protocols[0]["name"] == "sample"
-            assert "triggers" in protocols[0]
+            assert isinstance(protocols, dict)
+            assert "user" in protocols
+            assert "internal" in protocols
+
+            user = protocols["user"]
+            assert isinstance(user, list)
+            assert len(user) == 1
+            assert user[0]["name"] == "sample"
+            assert "triggers" in user[0]
 
     def test_orientation_includes_next_steps(self, isolated_env, temp_config):
         """Orientation includes next_steps when rolodex/protocols empty."""
@@ -197,6 +202,105 @@ class TestCompactOutput:
                 for check in checks:
                     assert "name" in check
                     assert "status" in check
+
+
+class TestOrientationPriming:
+    """Tests for complete agent priming via orientation output."""
+
+    def test_orientation_includes_internal_protocols(self, isolated_env, temp_config):
+        """Orientation includes built-in protocols from references/protocols/."""
+        temp_config.write_text('{"timezone": "UTC"}')
+
+        result = run_layton(cwd=isolated_env)
+        data = json.loads(result.stdout)
+
+        if data.get("success"):
+            protocols = data["data"]["protocols"]
+            assert "internal" in protocols, "protocols should have 'internal' key"
+            internal = protocols["internal"]
+            assert isinstance(internal, list)
+            assert len(internal) >= 10, (
+                f"Expected >= 10 internal protocols, got {len(internal)}"
+            )
+
+            # Spot-check key protocols
+            names = [p["name"] for p in internal]
+            assert "setup" in names
+            assert "track-item" in names
+            assert "set-focus" in names
+
+    def test_orientation_separates_user_and_internal_protocols(
+        self, isolated_env, temp_config, sample_protocol_file
+    ):
+        """Orientation separates user protocols from internal ones."""
+        temp_config.write_text('{"timezone": "UTC"}')
+
+        result = run_layton(cwd=isolated_env)
+        data = json.loads(result.stdout)
+
+        if data.get("success"):
+            protocols = data["data"]["protocols"]
+            assert "user" in protocols, "protocols should have 'user' key"
+            assert "internal" in protocols, "protocols should have 'internal' key"
+
+            user_names = [p["name"] for p in protocols["user"]]
+            internal_names = [p["name"] for p in protocols["internal"]]
+
+            assert "sample" in user_names
+            assert "sample" not in internal_names
+
+    def test_internal_protocols_have_triggers(self, isolated_env, temp_config):
+        """Internal protocols include trigger phrases for routing."""
+        temp_config.write_text('{"timezone": "UTC"}')
+
+        result = run_layton(cwd=isolated_env)
+        data = json.loads(result.stdout)
+
+        if data.get("success"):
+            internal = data["data"]["protocols"]["internal"]
+            for p in internal:
+                assert "triggers" in p, f"Protocol '{p['name']}' missing triggers"
+                assert len(p["triggers"]) > 0, (
+                    f"Protocol '{p['name']}' has empty triggers"
+                )
+
+    def test_orientation_includes_references(self, isolated_env, temp_config):
+        """Orientation includes reference documents inventory."""
+        temp_config.write_text('{"timezone": "UTC"}')
+
+        result = run_layton(cwd=isolated_env)
+        data = json.loads(result.stdout)
+
+        if data.get("success"):
+            assert "references" in data["data"], (
+                "orientation should include 'references'"
+            )
+            refs = data["data"]["references"]
+            assert isinstance(refs, list)
+            names = [r["name"] for r in refs]
+            # Spot-check key references
+            assert "beads-commands" in names
+            assert "persona" in names
+            assert "rolodex-authoring" in names
+            for r in refs:
+                assert "description" in r, (
+                    f"Reference '{r['name']}' missing description"
+                )
+
+    def test_orientation_includes_examples(self, isolated_env, temp_config):
+        """Orientation includes example protocol inventory."""
+        temp_config.write_text('{"timezone": "UTC"}')
+
+        result = run_layton(cwd=isolated_env)
+        data = json.loads(result.stdout)
+
+        if data.get("success"):
+            assert "examples" in data["data"], "orientation should include 'examples'"
+            examples = data["data"]["examples"]
+            assert isinstance(examples, list)
+            names = [e["name"] for e in examples]
+            assert "morning-briefing" in names
+            assert "gather" in names
 
 
 class TestNoVaultError:

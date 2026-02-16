@@ -1,3 +1,8 @@
+---
+name: rolodex-authoring
+description: Guide for writing rolodex cards for external data sources
+---
+
 # Rolodex Card Authoring Guide
 
 This reference explains how to create rolodex cards for Layton. Rolodex cards define how to query external data sources (Gmail, Jira, Slack, etc.) and what information to extract.

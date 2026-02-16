@@ -1,3 +1,8 @@
+---
+name: upgrade
+description: Migration guide from pre-1.0 naming to secretary metaphor
+---
+
 # Upgrading to v1.0.0 — Secretary Metaphor
 
 Layton's three primitives have been renamed:

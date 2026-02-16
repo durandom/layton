@@ -1,3 +1,13 @@
+---
+name: run-errand
+description: Execute errands via background Task agents for autonomous completion
+triggers:
+  - run errand
+  - execute errand
+  - spawn errand
+  - background task
+---
+
 <protocol name="run-errand">
 <objective>Execute errands via background Task agents for autonomous completion.</objective>
 
