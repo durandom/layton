@@ -7,8 +7,23 @@ The CLI can list protocols and bootstrap new protocol files from templates.
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Callable, Protocol, TypeVar
 
 from laytonlib.config import get_layton_dir
+
+
+class _Named(Protocol):
+    """Protocol for objects with a name attribute."""
+
+    name: str
+
+
+T = TypeVar("T", bound=_Named)
+
+
+def _get_skill_dir() -> Path:
+    """Get the skill root directory (skills/layton/)."""
+    return Path(__file__).parent.parent.parent
 
 
 @dataclass
@@ -25,6 +40,24 @@ class ProtocolInfo:
             "name": self.name,
             "description": self.description,
             "triggers": self.triggers,
+        }
+        if self.path:
+            result["path"] = str(self.path)
+        return result
+
+
+@dataclass
+class ReferenceInfo:
+    """Parsed reference document information."""
+
+    name: str
+    description: str
+    path: Path | None = None
+
+    def to_dict(self) -> dict:
+        result = {
+            "name": self.name,
+            "description": self.description,
         }
         if self.path:
             result["path"] = str(self.path)
@@ -51,6 +84,11 @@ PROTOCOL_TEMPLATE = get_protocol_template()
 def get_protocols_dir() -> Path:
     """Get the .layton/protocols/ directory path."""
     return get_layton_dir() / "protocols"
+
+
+def get_internal_protocols_dir() -> Path:
+    """Get the references/protocols/ directory inside the skill."""
+    return _get_skill_dir() / "references" / "protocols"
 
 
 def parse_frontmatter(content: str) -> dict | None:
@@ -106,46 +144,63 @@ def parse_frontmatter(content: str) -> dict | None:
     return result if result else None
 
 
+def _scan_markdown_dir(directory: Path, builder: Callable[[dict, Path], T]) -> list[T]:
+    """Scan a directory for markdown files with YAML frontmatter.
+
+    Args:
+        directory: Directory to scan for *.md files
+        builder: Function that takes (frontmatter_dict, path) and returns a dataclass instance
+
+    Returns:
+        List of built objects, sorted by name attribute.
+    """
+    if not directory.exists():
+        return []
+
+    items = []
+    for path in directory.glob("*.md"):
+        if path.name == ".gitkeep":
+            continue
+        try:
+            content = path.read_text()
+            frontmatter = parse_frontmatter(content)
+            if frontmatter and "name" in frontmatter:
+                items.append(builder(frontmatter, path))
+        except Exception:
+            continue
+
+    return sorted(items, key=lambda item: item.name)
+
+
+def _build_protocol(frontmatter: dict, path: Path) -> ProtocolInfo:
+    """Build a ProtocolInfo from parsed frontmatter."""
+    triggers = frontmatter.get("triggers", [])
+    if isinstance(triggers, str):
+        triggers = [triggers]
+    return ProtocolInfo(
+        name=frontmatter.get("name", path.stem),
+        description=frontmatter.get("description", ""),
+        triggers=triggers,
+        path=path,
+    )
+
+
+def _build_reference(frontmatter: dict, path: Path) -> ReferenceInfo:
+    """Build a ReferenceInfo from parsed frontmatter."""
+    return ReferenceInfo(
+        name=frontmatter["name"],
+        description=frontmatter.get("description", ""),
+        path=path,
+    )
+
+
 def list_protocols() -> list[ProtocolInfo]:
     """List all protocols from .layton/protocols/.
 
     Returns:
         List of ProtocolInfo objects, sorted by name
     """
-    protocols_dir = get_protocols_dir()
-    if not protocols_dir.exists():
-        return []
-
-    protocols = []
-    for path in protocols_dir.glob("*.md"):
-        if path.name == ".gitkeep":
-            continue
-
-        try:
-            content = path.read_text()
-            frontmatter = parse_frontmatter(content)
-            if frontmatter and "name" in frontmatter:
-                triggers = frontmatter.get("triggers", [])
-                if isinstance(triggers, str):
-                    triggers = [triggers]
-                protocols.append(
-                    ProtocolInfo(
-                        name=frontmatter.get("name", path.stem),
-                        description=frontmatter.get("description", ""),
-                        triggers=triggers,
-                        path=path,
-                    )
-                )
-        except Exception:
-            # Skip files that can't be read
-            continue
-
-    return sorted(protocols, key=lambda w: w.name)
-
-
-def get_internal_protocols_dir() -> Path:
-    """Get the references/protocols/ directory inside the skill."""
-    return _get_skill_dir() / "references" / "protocols"
+    return _scan_markdown_dir(get_protocols_dir(), _build_protocol)
 
 
 def list_internal_protocols() -> list[ProtocolInfo]:
@@ -155,57 +210,7 @@ def list_internal_protocols() -> list[ProtocolInfo]:
         List of ProtocolInfo objects from the skill's internal protocols,
         sorted by name.
     """
-    protocols_dir = get_internal_protocols_dir()
-    if not protocols_dir.exists():
-        return []
-
-    protocols = []
-    for path in protocols_dir.glob("*.md"):
-        if path.name == ".gitkeep":
-            continue
-
-        try:
-            content = path.read_text()
-            frontmatter = parse_frontmatter(content)
-            if frontmatter and "name" in frontmatter:
-                triggers = frontmatter.get("triggers", [])
-                if isinstance(triggers, str):
-                    triggers = [triggers]
-                protocols.append(
-                    ProtocolInfo(
-                        name=frontmatter.get("name", path.stem),
-                        description=frontmatter.get("description", ""),
-                        triggers=triggers,
-                        path=path,
-                    )
-                )
-        except Exception:
-            continue
-
-    return sorted(protocols, key=lambda w: w.name)
-
-
-@dataclass
-class ReferenceInfo:
-    """Parsed reference document information."""
-
-    name: str
-    description: str
-    path: Path | None = None
-
-    def to_dict(self) -> dict:
-        result = {
-            "name": self.name,
-            "description": self.description,
-        }
-        if self.path:
-            result["path"] = str(self.path)
-        return result
-
-
-def _get_skill_dir() -> Path:
-    """Get the skill root directory (skills/layton/)."""
-    return Path(__file__).parent.parent.parent
+    return _scan_markdown_dir(get_internal_protocols_dir(), _build_protocol)
 
 
 def list_internal_references() -> list[ReferenceInfo]:
@@ -214,27 +219,7 @@ def list_internal_references() -> list[ReferenceInfo]:
     Returns:
         List of ReferenceInfo objects, sorted by name.
     """
-    refs_dir = _get_skill_dir() / "references"
-    if not refs_dir.exists():
-        return []
-
-    refs = []
-    for path in refs_dir.glob("*.md"):
-        try:
-            content = path.read_text()
-            frontmatter = parse_frontmatter(content)
-            if frontmatter and "name" in frontmatter:
-                refs.append(
-                    ReferenceInfo(
-                        name=frontmatter["name"],
-                        description=frontmatter.get("description", ""),
-                        path=path,
-                    )
-                )
-        except Exception:
-            continue
-
-    return sorted(refs, key=lambda r: r.name)
+    return _scan_markdown_dir(_get_skill_dir() / "references", _build_reference)
 
 
 def list_internal_examples() -> list[ReferenceInfo]:
@@ -243,27 +228,9 @@ def list_internal_examples() -> list[ReferenceInfo]:
     Returns:
         List of ReferenceInfo objects, sorted by name.
     """
-    examples_dir = _get_skill_dir() / "references" / "examples"
-    if not examples_dir.exists():
-        return []
-
-    examples = []
-    for path in examples_dir.glob("*.md"):
-        try:
-            content = path.read_text()
-            frontmatter = parse_frontmatter(content)
-            if frontmatter and "name" in frontmatter:
-                examples.append(
-                    ReferenceInfo(
-                        name=frontmatter["name"],
-                        description=frontmatter.get("description", ""),
-                        path=path,
-                    )
-                )
-        except Exception:
-            continue
-
-    return sorted(examples, key=lambda e: e.name)
+    return _scan_markdown_dir(
+        _get_skill_dir() / "references" / "examples", _build_reference
+    )
 
 
 def add_protocol(name: str) -> Path:
