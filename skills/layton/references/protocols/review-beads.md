@@ -1,3 +1,13 @@
+---
+name: review-beads
+description: Find and review completed errands that need human attention
+triggers:
+  - review beads
+  - pending review
+  - check completed
+  - what finished
+---
+
 <protocol name="review-errands">
 <objective>Find and review completed errands that need human attention.</objective>
 

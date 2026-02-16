@@ -1,3 +1,10 @@
+---
+name: schedule-errand
+description: Schedule an errand from a template for background execution
+triggers:
+  - schedule errand
+---
+
 <protocol name="schedule-errand">
 <objective>Schedule an errand from a template for background execution.</objective>
 

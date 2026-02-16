@@ -143,6 +143,129 @@ def list_protocols() -> list[ProtocolInfo]:
     return sorted(protocols, key=lambda w: w.name)
 
 
+def get_internal_protocols_dir() -> Path:
+    """Get the references/protocols/ directory inside the skill."""
+    return _get_skill_dir() / "references" / "protocols"
+
+
+def list_internal_protocols() -> list[ProtocolInfo]:
+    """List built-in protocols from references/protocols/.
+
+    Returns:
+        List of ProtocolInfo objects from the skill's internal protocols,
+        sorted by name.
+    """
+    protocols_dir = get_internal_protocols_dir()
+    if not protocols_dir.exists():
+        return []
+
+    protocols = []
+    for path in protocols_dir.glob("*.md"):
+        if path.name == ".gitkeep":
+            continue
+
+        try:
+            content = path.read_text()
+            frontmatter = parse_frontmatter(content)
+            if frontmatter and "name" in frontmatter:
+                triggers = frontmatter.get("triggers", [])
+                if isinstance(triggers, str):
+                    triggers = [triggers]
+                protocols.append(
+                    ProtocolInfo(
+                        name=frontmatter.get("name", path.stem),
+                        description=frontmatter.get("description", ""),
+                        triggers=triggers,
+                        path=path,
+                    )
+                )
+        except Exception:
+            continue
+
+    return sorted(protocols, key=lambda w: w.name)
+
+
+@dataclass
+class ReferenceInfo:
+    """Parsed reference document information."""
+
+    name: str
+    description: str
+    path: Path | None = None
+
+    def to_dict(self) -> dict:
+        result = {
+            "name": self.name,
+            "description": self.description,
+        }
+        if self.path:
+            result["path"] = str(self.path)
+        return result
+
+
+def _get_skill_dir() -> Path:
+    """Get the skill root directory (skills/layton/)."""
+    return Path(__file__).parent.parent.parent
+
+
+def list_internal_references() -> list[ReferenceInfo]:
+    """List reference documents from references/*.md.
+
+    Returns:
+        List of ReferenceInfo objects, sorted by name.
+    """
+    refs_dir = _get_skill_dir() / "references"
+    if not refs_dir.exists():
+        return []
+
+    refs = []
+    for path in refs_dir.glob("*.md"):
+        try:
+            content = path.read_text()
+            frontmatter = parse_frontmatter(content)
+            if frontmatter and "name" in frontmatter:
+                refs.append(
+                    ReferenceInfo(
+                        name=frontmatter["name"],
+                        description=frontmatter.get("description", ""),
+                        path=path,
+                    )
+                )
+        except Exception:
+            continue
+
+    return sorted(refs, key=lambda r: r.name)
+
+
+def list_internal_examples() -> list[ReferenceInfo]:
+    """List example documents from references/examples/*.md.
+
+    Returns:
+        List of ReferenceInfo objects, sorted by name.
+    """
+    examples_dir = _get_skill_dir() / "references" / "examples"
+    if not examples_dir.exists():
+        return []
+
+    examples = []
+    for path in examples_dir.glob("*.md"):
+        try:
+            content = path.read_text()
+            frontmatter = parse_frontmatter(content)
+            if frontmatter and "name" in frontmatter:
+                examples.append(
+                    ReferenceInfo(
+                        name=frontmatter["name"],
+                        description=frontmatter.get("description", ""),
+                        path=path,
+                    )
+                )
+        except Exception:
+            continue
+
+    return sorted(examples, key=lambda e: e.name)
+
+
 def add_protocol(name: str) -> Path:
     """Create a new protocol file from template.
 

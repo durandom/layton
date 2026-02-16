@@ -1,3 +1,14 @@
+---
+name: set-focus
+description: Set current focus item (only one at a time)
+triggers:
+  - focus
+  - working on
+  - what should I do
+  - next task
+  - priority
+---
+
 <protocol name="set-focus">
 <required_reading>
 **Read if unfamiliar with bd commands:**

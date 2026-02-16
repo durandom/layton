@@ -1,3 +1,13 @@
+---
+name: track-item
+description: Add an item to Layton's attention list
+triggers:
+  - track
+  - watch
+  - monitor
+  - keep eye on
+---
+
 <protocol name="track-item">
 <required_reading>
 **Read if unfamiliar with bd commands:**

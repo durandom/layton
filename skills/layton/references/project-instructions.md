@@ -1,3 +1,8 @@
+---
+name: project-instructions
+description: Best practices for structuring CLAUDE.md and AGENTS.md files
+---
+
 <overview>
 Reference guide for structuring CLAUDE.md and AGENTS.md files in knowledge repositories using Layton.
 

@@ -1,3 +1,8 @@
+---
+name: errand-authoring
+description: Guide for writing errand templates for autonomous background tasks
+---
+
 # Errand Authoring Guide
 
 This reference explains how to create errands for Layton. Errands define **autonomous background tasks** — work that an AI executor completes without human interaction, with results tracked in bd for later review.

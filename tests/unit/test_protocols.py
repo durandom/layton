@@ -13,6 +13,7 @@ from laytonlib.protocols import (
     PROTOCOL_TEMPLATE,
     ProtocolInfo,
     add_protocol,
+    list_internal_protocols,
     list_protocols,
     parse_frontmatter,
 )
@@ -301,6 +302,75 @@ class TestBuiltinProtocols:
             "Should have trigger with 'retrospect' or 'reflect'"
         )
 
+class TestListInternalProtocols:
+    """Tests for list_internal_protocols function."""
+
+    def test_returns_list(self):
+        """Returns a list of ProtocolInfo objects."""
+        result = list_internal_protocols()
+        assert isinstance(result, list)
+        assert all(isinstance(p, ProtocolInfo) for p in result)
+
+    def test_finds_all_internal_protocols(self):
+        """Finds all 12 built-in protocols in references/protocols/."""
+        result = list_internal_protocols()
+        names = [p.name for p in result]
+        expected = [
+            "audit-project-instructions",
+            "author-errand",
+            "author-protocol",
+            "author-rolodex",
+            "extract",
+            "retrospect",
+            "review-beads",
+            "run-errand",
+            "schedule-errand",
+            "set-focus",
+            "setup",
+            "track-item",
+        ]
+        for name in expected:
+            assert name in names, f"Missing internal protocol: {name}"
+
+    def test_all_have_description(self):
+        """All internal protocols have a non-empty description."""
+        result = list_internal_protocols()
+        for p in result:
+            assert p.description, f"Protocol '{p.name}' has no description"
+
+    def test_all_have_triggers(self):
+        """All internal protocols have at least one trigger."""
+        result = list_internal_protocols()
+        for p in result:
+            assert len(p.triggers) > 0, f"Protocol '{p.name}' has no triggers"
+
+    def test_sorted_by_name(self):
+        """Results are sorted alphabetically by name."""
+        result = list_internal_protocols()
+        names = [p.name for p in result]
+        assert names == sorted(names)
+
+    def test_all_have_path(self):
+        """All internal protocols include their file path."""
+        result = list_internal_protocols()
+        for p in result:
+            assert p.path is not None, f"Protocol '{p.name}' has no path"
+            assert p.path.exists(), f"Protocol '{p.name}' path does not exist: {p.path}"
+
+    def test_does_not_include_user_protocols(self, temp_protocols_dir):
+        """Does not include user protocols from .layton/protocols/."""
+        (temp_protocols_dir / "user-custom.md").write_text("""---
+name: user-custom
+description: A user protocol
+triggers:
+  - custom
+---
+""")
+        result = list_internal_protocols()
+        names = [p.name for p in result]
+        assert "user-custom" not in names
+
+
     def test_setup_mentions_audit_protocol(self):
         """Setup protocol mentions audit protocol as optional step."""
         protocol_path = LAYTON_SKILL_DIR / "references" / "protocols" / "setup.md"
@@ -310,4 +380,37 @@ class TestBuiltinProtocols:
         # Check it's presented as optional
         assert "would you like" in content or "optional" in content, (
             "Audit mention should be presented as optional"
+        )
+
+
+class TestSkillMdPriming:
+    """Tests that SKILL.md delegates to CLI orientation instead of hardcoding."""
+
+    def test_skill_md_does_not_hardcode_file_index(self):
+        """SKILL.md should NOT contain a <file_index> section — CLI provides this."""
+        content = (LAYTON_SKILL_DIR / "SKILL.md").read_text()
+        assert "<file_index>" not in content, (
+            "SKILL.md should not hardcode file_index; CLI orientation provides this"
+        )
+
+    def test_skill_md_does_not_hardcode_routing(self):
+        """SKILL.md should NOT contain a <routing> section — triggers come from CLI."""
+        content = (LAYTON_SKILL_DIR / "SKILL.md").read_text()
+        assert "<routing>" not in content, (
+            "SKILL.md should not hardcode routing table; protocol triggers come from CLI"
+        )
+
+    def test_skill_md_references_orientation(self):
+        """SKILL.md should reference running scripts/layton for orientation."""
+        content = (LAYTON_SKILL_DIR / "SKILL.md").read_text()
+        assert "scripts/layton" in content, (
+            "SKILL.md should reference running scripts/layton"
+        )
+
+    def test_skill_md_is_concise(self):
+        """SKILL.md should be under 150 lines (was ~230 before priming)."""
+        content = (LAYTON_SKILL_DIR / "SKILL.md").read_text()
+        line_count = len(content.strip().split("\n"))
+        assert line_count < 150, (
+            f"SKILL.md should be concise (<150 lines), currently {line_count} lines"
         )
