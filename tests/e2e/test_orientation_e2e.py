@@ -197,3 +197,66 @@ class TestCompactOutput:
                 for check in checks:
                     assert "name" in check
                     assert "status" in check
+
+
+class TestNoVaultError:
+    """E2E tests for error when no .layton/config.json is found via vault walk."""
+
+    def test_no_vault_returns_error(self, tmp_path):
+        """Running from a directory with no vault anywhere up returns NO_VAULT."""
+        # tmp_path has no .layton/ at all
+        result = run_layton(cwd=tmp_path)
+
+        data = json.loads(result.stdout)
+        assert data["success"] is False
+        assert data["error"]["code"] == "NO_VAULT"
+        assert result.returncode == 1
+
+    def test_no_vault_message_includes_cwd(self, tmp_path):
+        """NO_VAULT error message includes the cwd for debugging."""
+        result = run_layton(cwd=tmp_path)
+
+        data = json.loads(result.stdout)
+        # The cwd should appear somewhere in the error output
+        output_text = json.dumps(data)
+        assert str(tmp_path) in output_text
+
+    def test_no_vault_includes_next_steps(self, tmp_path):
+        """NO_VAULT error includes actionable next steps."""
+        result = run_layton(cwd=tmp_path)
+
+        data = json.loads(result.stdout)
+        assert "next_steps" in data
+        assert len(data["next_steps"]) > 0
+
+    def test_wrong_directory_returns_specific_error(self, tmp_path):
+        """Running from the skill directory itself returns WRONG_DIRECTORY."""
+        # Simulate the skill directory fingerprint
+        (tmp_path / "SKILL.md").write_text("# Layton")
+        (tmp_path / "scripts" / "laytonlib").mkdir(parents=True)
+
+        result = run_layton(cwd=tmp_path)
+
+        data = json.loads(result.stdout)
+        assert data["success"] is False
+        assert data["error"]["code"] == "WRONG_DIRECTORY"
+        assert result.returncode == 1
+
+    def test_wrong_directory_hint_mentions_skill(self, tmp_path):
+        """WRONG_DIRECTORY message tells user they're in the skill directory."""
+        (tmp_path / "SKILL.md").write_text("# Layton")
+        (tmp_path / "scripts" / "laytonlib").mkdir(parents=True)
+
+        result = run_layton(cwd=tmp_path)
+
+        data = json.loads(result.stdout)
+        output_text = json.dumps(data).lower()
+        assert "skill" in output_text
+
+    def test_config_init_still_works_without_vault(self, tmp_path):
+        """'layton config init' should work even without an existing vault."""
+        result = run_layton("config", "init", cwd=tmp_path)
+
+        data = json.loads(result.stdout)
+        assert data["success"] is True
+        assert (tmp_path / ".layton" / "config.json").exists()

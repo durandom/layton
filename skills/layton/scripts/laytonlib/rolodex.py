@@ -8,7 +8,7 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-from laytonlib.doctor import find_git_root, get_layton_dir
+from laytonlib.config import find_vault_root, get_layton_dir
 
 
 @dataclass
@@ -138,8 +138,8 @@ def discover_cards() -> tuple[list[RolodexCard], list[DiscoveredCard]]:
         - known: Cards with files in .layton/rolodex/
         - unknown: Cards without files (need to be added)
     """
-    git_root = find_git_root()
-    base = git_root if git_root else Path.cwd()
+    vault_root = find_vault_root()
+    base = vault_root if vault_root else Path.cwd()
     skills_root = base / "skills"
 
     if not skills_root.exists():

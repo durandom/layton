@@ -8,7 +8,7 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from laytonlib.doctor import get_layton_dir
+from laytonlib.config import get_layton_dir
 
 
 @dataclass

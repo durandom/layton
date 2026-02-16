@@ -1,35 +1,49 @@
 """Configuration loading and management.
 
-Config is stored at .layton/config.json relative to git root (or cwd if not in git).
+Config is stored at .layton/config.json, discovered by walking up from cwd.
 Implements a simple key-value store with dot-notation access.
 """
 
 import json
-import subprocess
 from pathlib import Path
 from typing import Any
 
 from laytonlib.formatters import OutputFormatter
 
 
-def find_git_root() -> Path | None:
-    """Find the git repository root, or None if not in a repo."""
-    try:
-        result = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        return Path(result.stdout.strip())
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return None
+def find_vault_root() -> Path | None:
+    """Find the nearest directory containing a .layton/ directory.
+
+    Walks upward from cwd. Returns the directory (not .layton/ itself),
+    or None if no vault is found.
+    """
+    current = Path.cwd().resolve()
+    while True:
+        if (current / ".layton").is_dir():
+            return current
+        parent = current.parent
+        if parent == current:
+            break
+        current = parent
+    return None
+
+
+def detect_skill_directory() -> bool:
+    """Detect if cwd is the Layton skill directory itself.
+
+    Checks for SKILL.md + scripts/laytonlib/ as a unique fingerprint.
+    """
+    cwd = Path.cwd()
+    return (cwd / "SKILL.md").is_file() and (cwd / "scripts" / "laytonlib").is_dir()
 
 
 def get_layton_dir() -> Path:
-    """Get the .layton directory path (in git root or cwd)."""
-    git_root = find_git_root()
-    base = git_root if git_root else Path.cwd()
+    """Get the .layton directory path.
+
+    Uses find_vault_root() for discovery. Falls back to cwd (for 'config init').
+    """
+    vault_root = find_vault_root()
+    base = vault_root if vault_root else Path.cwd()
     return base / ".layton"
 
 
