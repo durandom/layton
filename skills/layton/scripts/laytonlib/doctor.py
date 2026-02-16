@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal
 
+from laytonlib.config import find_vault_root, get_layton_dir
 from laytonlib.formatters import OutputFormatter
 
 
@@ -27,27 +28,6 @@ class CheckResult:
             "status": self.status,
             "message": self.message,
         }
-
-
-def find_git_root() -> Path | None:
-    """Find the git repository root, or None if not in a repo."""
-    try:
-        result = subprocess.run(
-            ["git", "rev-parse", "--show-toplevel"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
-        return Path(result.stdout.strip())
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return None
-
-
-def get_layton_dir() -> Path:
-    """Get the .layton directory path (in git root or cwd)."""
-    git_root = find_git_root()
-    base = git_root if git_root else Path.cwd()
-    return base / ".layton"
 
 
 def get_config_path() -> Path:
@@ -105,8 +85,8 @@ def check_beads_available() -> CheckResult:
 
 def check_beads_initialized() -> CheckResult:
     """Check if .beads/ directory exists."""
-    git_root = find_git_root()
-    base = git_root if git_root else Path.cwd()
+    vault_root = find_vault_root()
+    base = vault_root if vault_root else Path.cwd()
     beads_dir = base / ".beads"
 
     if beads_dir.exists():

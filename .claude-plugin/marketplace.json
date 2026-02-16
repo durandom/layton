@@ -1,6 +1,6 @@
 {
   "name": "secretary",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "description": "Personal AI secretary for attention management",
   "author": "durandom",
   "owner": {
@@ -10,7 +10,7 @@
   "plugins": [
     {
       "name": "layton",
-      "version": "2.0.0",
+      "version": "2.0.2",
       "description": "Personal AI secretary for attention management. Track what matters, maintain focus, get context-aware briefings.",
       "source": "./",
       "strict": false,

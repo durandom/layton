@@ -629,6 +629,36 @@ def main(argv: list[str] | None = None) -> int:
     # Create formatter based on --human flag
     formatter = OutputFormatter(human=args.human, verbose=args.verbose)
 
+    # Check for vault (except for 'config init' which creates one)
+    is_config_init = args.command == "config" and getattr(args, "config_command", None) == "init"
+    if not is_config_init:
+        from laytonlib.config import detect_skill_directory, find_vault_root
+
+        vault_root = find_vault_root()
+        if vault_root is None:
+            from pathlib import Path
+
+            cwd = str(Path.cwd())
+            if detect_skill_directory():
+                formatter.error(
+                    "WRONG_DIRECTORY",
+                    f"Running from the Layton skill directory, not a project vault (cwd: {cwd})",
+                    next_steps=[
+                        "Do not cd into the skill directory before invoking the script",
+                        "Call the script with its full path from your project root",
+                    ],
+                )
+            else:
+                formatter.error(
+                    "NO_VAULT",
+                    f"No .layton/ directory found in {cwd} or any parent directory",
+                    next_steps=[
+                        "Run 'layton config init' to create a vault in the current directory",
+                        "Or cd into a project that has a .layton/ vault",
+                    ],
+                )
+            return 1
+
     # No-arg default: run orientation (doctor + rolodex + protocols)
     if args.command is None:
         return run_orientation(formatter)

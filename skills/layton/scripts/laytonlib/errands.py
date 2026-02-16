@@ -13,8 +13,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from string import Template
 
-from laytonlib.config import get_nested, load_config, save_config, set_nested
-from laytonlib.doctor import get_layton_dir
+from laytonlib.config import get_layton_dir, get_nested, load_config, save_config, set_nested
 
 
 # Fixed labels for bead state management

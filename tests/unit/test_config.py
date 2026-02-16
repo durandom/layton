@@ -13,6 +13,8 @@ sys.path.insert(
 
 from laytonlib.config import (
     collect_keys,
+    detect_skill_directory,
+    find_vault_root,
     get_default_config,
     get_nested,
     load_config,
@@ -148,6 +150,89 @@ class TestDefaultConfig:
         config = get_default_config()
         assert config["work"]["schedule"]["start"] == "09:00"
         assert config["work"]["schedule"]["end"] == "17:00"
+
+
+class TestFindVaultRoot:
+    """Tests for vault root discovery via .layton/config.json marker."""
+
+    def test_finds_vault_in_cwd(self, tmp_path, monkeypatch):
+        """Finds vault when .layton/config.json is in cwd."""
+        (tmp_path / ".layton").mkdir()
+        (tmp_path / ".layton" / "config.json").write_text("{}")
+        monkeypatch.chdir(tmp_path)
+
+        assert find_vault_root() == tmp_path
+
+    def test_finds_vault_in_parent(self, tmp_path, monkeypatch):
+        """Walks up and finds vault in a parent directory."""
+        (tmp_path / ".layton").mkdir()
+        (tmp_path / ".layton" / "config.json").write_text("{}")
+        child = tmp_path / "sub" / "deep"
+        child.mkdir(parents=True)
+        monkeypatch.chdir(child)
+
+        assert find_vault_root() == tmp_path
+
+    def test_returns_none_when_no_vault(self, tmp_path, monkeypatch):
+        """Returns None when no .layton/config.json exists anywhere up."""
+        monkeypatch.chdir(tmp_path)
+
+        assert find_vault_root() is None
+
+    def test_finds_layton_dir_without_config(self, tmp_path, monkeypatch):
+        """A .layton/ directory without config.json is still a vault."""
+        (tmp_path / ".layton").mkdir()
+        # No config.json inside — but .layton/ directory exists
+        monkeypatch.chdir(tmp_path)
+
+        assert find_vault_root() == tmp_path
+
+    def test_finds_nearest_vault(self, tmp_path, monkeypatch):
+        """When nested vaults exist, returns the nearest (deepest) one."""
+        # Outer vault
+        (tmp_path / ".layton").mkdir()
+        (tmp_path / ".layton" / "config.json").write_text("{}")
+        # Inner vault
+        inner = tmp_path / "project"
+        (inner / ".layton").mkdir(parents=True)
+        (inner / ".layton" / "config.json").write_text("{}")
+        monkeypatch.chdir(inner)
+
+        assert find_vault_root() == inner
+
+
+class TestDetectSkillDirectory:
+    """Tests for detecting when running from the Layton skill directory."""
+
+    def test_detects_skill_directory(self, tmp_path, monkeypatch):
+        """Returns True when SKILL.md and scripts/laytonlib/ exist."""
+        (tmp_path / "SKILL.md").write_text("# Layton")
+        (tmp_path / "scripts" / "laytonlib").mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        assert detect_skill_directory() is True
+
+    def test_false_without_skill_md(self, tmp_path, monkeypatch):
+        """Returns False when SKILL.md is missing."""
+        (tmp_path / "scripts" / "laytonlib").mkdir(parents=True)
+        monkeypatch.chdir(tmp_path)
+
+        assert detect_skill_directory() is False
+
+    def test_false_without_laytonlib(self, tmp_path, monkeypatch):
+        """Returns False when scripts/laytonlib/ is missing."""
+        (tmp_path / "SKILL.md").write_text("# Something")
+        monkeypatch.chdir(tmp_path)
+
+        assert detect_skill_directory() is False
+
+    def test_false_in_normal_project(self, tmp_path, monkeypatch):
+        """Returns False in a normal project directory."""
+        (tmp_path / ".layton").mkdir()
+        (tmp_path / ".layton" / "config.json").write_text("{}")
+        monkeypatch.chdir(tmp_path)
+
+        assert detect_skill_directory() is False
 
 
 class TestLoadSaveConfig:
