@@ -651,7 +651,7 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 formatter.error(
                     "NO_VAULT",
-                    f"No .layton/config.json found in {cwd} or any parent directory",
+                    f"No .layton/ directory found in {cwd} or any parent directory",
                     next_steps=[
                         "Run 'layton config init' to create a vault in the current directory",
                         "Or cd into a project that has a .layton/ vault",

@@ -200,7 +200,7 @@ class TestCompactOutput:
 
 
 class TestNoVaultError:
-    """E2E tests for error when no .layton/config.json is found via vault walk."""
+    """E2E tests for error when no .layton/ vault directory is found via vault walk."""
 
     def test_no_vault_returns_error(self, tmp_path):
         """Running from a directory with no vault anywhere up returns NO_VAULT."""
