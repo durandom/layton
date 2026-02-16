@@ -399,9 +399,7 @@ Check the file at ${file_path}.
         )
 
         variables = {"file_path": "src/auth.py"}
-        result = run_layton(
-            "errands", "run", "check", json.dumps(variables), cwd=cwd
-        )
+        result = run_layton("errands", "run", "check", json.dumps(variables), cwd=cwd)
 
         assert result.returncode == 0, f"Run failed: {result.stdout} {result.stderr}"
         data = json.loads(result.stdout)
@@ -455,9 +453,7 @@ Sweep it.
         assert "scheduled" in labels
         assert "type:sweep" in labels
 
-    def test_run_nonexistent_errand(
-        self, temp_config, real_beads_isolated
-    ):
+    def test_run_nonexistent_errand(self, temp_config, real_beads_isolated):
         """errands run fails with ERRAND_NOT_FOUND for missing errand."""
         cwd = temp_config.parent.parent
 
