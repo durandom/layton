@@ -350,27 +350,27 @@ def get_beads_pending_review() -> list[dict]:
     """Get closed beads with the needs-review label.
 
     Returns:
-        List of bead dicts awaiting review
+        List of bead dicts awaiting review (only Layton-managed beads)
     """
-    return get_beads_by_label(LABEL_NEEDS_REVIEW, status="closed")
+    return get_beads_by_label(f"layton,{LABEL_NEEDS_REVIEW}", status="closed")
 
 
 def get_beads_scheduled() -> list[dict]:
     """Get open beads with the scheduled label.
 
     Returns:
-        List of bead dicts that are scheduled for execution
+        List of bead dicts that are scheduled for execution (only Layton-managed beads)
     """
-    return get_beads_by_label(LABEL_SCHEDULED, status="open")
+    return get_beads_by_label(f"layton,{LABEL_SCHEDULED}", status="open")
 
 
 def get_beads_in_progress() -> list[dict]:
     """Get open beads with the in-progress label.
 
     Returns:
-        List of bead dicts that are currently being executed
+        List of bead dicts that are currently being executed (only Layton-managed beads)
     """
-    return get_beads_by_label(LABEL_IN_PROGRESS, status="open")
+    return get_beads_by_label(f"layton,{LABEL_IN_PROGRESS}", status="open")
 
 
 def schedule_errand(name: str, variables: dict[str, str] | None = None) -> dict:

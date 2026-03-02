@@ -415,7 +415,7 @@ class TestGetBeadsInProgress:
         result = get_beads_in_progress()
         assert len(result) == 1
         assert result[0]["id"] == "bead-1"
-        assert "in-progress" in captured_cmd
+        assert "layton,in-progress" in captured_cmd
         assert "open" in captured_cmd
 
 

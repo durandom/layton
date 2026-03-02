@@ -1064,6 +1064,7 @@ Do task 2.
 
         assert result.returncode == 0
         data = json.loads(result.stdout)
+        assert data["success"] is True
         queues = data["data"]["queues"]
 
         assert queues["scheduled"] == 0
