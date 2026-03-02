@@ -51,6 +51,15 @@ jobs:
       - name: Install dependencies
         run: pip install pytest syrupy
 
+      - name: Install Dolt (beads backend)
+        run: |
+          if [ "${{ runner.os }}" == "Linux" ]; then
+            sudo bash -c 'curl -L https://github.com/dolthub/dolt/releases/latest/download/install.sh | sudo bash'
+          else
+            brew install dolt
+          fi
+          dolt version
+
       - name: Install beads CLI
         run: |
           # Download latest beads release
