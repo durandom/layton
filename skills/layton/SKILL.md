@@ -57,59 +57,18 @@ Before taking ANY action, follow this sequence:
 
 <intake>
 ```bash
-# Step 1: Run health + status checks automatically
-DOCTOR_OUTPUT=$(scripts/layton doctor 2>&1)
-STATUS_OUTPUT=$(scripts/layton errands status 2>&1)
-
-# Step 2: Parse health status
-if echo "$DOCTOR_OUTPUT" | grep -q '"success": true'; then
-    HEALTH="✓ System ready"
-else
-    HEALTH="⚠️ System needs setup"
-fi
-
-# Step 3: Parse queue counts
-NEEDS_REVIEW=$(echo "$STATUS_OUTPUT" | grep -o '"needs_review": [0-9]*' | grep -o '[0-9]*' || echo "0")
-IN_PROGRESS=$(echo "$STATUS_OUTPUT" | grep -o '"in_progress": [0-9]*' | grep -o '[0-9]*' || echo "0")
-SCHEDULED=$(echo "$STATUS_OUTPUT" | grep -o '"scheduled": [0-9]*' | grep -o '[0-9]*' || echo "0")
-
-# Step 4: Show contextual intake
-echo "$HEALTH"
-if [ "$NEEDS_REVIEW" -gt 0 ]; then
-    echo "📋 $NEEDS_REVIEW errands need review"
-fi
-if [ "$IN_PROGRESS" -gt 0 ] || [ "$SCHEDULED" -gt 0 ]; then
-    echo "⏳ $SCHEDULED scheduled | 🔄 $IN_PROGRESS in-progress | ✅ $NEEDS_REVIEW needs-review"
-fi
-echo ""
+scripts/layton
 ```
 
-**If system needs setup:**
-```
-What would you like to do?
-1. Schedule an errand (will auto-setup)
-2. Fix configuration manually
-3. Something else
-```
+The orientation output includes:
+- Health checks (`checks` field)
+- Queue status (`errands.queue` with `scheduled`, `in_progress`, `pending_review` arrays)
+- Available templates, protocols, rolodex cards
 
-**If healthy with pending reviews:**
-```
-What would you like to do?
-1. Review completed errands (N pending)
-2. Schedule new errand
-3. Get full status
-4. Something else
-```
-
-**If healthy, nothing pending:**
-```
-What would you like to do?
-1. Get oriented (full status check)
-2. Track something (add to attention list)
-3. Set focus (designate current work item)
-4. Schedule an errand
-5. Something else
-```
+**Based on the orientation data, adjust your response:**
+- If `errands.queue.pending_review` has items → Mention "N errands need review" and prioritize review option
+- If `needs_setup` is true → Guide user through setup or offer auto-setup via errand scheduling
+- Otherwise → Present standard options (get oriented, track something, set focus, schedule errand)
 
 **Wait for response before proceeding.**
 </intake>
