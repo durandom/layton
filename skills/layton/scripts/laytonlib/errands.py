@@ -417,7 +417,7 @@ def schedule_errand(name: str, variables: dict[str, str] | None = None) -> dict:
     return bd_create(
         title=title,
         parent=epic,
-        labels=[LABEL_SCHEDULED, f"type:{name}"],
+        labels=["layton", LABEL_SCHEDULED, f"type:{name}"],
         description=rendered_body,
     )
 

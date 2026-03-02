@@ -57,16 +57,59 @@ Before taking ANY action, follow this sequence:
 
 <intake>
 ```bash
-scripts/layton
+# Step 1: Run health + status checks automatically
+DOCTOR_OUTPUT=$(scripts/layton doctor 2>&1)
+STATUS_OUTPUT=$(scripts/layton errands status 2>&1)
+
+# Step 2: Parse health status
+if echo "$DOCTOR_OUTPUT" | grep -q '"success": true'; then
+    HEALTH="✓ System ready"
+else
+    HEALTH="⚠️ System needs setup"
+fi
+
+# Step 3: Parse queue counts
+NEEDS_REVIEW=$(echo "$STATUS_OUTPUT" | grep -o '"needs_review": [0-9]*' | grep -o '[0-9]*' || echo "0")
+IN_PROGRESS=$(echo "$STATUS_OUTPUT" | grep -o '"in_progress": [0-9]*' | grep -o '[0-9]*' || echo "0")
+SCHEDULED=$(echo "$STATUS_OUTPUT" | grep -o '"scheduled": [0-9]*' | grep -o '[0-9]*' || echo "0")
+
+# Step 4: Show contextual intake
+echo "$HEALTH"
+if [ "$NEEDS_REVIEW" -gt 0 ]; then
+    echo "📋 $NEEDS_REVIEW errands need review"
+fi
+if [ "$IN_PROGRESS" -gt 0 ] || [ "$SCHEDULED" -gt 0 ]; then
+    echo "⏳ $SCHEDULED scheduled | 🔄 $IN_PROGRESS in-progress | ✅ $NEEDS_REVIEW needs-review"
+fi
+echo ""
 ```
 
+**If system needs setup:**
+```
 What would you like to do?
+1. Schedule an errand (will auto-setup)
+2. Fix configuration manually
+3. Something else
+```
 
+**If healthy with pending reviews:**
+```
+What would you like to do?
+1. Review completed errands (N pending)
+2. Schedule new errand
+3. Get full status
+4. Something else
+```
+
+**If healthy, nothing pending:**
+```
+What would you like to do?
 1. Get oriented (full status check)
 2. Track something (add to attention list)
 3. Set focus (designate current work item)
-4. Retrospect on protocol (reflect on what worked)
+4. Schedule an errand
 5. Something else
+```
 
 **Wait for response before proceeding.**
 </intake>
@@ -81,13 +124,15 @@ The CLI script is at `scripts/layton` **relative to this SKILL.md file** (not th
 **Key commands:**
 
 ```bash
-scripts/layton                            # Full orientation (source of truth)
-scripts/layton doctor                     # Health check
-scripts/layton context                    # Temporal context
-scripts/layton config show|init|get|set   # Configuration management
-scripts/layton rolodex [--discover|add]   # Rolodex card management
-scripts/layton protocols [add]            # Protocol management
-scripts/layton errands [add|schedule|run|prompt]  # Errand management
+scripts/layton                                     # Full orientation (source of truth)
+scripts/layton doctor                              # Health check
+scripts/layton context                             # Temporal context
+scripts/layton config show|init|get|set            # Configuration management
+scripts/layton rolodex [--discover|add]            # Rolodex card management
+scripts/layton protocols [add]                     # Protocol management
+scripts/layton errands                             # List available errand templates
+scripts/layton errands [add|schedule|run|prompt]   # Errand management
+scripts/layton errands status                      # Show queue status (scheduled, in-progress, needs-review counts)
 ```
 
 Run `scripts/layton --help` for full usage details.
