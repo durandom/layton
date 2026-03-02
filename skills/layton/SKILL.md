@@ -60,15 +60,7 @@ Before taking ANY action, follow this sequence:
 scripts/layton
 ```
 
-The orientation output includes:
-- Health checks (`checks` field)
-- Queue status (`errands.queue` with `scheduled`, `in_progress`, `pending_review` arrays)
-- Available templates, protocols, rolodex cards
-
-**Based on the orientation data, adjust your response:**
-- If `errands.queue.pending_review` has items → Mention "N errands need review" and prioritize review option
-- If `needs_setup` is true → Guide user through setup or offer auto-setup via errand scheduling
-- Otherwise → Present standard options (get oriented, track something, set focus, schedule errand)
+Review the orientation data and present options based on what's most relevant to the user's current situation.
 
 **Wait for response before proceeding.**
 </intake>
