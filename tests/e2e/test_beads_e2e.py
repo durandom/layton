@@ -240,6 +240,7 @@ Review the file at ${file_path} for ${focus_area}.
         )
         labels = extract_json(label_result.stdout)
 
+        assert "layton" in labels
         assert "scheduled" in labels
         assert "type:code-review" in labels
 
@@ -450,6 +451,7 @@ Sweep it.
             check=True,
         )
         labels = extract_json(label_result.stdout)
+        assert "layton" in labels
         assert "scheduled" in labels
         assert "type:sweep" in labels
 
@@ -961,3 +963,110 @@ Test protocol.
         prompt = json.loads(result.stdout)["data"]["prompt"]
 
         assert f"bd label remove {bead_id} in-progress" in prompt
+
+
+class TestErrandsStatus:
+    """E2E tests for layton errands status."""
+
+    def test_status_returns_queue_counts(
+        self, temp_errands_dir, temp_config, real_beads_isolated
+    ):
+        """errands status returns JSON with queue counts."""
+        cwd = temp_config.parent.parent
+
+        # Initialize beads
+        subprocess.run(["bd", "init"], cwd=cwd, capture_output=True, check=True)
+
+        # Create an epic
+        epic_result = subprocess.run(
+            ["bd", "create", "--title", "Test Epic", "--type", "epic", "--json"],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        epic_data = extract_json(epic_result.stdout)
+        epic_id = epic_data["id"]
+        run_layton("errands", "epic", "set", epic_id, cwd=cwd)
+
+        # Create and schedule 2 errands
+        (temp_errands_dir / "task1.md").write_text(
+            """---
+name: task1
+description: First task
+---
+
+## Task
+
+Do task 1.
+"""
+        )
+        (temp_errands_dir / "task2.md").write_text(
+            """---
+name: task2
+description: Second task
+---
+
+## Task
+
+Do task 2.
+"""
+        )
+
+        result1 = run_layton("errands", "schedule", "task1", cwd=cwd)
+        assert result1.returncode == 0
+        bead1_id = json.loads(result1.stdout)["data"]["scheduled"]["id"]
+
+        result2 = run_layton("errands", "schedule", "task2", cwd=cwd)
+        assert result2.returncode == 0
+        bead2_id = json.loads(result2.stdout)["data"]["scheduled"]["id"]
+
+        # Transition bead1 to in-progress
+        subprocess.run(
+            ["bd", "label", "remove", bead1_id, "scheduled"],
+            cwd=cwd,
+            capture_output=True,
+            check=True,
+        )
+        subprocess.run(
+            ["bd", "label", "add", bead1_id, "in-progress"],
+            cwd=cwd,
+            capture_output=True,
+            check=True,
+        )
+
+        # Close bead2 and mark for review
+        subprocess.run(
+            ["bd", "close", bead2_id], cwd=cwd, capture_output=True, check=True
+        )
+        subprocess.run(
+            ["bd", "label", "add", bead2_id, "needs-review"],
+            cwd=cwd,
+            capture_output=True,
+            check=True,
+        )
+
+        # Now check status
+        result = run_layton("errands", "status", cwd=cwd)
+
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert data["success"] is True
+        queues = data["data"]["queues"]
+
+        # Verify counts (use >= since other tests may have left beads)
+        assert queues["in_progress"] >= 1  # At least bead1
+        assert queues["needs_review"] >= 1  # At least bead2
+
+    def test_status_empty_queues(self, isolated_env):
+        """errands status returns zero counts when no beads exist."""
+        result = run_layton("errands", "status", cwd=isolated_env)
+
+        assert result.returncode == 0
+        data = json.loads(result.stdout)
+        assert data["success"] is True
+        queues = data["data"]["queues"]
+
+        assert queues["scheduled"] == 0
+        assert queues["in_progress"] == 0
+        assert queues["needs_review"] == 0

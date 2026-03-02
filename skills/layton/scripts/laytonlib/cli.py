@@ -141,6 +141,9 @@ def create_parser() -> argparse.ArgumentParser:
     )
     errands_prompt.add_argument("bead_id", help="Bead ID")
 
+    # errands status — queue summary for intake
+    errands_subparsers.add_parser("status", help="Show queue status summary")
+
     return parser
 
 
@@ -403,6 +406,37 @@ def run_protocols(
         return 0
 
 
+def run_errands_status(formatter: OutputFormatter) -> int:
+    """Run errands status command - show queue summary.
+
+    Args:
+        formatter: Output formatter
+
+    Returns:
+        Exit code (0=success)
+    """
+    from laytonlib.errands import (
+        get_beads_in_progress,
+        get_beads_pending_review,
+        get_beads_scheduled,
+    )
+
+    beads_scheduled = get_beads_scheduled()
+    beads_in_progress = get_beads_in_progress()
+    beads_pending_review = get_beads_pending_review()
+
+    data = {
+        "queues": {
+            "scheduled": len(beads_scheduled),
+            "in_progress": len(beads_in_progress),
+            "needs_review": len(beads_pending_review),
+        }
+    }
+
+    formatter.success(data)
+    return 0
+
+
 def _parse_json_vars(json_vars_arg: str | None) -> dict | None:
     """Parse JSON variables from argument or stdin.
 
@@ -620,6 +654,9 @@ def run_errands(
 
         formatter.success({"bead_id": bead_id, "prompt": prompt})
         return 0
+
+    elif command == "status":
+        return run_errands_status(formatter)
 
     else:
         # Default: list errands

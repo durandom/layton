@@ -60,13 +60,7 @@ Before taking ANY action, follow this sequence:
 scripts/layton
 ```
 
-What would you like to do?
-
-1. Get oriented (full status check)
-2. Track something (add to attention list)
-3. Set focus (designate current work item)
-4. Retrospect on protocol (reflect on what worked)
-5. Something else
+Review the orientation data and present options based on what's most relevant to the user's current situation.
 
 **Wait for response before proceeding.**
 </intake>
@@ -81,13 +75,15 @@ The CLI script is at `scripts/layton` **relative to this SKILL.md file** (not th
 **Key commands:**
 
 ```bash
-scripts/layton                            # Full orientation (source of truth)
-scripts/layton doctor                     # Health check
-scripts/layton context                    # Temporal context
-scripts/layton config show|init|get|set   # Configuration management
-scripts/layton rolodex [--discover|add]   # Rolodex card management
-scripts/layton protocols [add]            # Protocol management
-scripts/layton errands [add|schedule|run|prompt]  # Errand management
+scripts/layton                                     # Full orientation (source of truth)
+scripts/layton doctor                              # Health check
+scripts/layton context                             # Temporal context
+scripts/layton config show|init|get|set            # Configuration management
+scripts/layton rolodex [--discover|add]            # Rolodex card management
+scripts/layton protocols [add]                     # Protocol management
+scripts/layton errands                             # List available errand templates
+scripts/layton errands [add|schedule|run|prompt]   # Errand management
+scripts/layton errands status                      # Show queue status (scheduled, in-progress, needs-review counts)
 ```
 
 Run `scripts/layton --help` for full usage details.

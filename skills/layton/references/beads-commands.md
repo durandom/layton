@@ -30,6 +30,9 @@ Output:
 | Current focus | `bd list --label focus --json` |
 | All Layton errands | `bd list --label layton --json` |
 | Ready work | `bd ready --json` |
+| Scheduled errands | `bd list -l scheduled -s open --json` |
+| In-progress errands | `bd list -l in-progress -s open --json` |
+| Needs review | `bd list -l needs-review -s closed --json` |
 
 </querying_errands>
 
@@ -60,9 +63,13 @@ bd close <id> --reason "..." --json
 
 | Label | Purpose |
 | --- | --- |
-| `layton` | Namespace - all Layton-managed errands |
+| `layton` | Namespace - all Layton-managed beads |
 | `watching` | Items user wants tracked |
 | `focus` | Current work item (only one) |
+| `scheduled` | Errand waiting for execution |
+| `in-progress` | Errand currently executing |
+| `needs-review` | Completed errand awaiting human review |
+| `type:<name>` | Errand template type (e.g., `type:code-review`) |
 | `jira`, `github`, etc. | Source system |
 
 </label_conventions>
